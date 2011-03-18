@@ -1,0 +1,52 @@
+#!/usr/bin/env ruby
+
+require 'rubygems'
+require 'thor'
+require 'bundler'
+require 'mccloud'
+
+class MccloudCLI < Thor 
+  
+  desc "init [NAME] [TEMPLATE]", "initializes a box from a template" 
+  method_options :force => :boolean
+  def init(boxname=nil, template=nil)
+    if (boxname.nil?)  
+      puts "please provide a boxname"
+      exit
+    end
+    
+    puts "Init a new box #{boxname}, starting from template #{template}"
+  	Mccloud::Session.define(boxname,template)
+  	
+  end
+
+  desc "templates", "list the template available" 
+  def templates 
+    Mccloud::Session.list_templates
+  end
+  
+  desc "build [NAME]", "build the box defined" 
+  method_options :force => :boolean
+  def build(boxname)
+    puts "Building box #{boxname}"
+	  Mccloud::Session.build(boxname)
+  end
+
+  desc "export [NAME]", "export the box" 
+  method_options :force => :boolean  
+  def export(boxname)
+      if (!boxname.nil?)
+        Mccloud::Session.export_box(boxname)
+      end
+  end
+  
+end
+
+
+
+version=VirtualBox.version
+if (version.match(/^4./))
+   	MccloudCLI.start
+else
+   	puts "veewee only supports VirtualBox 4.x"
+end
