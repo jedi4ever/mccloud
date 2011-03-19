@@ -11,7 +11,7 @@ module Mccloud
 
       desc <<-DESC
       Initialize a mccloud environment 
-      mccloud init
+      mccloud init [AMI-ID]
       DESC
 
       first_argument :ami_id, :required => true, :desc => 'AMI ID'

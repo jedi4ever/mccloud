@@ -5,8 +5,8 @@ Gem::Specification.new do |s|
   s.name        = "mccloud"
   s.version     = Mccloud::VERSION
   s.platform    = Gem::Platform::RUBY
-  s.authors     = ["Patrick Debois", "Ringo De Smet"]
-  s.email       = ["patrick.debois@jedi.be", "ringo.desmet@gmail.com"]
+  s.authors     = ["Patrick Debois"]
+  s.email       = ["patrick.debois@jedi.be"]
   s.homepage    = "http://github.com/jedi4ever/mccloud/"
   s.summary     = %q{Cloud integration vagrant style}
   s.description = %q{Use the same simple commandline api to manage cloud interfaces}
@@ -15,6 +15,8 @@ Gem::Specification.new do |s|
   s.rubyforge_project         = "mccloud"
 
   s.add_dependency "net-ssh", "~> 2.1.0"
+  s.add_dependency "fog"
+  s.add_dependency "templater"
   s.add_dependency "popen4", "~> 0.1.2"
   s.add_dependency "thor", "~> 0.14.6"
   s.add_dependency "highline", "~> 1.6.1"

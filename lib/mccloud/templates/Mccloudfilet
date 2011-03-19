@@ -1,1 +1,9 @@
-ami=<%= ami_id %>
+Mccloud::Config.run do |config|
+  # All Mccloud configuration is done here. For a detailed explanation
+  # and listing of configuration options, please view the documentation
+  # online.
+
+  # Every Mccloud virtual environment requires a ami to build off of.
+  config.vm.ami = "<%= ami_id %>"
+
+end

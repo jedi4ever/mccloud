@@ -4,49 +4,36 @@ require 'rubygems'
 require 'thor'
 require 'bundler'
 require 'mccloud'
+require 'mccloud/generators'
+require 'mccloud/config'
 
 class MccloudCLI < Thor 
   
-  desc "init [NAME] [TEMPLATE]", "initializes a box from a template" 
+  desc "init [AMI-ID]", "initializes a box from a template" 
   method_options :force => :boolean
-  def init(boxname=nil, template=nil)
-    if (boxname.nil?)  
-      puts "please provide a boxname"
-      exit
-    end
-    
-    puts "Init a new box #{boxname}, starting from template #{template}"
-  	Mccloud::Session.define(boxname,template)
-  	
+  def init(amiId=nil)
+	Mccloud::Generators.run_cli Dir.pwd, File.basename(__FILE__), Mccloud::VERSION, ARGV
   end
 
-  desc "templates", "list the template available" 
-  def templates 
-    Mccloud::Session.list_templates
+  desc "templates", "list amis available" 
+  def templates(query=nil)
+    Mccloud::CLI.list_templates(query)
   end
   
-  desc "build [NAME]", "build the box defined" 
+  desc "up", "bring a machine up"
   method_options :force => :boolean
-  def build(boxname)
-    puts "Building box #{boxname}"
-	  Mccloud::Session.build(boxname)
+  def up(boxname=nil)
+	#if File.exist?(path)
+	Kernel.load File.join(Dir.pwd,"Mccloudfile")
+	puts Mccloud::Config.config.ami
   end
 
-  desc "export [NAME]", "export the box" 
+  desc "halt [NAME]", "shutdown the machine"
   method_options :force => :boolean  
-  def export(boxname)
-      if (!boxname.nil?)
-        Mccloud::Session.export_box(boxname)
-      end
+  def halt(boxname)
   end
-  
+
 end
 
+MccloudCLI.start
 
-
-version=VirtualBox.version
-if (version.match(/^4./))
-   	MccloudCLI.start
-else
-   	puts "veewee only supports VirtualBox 4.x"
-end

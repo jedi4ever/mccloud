@@ -1,3 +1,3 @@
 source "http://rubygems.org"
 
-gem "mcloud", :path => "."
+gem "mccloud", :path => "."
