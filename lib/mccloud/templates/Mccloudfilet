@@ -3,7 +3,19 @@ Mccloud::Config.run do |config|
   # and listing of configuration options, please view the documentation
   # online.
 
-  # Every Mccloud virtual environment requires a ami to build off of.
-  config.vm.ami = "<%= ami_id %>"
+  config.mccloud.prefix="mccloud"
 
+  config.vm.define :web do |web_config|
+    web_config.vm.ami = "ami-cef405a7"
+    web_config.vm.provider="AWS"
+    web_config.vm.provider_options={ 
+      #ID = "ami-cef405a7" = x64 Ubuntu 10.10
+      :image_id => 'ami-cef405a7', :flavor_id => 't1.micro',
+      :groups => %w(ec2securitygroup), :key_name => "ec2-keyname",
+      :availability_zone => "us-east-1b" }
+    web_config.vm.forward_port("http", 80, 8080)
+    web_config.vm.user="ubuntu"
+    web_config.vm.bootstrap="ruby-bootstrap.sh"
+    web_config.vm.key="my-ec2-key.pem"
+  end
 end
