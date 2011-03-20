@@ -36,6 +36,8 @@ $ mccloud init
 This will create a Mccloudfile
 
 ### Edit your Mccloud appropriate
+
+<pre>
 Mccloud::Config.run do |config|
   # All Mccloud configuration is done here. For a detailed explanation
   # and listing of configuration options, please view the documentation
@@ -57,6 +59,7 @@ Mccloud::Config.run do |config|
     web_config.vm.key="my-ec2-key.pem"
   end
 end
+</pre>
 
 ### Start your machines
 $ mccloud up web
