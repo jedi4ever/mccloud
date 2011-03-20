@@ -25,10 +25,12 @@ This project tries to combine both:
 ## How it will work/works
 
 ### Create a config file for fog. Note that these are spaces in front and no tabs
-$HOME/.fog
+$ cat $HOME/.fog
+<pre>
 :default:
   :aws_access_key_id: <your id here>
   :aws_secret_access_key: <your acess key here>
+</pre>
 
 ### Create a Mccloud project
 $ mccloud init
