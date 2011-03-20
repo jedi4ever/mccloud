@@ -1,3 +1,7 @@
+## Note:
+- This is a quick copy and paste job(weekend hacking), you should not consider it anything but experimental right now
+- But I wanted the idea already with others
+
 ## Kudos to great stuff
 - [Vagrant](http://www.vagrantup.com) is great for testing machines on your local machines
 - [Fog](https://github.com/geemus/fog) is a great fog library for managing cloud systems
@@ -10,7 +14,6 @@ This project tries to combine both:
 
 ## Some notes before you dive in
 
-- This is a quick copy and paste job(weekend hacking), you should not consider it anything but experimental right now
 - I could probably have integrated with vagrant code but this would have taken me longer to understand vagrant code
 - I didn't want the dependency on virtualbox
 - The machines it creates will have the prefix as defined in the Mccloudfile, so this should not pollute your stuff
