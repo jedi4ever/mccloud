@@ -92,6 +92,7 @@ module Mccloud
             :node_name => config.node_name,
             :provisioning_path => config.provisioning_path,
             :cookbooks_path => cookbooks_path,
+      		:log_level        => :debug,
             :recipe_url => config.recipe_url,
             :roles_path => roles_path,
             })
@@ -113,3 +114,9 @@ module Mccloud
         end
       end #Module Provisioners
     end #Module Mccloud
+
+
+#cookbook_path     "/etc/chef/recipes/cookbooks" 
+#log_level         :info
+#file_store_path  "/etc/chef/recipes/" 
+#file_cache_path  "/etc/chef/recipes/" 
