@@ -1,12 +1,13 @@
+require 'mccloud/util/iterator'
+
 module Mccloud
   module Command
-  def halt(selection=nil)
-    load_config
+  include Mccloud::Util
+  def halt(selection=nil,options=nil)
     on_selected_machines(selection) do |id,vm|
-      server=PROVIDER.servers.get(id)
-      unless server.state == "stopping" || server.state =="stopped"
+       unless vm.instance.state == "stopping" || vm.instance.state =="stopped"
         puts "halting #{id}"
-        server.stop
+        vm.instance.stop
       else
         puts "#{server.state} so not halting #{vm.name} - #{id}"        
       end

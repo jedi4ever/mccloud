@@ -24,7 +24,8 @@ Gem::Specification.new do |s|
   s.add_dependency "highline", "~> 1.6.1"
   s.add_dependency "progressbar"
   s.add_dependency "cucumber", "0.8.5"
-  #s.add_dependency "pty"
+
+  s.add_dependency "net-ssh-multi"
   #s.add_dependency "rspec"
 
   s.add_development_dependency "bundler", ">= 1.0.0"

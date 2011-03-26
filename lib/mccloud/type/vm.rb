@@ -1,3 +1,4 @@
+require 'pp'
 module Mccloud
   module Type
     
@@ -9,17 +10,13 @@ module Mccloud
     attr_accessor :user
     attr_accessor :key
     attr_accessor :bootstrap
-    def define(name)
-      config=Configuration.new
-      yield config
-      config.vm.name=name
-      Mccloud::Config.config.vms[name.to_s]=config.vm
+    #attr_accessor :instance
+    
+    def instance
+      this_instance=Mccloud.session.config.providers[provider].servers.get(Mccloud.session.all_servers[name.to_s])
+      return this_instance
     end
-    def provision(type)
-      provisioner=ChefSolo.new
-      yield provisioner
-      Mccloud::Config.config.chef=provisioner
-    end
+    
     def forward_port(local,remote,host)
     end
   end

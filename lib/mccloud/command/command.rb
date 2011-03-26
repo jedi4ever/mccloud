@@ -1,7 +1,6 @@
 module Mccloud
   module Command
     def command(selection=nil,command="who am i")
-      load_config
       unless options.parallel?
       on_selected_machines(selection) do |id,vm|
         server=PROVIDER.servers.get(id)

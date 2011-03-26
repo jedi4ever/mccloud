@@ -4,7 +4,7 @@ module Mccloud
     load_config
     on_selected_machines(selection) do |id,vm|
       puts "rebooting #{id}"
-      PROVIDER.servers.get(id).reboot
+      vm.instance.reboot
     end
   end
 end

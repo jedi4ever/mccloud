@@ -2,11 +2,24 @@ require 'json'
 require 'logger'
 
 require 'fog'
-PROVIDER=Fog::Compute.new(:provider => 'AWS')
 
+require 'mccloud/config'
+
+require 'mccloud/command/status'
+require 'mccloud/command/up'
+require 'mccloud/command/halt'
+require 'mccloud/command/ssh'
+require 'mccloud/command/boot'
+require 'mccloud/command/bootstrap'
+require 'mccloud/command/reload'
+require 'mccloud/command/multi'
+require 'mccloud/command/init'
+require 'mccloud/command/suspend'
+require 'mccloud/command/destroy'
 
 module Mccloud
   
+  # We need some global thing for the config file to find our session
   def self.session=(value)
     @session=value
   end
@@ -17,6 +30,9 @@ module Mccloud
   class Session
     attr_accessor :config
     attr_accessor :logger
+    attr_accessor :all_servers
+    
+    include Mccloud::Command
     
     def initialize(options=nil)
       @logger = Logger.new(STDOUT)
@@ -28,6 +44,7 @@ module Mccloud
       #logger.formatter = proc { |severity, datetime, progname, msg|
       #   "#{datetime} - #{severity}: #{msg}\n"
       # }
+      @session=self
       Mccloud.session=self
     end
     
@@ -64,39 +81,72 @@ module Mccloud
         
       end
       
+      #Loading providers
+      Mccloud.session.config.vms.each do |name,vm|
+        @logger.debug "adding provider #{vm.provider}"
+        @session.config.providers[vm.provider]=Fog::Compute.new(:provider => vm.provider)
+      end
+            
       invalid_cache=false
-      Mccloud::Config.config.vms.each do |definedvm|
-        vm=definedvm[1]
-        name=vm.name.to_s
-        prefix=Mccloud::Config.config.mccloud.prefix
-        id=@all_servers["#{prefix} - #{name}"]
+      @session.config.vms.each do |name,vm|
+        prefix=@session.config.mccloud.prefix
+        id=@all_servers["#{name.to_s}"]
+        
         #Check if not destroyed or something else
-        server=PROVIDER.servers.get(id)
-        if server.nil?
+        
+        instance=vm.instance
+        if instance.nil?
+          @logger.error "Cache is invalid"
           invalid_cache=true
         else  
-          if server.state == "shutting-down" || server.state == "terminated"
-            @logger.info "parsing .mccloud json" "rebuilding cache"
+          if instance.state == "shutting-down" || instance.state == "terminated"
+            @logger.info "parsing .mccloud json" 
+            @logger.info "rebuilding cache"
             invalid_cache=true
           end
         end
       end
       
-      
+      #
       if (invalid_cache)
         #Resetting the list
         @all_servers=Hash.new
-        PROVIDER.servers.each do |server|
-          if !(server.state == "terminated")
-            @all_servers[server.tags["Name"]]=server.id	
-          else
-            @logger.debug "ignoring #{server.id} is terminated"
+
+        servers_by_provider=Hash.new
+      
+        # Find all providers
+        @session.config.providers.each do |name,provider|
+          server_list=Hash.new
+          provider.servers.each do |server|
+
+            if !(server.state == "terminated")
+                server_list[server.tags["Name"]]=server.id	
+            end
+          end
+          servers_by_provider[name]=server_list
+        end
+        prefix=@session.config.mccloud.prefix
+        
+        @session.config.vms.each do |name,vm|
+          id=servers_by_provider[vm.provider]["#{prefix} - #{name.to_s}"]
+        
+
+          if !id.nil?
+            @all_servers[name]=id
+            #@session.config.vms[name].instance=@session.config.providers[vm.provider].servers.get(id)
           end
         end
+        
           dotmccloud=File.new(".mccloud","w")
           dotmccloud.puts(@all_servers.to_json)
           dotmccloud.close
+          
+       
       end
     end
+
+
+
+
   end
 end

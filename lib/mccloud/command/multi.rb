@@ -4,18 +4,17 @@ module Mccloud
   module Command
     #http://stackoverflow.com/questions/1383282/netsshmulti-using-the-session-exec-how-do-you-get-the-output-straight-away
     #https://gist.github.com/700730
-    def multi(selection=nil,command="who am i")
-      load_config
+    def multi(selection=nil,command="who am i",options=nil)
       trap("INT") { puts "we hit CTRL_C"; exit }
       
       Net::SSH::Multi.start do |session|
          # Connect to remote machines
          ip2name=Hash.new
          on_selected_machines(selection) do |id,vm|
-           server=PROVIDER.servers.get(id)
-           if server.state == "running"
-             ip2name[server.public_ip_address]=vm.name
-             session.use "#{server.public_ip_address}", { :user => vm.user , :keys => [ vm.key ], :paranoid => false, :keys_only => true}
+           instance=vm.instance
+           if instance.state == "running"
+             ip2name[instance.public_ip_address]=vm.name
+             session.use "#{instance.public_ip_address}", { :user => vm.user , :keys => [ vm.key ], :paranoid => false, :keys_only => true}
            end
          end
 

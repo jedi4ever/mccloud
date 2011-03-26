@@ -1,22 +1,19 @@
+require 'pp'
 module Mccloud
   module Util
-    def on_selected_machines(selection)
+    def on_selected_machines(selection=nil)
       if selection.nil? || selection == "all"
         puts "no selection - all machines"
-        Mccloud::Config.config.vms.each do |definedvm|
-          vm=definedvm[1]
-          name=definedvm[0]
-          prefix=Mccloud::Config.config.mccloud.prefix
-          id=all_servers["#{prefix} - #{name}"]
-          vm=Mccloud::Config.config.vms[name]
+        @session.config.vms.each do |name,vm|
+          id=@all_servers["#{name}"]
+          vm=@session.config.vms[name]
           yield id,vm
 
         end
       else
         name=selection
-        prefix=Mccloud::Config.config.mccloud.prefix
-        id=all_servers["#{prefix} - #{name}"]
-        vm=Mccloud::Config.config.vms[name]
+        id=@all_servers["#{name}"]
+        vm=@session.config.vms[name]
         yield id,vm
       end
     end

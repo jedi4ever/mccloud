@@ -4,265 +4,108 @@ require 'rubygems'
 require 'thor'
 require 'bundler'
 require 'mccloud'
-require 'mccloud/generators'
-require 'mccloud/config'
-require 'mccloud/ssh'
-require 'mccloud/rsync'
-require 'mccloud/util/platform'
-require 'fog'
-require 'pp'
-require 'net/scp'
 
-PROVIDER=Fog::Compute.new(:provider => 'AWS')
+require 'mccloud/session'
 
 class MccloudCLI < Thor 
 
   attr_accessor :all_servers
   no_tasks do
-    def load_config
-      #if File.exist?(path)
-      Kernel.load File.join(Dir.pwd,"Mccloudfile")
-      @all_servers=Hash.new
-      PROVIDER.servers.each do |server|
-        if !(server.state == "terminated")
-          @all_servers[server.tags["Name"]]=server.id	
-        else
-          #puts "ignoring #{server.id} is terminated"
-        end
-
-      end
+    def create_session
+      @session=Mccloud::Session.new
+      @session.load_config
     end
-    def on_selected_machines(selection)
-      if selection.nil?
-        puts "no selection - all machines"
-        Mccloud::Config.config.vms.each do |definedvm|
-          vm=definedvm[1]
-          name=definedvm[0]
-          prefix=Mccloud::Config.config.mccloud.prefix
-          id=all_servers["#{prefix} - #{name}"]
-          vm=Mccloud::Config.config.vms[name]
-          yield id,vm
 
-        end
-      else
-        name=selection
-        prefix=Mccloud::Config.config.mccloud.prefix
-        id=all_servers["#{prefix} - #{name}"]
-            vm=Mccloud::Config.config.vms[name]
-            yield id,vm
-      end
-    end
   end
 
   desc "init [AMI-ID]", "initializes a box from a template" 
   method_options :force => :boolean
   def init(amiId=nil)
-    load_config
-    Mccloud::Generators.run_cli Dir.pwd, File.basename(__FILE__), Mccloud::VERSION, ARGV
-  end
-
-  desc "templates", "list amis available" 
-  def templates(query=nil)
-    load_config
-    Mccloud::CLI.list_templates(query)
   end
 
   desc "up", "bring a machine up"
   method_options :force => :boolean
   def up(selection=nil)
-    load_config
-      on_selected_machines(selection) do |id,vm|
-        if (id.nil?)
-          puts "#{vm.name} doesn't yet exist"
-          provider_options=vm.provider_options
-          boxname=vm.name
-          puts "spinning up a new machine called #{boxname}"
-          server= PROVIDER.servers.create(provider_options)
-          puts "waiting for it the machine to become accessible"
-          server.wait_for { ready?}
-          prefix=Mccloud::Config.config.mccloud.prefix
-
-          PROVIDER.create_tags(server.id, { "Name" => "#{prefix} - #{boxname}"})       
-        else 
-          state=PROVIDER.servers.get(id).state
-          if state =="stopped"
-            puts "machine was stopped -> starting it again"
-            PROVIDER.servers.get(id).start
-          else
-            puts "Machine #{selection} already exists but is in state #{state} "
-          end
-        end
-      end
-      
-      #server.boostrap(:image_id => 'ami', :private_key_path => '', :public_key_path => '')
-
+    create_session
+    @session.up(selection)
+  end
+  
+  desc "status", "show a status of all machines that are configured"
+  method_options :verbose => false
+  def status(selection=nil)
+    create_session
+    @session.status(selection,options)
   end
 
+  desc "halt [NAME]", "shutdown the machine"
+  method_options :force => :boolean  
+  def halt(selection=nil)
+    create_session
+     @session.halt(selection,options)
+  end
+  
+  desc "ssh [NAME]", "spawns an ssh to the machine"
+   method_options :screen => :boolean  
+   def ssh(selection=nil,command=nil)
+    create_session
+    @session.ssh(selection,command,options)
+   end
+   
   desc "suspend", "freeze"
   method_options :force => :boolean
   def suspend(selection=nil)
-    load_config
-    on_selected_machines(selection) do |id,vm|
-      puts "halting #{id}"
-      PROVIDER.servers.get(id).stop
-    end
+    create_session
+    @session.suspend(selection,options)
   end
 
   desc "boot", "freeze"
   method_options :force => :boolean
   def boot(selection=nil)
-    load_config
-    on_selected_machines(selection) do |id,vm|
-      puts "starting #{id}"
-      PROVIDER.servers.get(id).start
-    end
-  end
-
-
-  desc "halt [NAME]", "shutdown the machine"
-  method_options :force => :boolean  
-  def halt(selection=nil)
-    load_config
-    on_selected_machines(selection) do |id,vm|
-      server=PROVIDER.servers.get(id)
-      unless server.state == "stopping" || server.state =="stopped"
-        puts "halting #{id}"
-        server.stop
-      else
-        puts "#{server.state} so not halting #{vm.name} - #{id}"        
-      end
-    end
+    create_session
+    @session.boot(selection,options)
   end
 
   desc "destroy [NAME]", "destroys the machine"
   method_options :force => :boolean  
   def destroy(selection=nil)
-    load_config
-    on_selected_machines(selection) do |id,vm|
-      server=PROVIDER.servers.get(id)
-      unless server.state == "shutting-down" || server.state =="destroyed"
-        puts "destroying #{id}"
-        server.destroy
-      else
-        puts "#{server.state} so not destroying #{vm.name} - #{id}"        
-      end
-    end
+    create_session
+    @session.destroy(selection,options)
   end
 
   desc "reload [NAME]", "reloads the machine"
   method_options :force => :boolean  
   def reload(selection=nil?)
-    load_config
-    on_selected_machines(selection) do |id,vm|
-      puts "rebooting #{id}"
-      PROVIDER.servers.get(id).reboot
-    end
+    create_session
+    @session.reload(selection,options)
   end
 
-  desc "ssh [NAME]", "spawns an ssh to the machine"
-  method_options :force => :boolean  
-  def ssh(selection=nil)
-    load_config
-    if selection.nil?
-      Mccloud::Config.config.vms
-      selection=Mccloud::Config.config.vms.first[0]
-    end
-    name=selection
-    prefix=Mccloud::Config.config.mccloud.prefix
-    id=all_servers["#{prefix} - #{name}"]
-
-    instance=PROVIDER.servers.get(id)
-    vm=Mccloud::Config.config.vms[name]
-
-    #https://github.com/mitchellh/vagrant/blob/master/lib/vagrant/ssh.rb
-    options={ :port => 22, :private_key_path => vm.key, 
-      :username => vm.user , :host => instance.public_ip_address }
-      # Command line options
-      command_options = ["-p #{options[:port]}", "-o UserKnownHostsFile=/dev/null",
-      "-o StrictHostKeyChecking=no", "-o IdentitiesOnly=yes",
-      "-i #{options[:private_key_path]}"]
-      # Some hackery going on here. On Mac OS X Leopard (10.5), exec fails
-      # (GH-51). As a workaround, we fork and wait. On all other platforms,
-      # we simply exec.
-      pid = nil
-      pid = fork if Mccloud::Util::Platform.leopard? || Mccloud::Util::Platform.tiger?
-      Kernel.exec "ssh #{command_options.join(" ")} #{options[:username]}@#{options[:host]}".strip if pid.nil?
-      Process.wait(pid) if pid
-    end
-
-    desc "command [NAME] [COMMAND]", "exec a command on a box"
-    def command(selection,command="who am i")
-      load_config
-      on_selected_machines(selection) do |id,vm|
-        server=PROVIDER.servers.get(id)
-        server.private_key_path=vm.key
-        server.username = vm.user
-        result=server.ssh(command)
-        puts result[0].stdout
-      end
-    end
-
-    desc "bootstrap [NAME]", "exec a command on a box"
-    def bootstrap(selection,command="who am i")
-      load_config
-      on_selected_machines(selection) do |id,vm|
-        server=PROVIDER.servers.get(id)
-        server.private_key_path=vm.key
-        server.username = vm.user
-        server.scp(vm.bootstrap,"/tmp/bootstrap.sh")
-        result=server.ssh("chmod +x /tmp/bootstrap.sh")
-        instance=PROVIDER.servers.get(id)
-        options={ :port => 22, :keys => [ vm.key ], :paranoid => false, :keys_only => true}
-        Mccloud::Ssh.execute(instance.public_ip_address,vm.user,options,"sudo /tmp/bootstrap.sh")
-      end
-    end
-
-
-    desc "status", "status"
-    method_options :force => :boolean  
-    def status
-      load_config
-      Kernel.load File.join(Dir.pwd,"Mccloudfile")
-      printf "%-40s %-41s %-12s %-20s %-10s\n", "Name", "Public Name", "Instance Id", "IP", "Type"
-      159.times { |i| printf "=" } ; puts
-      PROVIDER.servers.each do |vm|
-        printf "%-40s %-41s %-12s %-20s %-10s %-10s\n", vm.tags["Name"].strip, vm.dns_name,vm.id, vm.public_ip_address, vm.flavor.name,vm.state
-      end
-    end
-
-    desc "provision ", "provision the machine"
-    def provision(selection=nil?)
-      load_config
-      pp Mccloud::Config.config
-      on_selected_machines(selection) do |id,vm|
-        instance=PROVIDER.servers.get(id)
-        instance.private_key_path=vm.key
-        instance.username = vm.user
-        json=Mccloud::Config.config.chef.setup_json
-        cooks=Array.new
-        Mccloud::Config.config.chef.cookbooks_path.each do |cook|
-          cooks << File.join("/tmp/"+File.basename(cook))
-        end
-        cookpath="cookbook_path [\""+cooks.join("\",\"")+"\"]"
-        configfile=['file_cache_path "/var/chef-solo"',cookpath]
-        instance.scp(StringIO.new(json),"/tmp/dna.json")
-        instance.scp(StringIO.new(configfile.join("\n")),"/tmp/solo.rb")
-
-        Mccloud::Config.config.chef.cookbooks_path.each do |path|
-          Mccloud::Rsync.share(path,vm,instance)
-        end
-        puts "Running chef-solo"
-        options={ :port => 22, :keys => [ vm.key ], :paranoid => false, :keys_only => true}
-        Mccloud::Ssh.execute(instance.public_ip_address,vm.user,options,"sudo chef-solo -c /tmp/solo.rb -j /tmp/dna.json")
-      end
-      ##on_selected_machines(selection) do |id,vm|
-      #instance=PROVIDER.servers.get(id)
-      #options={ :port => 22, :keys => [ vm.key ], :paranoid => false, :keys_only => true}
-      #Mccloud::Ssh.execute(instance.public_ip_address,vm.user,options,"who am i")
-      #end
-    end
-
+  desc "command [NAME] [COMMAND]", "exec a command on a box"
+  method_options :parallel => :boolean
+  def command(selection=nil,command="who am i")
+    create_session
+    @session.command(selection,command,options)
   end
 
-  MccloudCLI.start
+  desc "bootstrap [NAME]", "exec a command on a box"
+  method_options :sudo => :boolean      
+  def bootstrap(selection=nil,script="who am i")
+    create_session
+    @session.bootstrap(selection,script,options)
+  end
 
+  desc "multi","multi"
+  method_options :verbose => :boolean  
+  def multi(selection=nil,command="who am i")
+    create_session
+    @session.multi(selection,command,options)
+  end  
+
+  desc "provision", "provision the machine"
+  def provision(selection=nil)
+    create_session
+    @session.provision(selection,command,options)
+  end
+
+end
+
+MccloudCLI.start

@@ -1,27 +1,30 @@
 require 'pp'
+require 'mccloud/util/iterator'
+
 module Mccloud
   module Command
-    def self.up(selection)
+    include Mccloud::Util
+    def up(selection)
     
-    pp Mccloud.session.config
-    exit
     on_selected_machines(selection) do |id,vm|
+
+      provider=@session.config.providers[vm.provider]
       if (id.nil?)
         puts "#{vm.name} doesn't yet exist"
         provider_options=vm.provider_options
         boxname=vm.name
         puts "spinning up a new machine called #{boxname}"
-        server= PROVIDER.servers.create(provider_options)
+        instance=provider.servers.create(provider_options)
         puts "waiting for it the machine to become accessible"
-        server.wait_for { ready?}
-        prefix=Mccloud::Config.config.mccloud.prefix
+        instance.wait_for { ready?}
+        prefix=@session.config.mccloud.prefix
 
-        PROVIDER.create_tags(server.id, { "Name" => "#{prefix} - #{boxname}"})       
+        provider.create_tags(instance.id, { "Name" => "#{prefix} - #{boxname}"})       
       else 
-        state=PROVIDER.servers.get(id).state
+        state=vm.instance.state
         if state =="stopped"
           puts "machine was stopped -> starting it again"
-          PROVIDER.servers.get(id).start
+          vm.instance.start
         else
           puts "Machine #{selection} already exists but is in state #{state} "
         end

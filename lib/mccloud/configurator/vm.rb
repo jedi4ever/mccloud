@@ -19,10 +19,10 @@ module Mccloud
     
     def initialize()
       @chef=Mccloud::Provisioner::ChefSolo.new
-      @vm=Mccloud::Type::Vm.new	
-    end
+     end
     
     def define(name)
+      @vm=Mccloud::Type::Vm.new	
       vmconfig=self
       yield vmconfig
       @vm.name=name
