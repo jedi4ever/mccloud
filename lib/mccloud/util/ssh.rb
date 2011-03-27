@@ -1,5 +1,5 @@
 module Mccloud
-  class Ssh
+  module Util
 
     def self.when_ssh_login_works(ip="localhost", options = {  } , &block)
 
@@ -78,7 +78,7 @@ module Mccloud
       return false
     end
 
-    def self.execute(host ,user , options = { :progress => "on" } ,command=nil ,exitcode=0)
+    def self.ssh(host ,user , options = { :progress => "on" } ,command=nil ,exitcode=0)
       
       defaults= { :port => "22",  :user => "root", :paranoid => false }
       options=defaults.merge(options)

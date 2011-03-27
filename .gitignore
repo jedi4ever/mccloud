@@ -1,2 +1,5 @@
 Mccloudfile
 .mccloud
+*.pp
+puppet/*
+chef/*

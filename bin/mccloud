@@ -103,9 +103,14 @@ class MccloudCLI < Thor
   desc "provision", "provision the machine"
   def provision(selection=nil)
     create_session
-    @session.provision(selection,command,options)
+    @session.provision(selection,options)
   end
 
+  desc "server", "runs a server+ forwards"
+  def server(selection=nil)
+    create_session
+    @session.server(selection,options)
+  end
 end
 
 MccloudCLI.start

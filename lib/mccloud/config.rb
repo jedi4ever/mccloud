@@ -7,6 +7,7 @@ module Mccloud
   class Configuration
     attr_accessor :vms
     attr_accessor :providers
+    attr_accessor :provisioners
     
     attr_accessor :mccloud
     attr_accessor :vm
@@ -17,6 +18,7 @@ module Mccloud
       @providers=Hash.new
       @vm=Mccloud::Configurator::VmConfigurator.new
       @mccloud=Mccloud::Configurator::MccloudConfigurator.new	
+      @provisioners=Hash.new
     end
   end
   

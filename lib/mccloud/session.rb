@@ -16,6 +16,8 @@ require 'mccloud/command/multi'
 require 'mccloud/command/init'
 require 'mccloud/command/suspend'
 require 'mccloud/command/destroy'
+require 'mccloud/command/provision'
+require 'mccloud/command/server'
 
 module Mccloud
   

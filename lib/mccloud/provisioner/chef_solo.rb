@@ -1,3 +1,5 @@
+require 'mccloud/util/rsync'
+require 'mccloud/util/ssh'
 module Mccloud
   module Provisioner
     class ChefSolo
@@ -19,6 +21,31 @@ module Mccloud
       def initialize
         @provisioning_path="/tmp/mccloud-chef"
         @json={ :instance_role => "mccloud"}
+      end
+      
+      def run(vm)
+        puts "we ran mylord"
+        json=@json.to_json
+        puts json
+        cooks=Array.new
+        @cookbooks_path.each do |cook|
+          cooks << File.join("/tmp/"+File.basename(cook))
+        end
+        cookpath="cookbook_path [\""+cooks.join("\",\"")+"\"]"
+        loglevel="loglevel :debug"
+        configfile=['file_cache_path "/var/chef-solo"',cookpath,loglevel]
+        vm.instance.scp(StringIO.new(json),"/tmp/dna.json")
+        vm.instance.scp(StringIO.new(configfile.join("\n")),"/tmp/solo.rb")
+
+        # Share the cookbooks
+        cookbooks_path.each do |path|
+          Mccloud::Util.rsync(path,vm,vm.instance)
+        end
+        
+        puts "Running chef-solo"
+        options={ :port => 22, :keys => [ vm.key ], :paranoid => false, :keys_only => true}
+        Mccloud::Util.ssh(vm.instance.public_ip_address,vm.user,options,"sudo chef-solo -c /tmp/solo.rb -j /tmp/dna.json -l debug")
+        
       end
       # Returns the run list for the provisioning
       def run_list
