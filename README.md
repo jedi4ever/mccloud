@@ -1,6 +1,9 @@
 ## Note:
 - This is a quick copy and paste job(weekend hacking), you should not consider it anything but experimental right now
-- But I wanted the idea already with others
+- But I wanted to share the idea already with others
+
+## DISCLAIMER:
+this is alpha sofware . Don't trust it:) And don't complain if it removes all your EC instances at once....
 
 ## Kudos to great stuff
 - [Vagrant](http://www.vagrantup.com) is great for testing machines on your local machines
@@ -21,9 +24,7 @@ This project tries to combine both:
 ## Todo:
 
 - provision to other providers than ec2
-- Shared folders will become rsync-ed directories
 - try to stay fully compatible with Vagrantfile
-- manage cloud providers better
 
 ## How it will work/works
 
