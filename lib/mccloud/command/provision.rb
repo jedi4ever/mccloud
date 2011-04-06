@@ -6,7 +6,7 @@ module Mccloud
     def provision(selection=nil,options=nil)
       on_selected_machines(selection) do |id,vm|
         instance=vm.instance
-        instance.private_key_path=vm.key
+        instance.private_key_path=vm.private_key
         instance.username = vm.user
   
         #p vm.provisioner

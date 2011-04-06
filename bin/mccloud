@@ -18,9 +18,10 @@ class MccloudCLI < Thor
 
   end
 
-  desc "init [AMI-ID]", "initializes a box from a template" 
+  desc "init", "creates a Mccloud Config File" 
   method_options :force => :boolean
   def init(amiId=nil)
+    Mccloud::Command.init(amiId,options)
   end
 
   desc "up", "bring a machine up"

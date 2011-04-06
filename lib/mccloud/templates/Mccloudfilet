@@ -24,7 +24,7 @@ Mccloud::Config.run do |config|
     web_config.vm.forward_port("http", 80, 8080)
     web_config.vm.user="ubuntu"
     web_config.vm.bootstrap="ruby-bootstrap.sh"
-    web_config.vm.key="my-ec2-key.pem"
+    web_config.vm.private_key="my-ec2-key.pem"
   end
 
   ### Provisioners

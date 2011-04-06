@@ -8,7 +8,8 @@ module Mccloud
     attr_accessor :provider_options
     attr_accessor :name
     attr_accessor :user
-    attr_accessor :key
+    attr_accessor :private_key
+    attr_accessor :public_key
     attr_accessor :bootstrap
     attr_accessor :provisioner
     attr_accessor :forwardings

@@ -14,7 +14,7 @@ module Mccloud
            instance=vm.instance
            if instance.state == "running"
              ip2name[instance.public_ip_address]=vm.name
-             session.use "#{instance.public_ip_address}", { :user => vm.user , :keys => [ vm.key ], :paranoid => false, :keys_only => true}
+             session.use "#{instance.public_ip_address}", { :user => vm.user , :keys => [ vm.private_key ], :paranoid => false, :keys_only => true}
            end
          end
 

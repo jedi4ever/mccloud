@@ -14,7 +14,15 @@ module Mccloud
           provider_options=vm.provider_options
           boxname=vm.name
           puts "Spinning up a new machine called #{boxname}"
-          instance=provider.servers.create(provider_options)
+          
+          provider_options=provider_options.merge({ :private_key_path => vm.private_key , :public_key_path => vm.public_key, :username => vm.user})
+          
+          #pp provider_options 
+          instance=provider.servers.bootstrap(provider_options)
+
+          #instance=provider.servers.create(provider_options)
+          #instance=provider.servers.create(provider_options)
+          
           puts "Waiting for it the machine to become accessible"
           instance.wait_for { printf "."; STDOUT.flush;  ready?}
           puts
@@ -54,7 +62,6 @@ module Mccloud
 
       @session.provision(selection,options)       
 
-      #server.boostrap(:image_id => 'ami', :private_key_path => '', :public_key_path => '')
     end
  
  

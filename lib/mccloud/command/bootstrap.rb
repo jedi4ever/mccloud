@@ -6,7 +6,7 @@ module Mccloud
       on_selected_machines(selection) do |id,vm|
         puts "bootstrap #{selection} "
         server=vm.instance
-        server.private_key_path=vm.key
+        server.private_key_path=vm.private_key
         server.username = vm.user
         if server.state == "running"
           puts "Uploading bootstrap code to machine #{vm.name}"

@@ -23,7 +23,7 @@ module Mccloud
     end
 
     #https://github.com/mitchellh/vagrant/blob/master/lib/vagrant/ssh.rb
-    options={ :port => 22, :private_key_path => vm.key, 
+    options={ :port => 22, :private_key_path => vm.private_key, 
       :username => vm.user , :host => vm.instance.public_ip_address }
       # Command line options
       command_options = ["-p #{options[:port]}", "-o UserKnownHostsFile=/dev/null",

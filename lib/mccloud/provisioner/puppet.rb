@@ -30,7 +30,7 @@ module Mccloud
         vm.instance.scp(@manifest_file,"#{@pp_path}/manifest.pp")      
         
         puts "Running puppet"
-        options={ :port => 22, :keys => [ vm.key ], :paranoid => false, :keys_only => true}
+        options={ :port => 22, :keys => [ vm.private_key ], :paranoid => false, :keys_only => true}
         Mccloud::Util.ssh(vm.instance.public_ip_address,vm.user,options,"sudo puppet #{@pp_path}/manifest.pp")
         
       end

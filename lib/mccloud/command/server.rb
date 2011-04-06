@@ -11,7 +11,7 @@ module Mccloud
           public_ip_address=vm.instance.public_ip_address
           private_ip_address=vm.instance.private_ip_address
           unless public_ip_address.nil? || private_ip_address.nil?
-            ssh_options={ :keys => [ vm.key ], :paranoid => false, :keys_only => true}
+            ssh_options={ :keys => [ vm.private_key ], :paranoid => false, :keys_only => true}
             Net::SSH.start(public_ip_address, vm.user, ssh_options) do |ssh|
               vm.forwardings.each do |forwarding|
                 puts "forwarding port #{forwarding.remote} from #{vm.name} to local port #{forwarding.local}"

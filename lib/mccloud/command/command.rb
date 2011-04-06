@@ -4,7 +4,7 @@ module Mccloud
       unless options.parallel?
       on_selected_machines(selection) do |id,vm|
         server=PROVIDER.servers.get(id)
-        server.private_key_path=vm.key
+        server.private_key_path=vm.private_key
         server.username = vm.user
           if server.state == "running"
             result=server.ssh(command)
