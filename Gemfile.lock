@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    mccloud (0.0.1)
+    mccloud (0.0.2)
       cucumber (= 0.8.5)
       fog
       highline (~> 1.6.1)
