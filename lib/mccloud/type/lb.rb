@@ -2,21 +2,16 @@ require 'mccloud/type/forwarding'
 module Mccloud
   module Type
     
-  class Vm
-    attr_accessor :ami
+  class Lb
     attr_accessor :provider
     attr_accessor :provider_options
     attr_accessor :name
-    attr_accessor :user
-    attr_accessor :key
-    attr_accessor :bootstrap
-    attr_accessor :provisioner
-    attr_accessor :forwardings
+    
+    attr_accessor :members
     
     attr_accessor :instance
     
     def initialize
-      @forwardings=Array.new
     end
     
     def instance
@@ -33,13 +28,6 @@ module Mccloud
       return @this_instance
     end
     
-    def reload
-      @this_instance=nil
-    end
-    def forward_port(name,local,remote)
-      forwarding=Forwarding.new(name,local,remote)
-      forwardings << forwarding
-    end
   end
   
 end

@@ -1,15 +1,23 @@
+require 'pp'
 module Mccloud
   module Command
     def bootstrap(selection=nil,command="who am i",options=nil)
+      
       on_selected_machines(selection) do |id,vm|
+        puts "bootstrap #{selection} "
         server=vm.instance
         server.private_key_path=vm.key
         server.username = vm.user
         if server.state == "running"
-          puts "uploading bootstrap code to machine #{vm.name}"
-          server.scp(vm.bootstrap,"/tmp/bootstrap.sh")
-          puts "enabling the bootstrap code to run"
-          result=server.ssh("chmod +x /tmp/bootstrap.sh")
+          puts "Uploading bootstrap code to machine #{vm.name}"
+          unless !File.exists?(vm.bootstrap)
+            server.scp(vm.bootstrap,"/tmp/bootstrap.sh")
+            puts "Enabling the bootstrap code to run"
+            result=server.ssh("chmod +x /tmp/bootstrap.sh")
+          else
+            puts "Error: bootstrap file #{vm.bootstrap} does not exist"
+            exit -1
+          end
         else
           puts "server is not running, so bootstrapping will do no good"
         end

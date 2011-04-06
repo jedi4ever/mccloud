@@ -8,8 +8,10 @@ module Mccloud
        unless vm.instance.state == "stopping" || vm.instance.state =="stopped"
         puts "halting #{id}"
         vm.instance.stop
+        vm.instance.wait_for { printf "."; STDOUT.flush; state=="stopped"}
+        puts 
       else
-        puts "#{server.state} so not halting #{vm.name} - #{id}"        
+        puts "#{vm.name} has state: #{server.state} so we're not halting #{vm.name} - #{id}"        
       end
     end
   end

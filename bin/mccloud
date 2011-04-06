@@ -27,7 +27,7 @@ class MccloudCLI < Thor
   method_options :force => :boolean
   def up(selection=nil)
     create_session
-    @session.up(selection)
+    @session.up(selection,options)
   end
   
   desc "status", "show a status of all machines that are configured"

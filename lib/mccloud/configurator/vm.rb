@@ -7,19 +7,10 @@ module Mccloud
   module Configurator
     
   class VmConfigurator
-#    attr_accessor :ami
-#    attr_accessor :provider
-#    attr_accessor :provider_options
-#    attr_accessor :name
-#    attr_accessor :user
-#    attr_accessor :key
-#    attr_accessor :bootstrap
 
-#    attr_accessor :chef
     attr_accessor :vm
     
     def initialize()
-#      @chef=Mccloud::Provisioner::ChefSolo.new
      end
     
     def define(name)
@@ -39,11 +30,7 @@ module Mccloud
       end
       yield @provisioner
       Mccloud.session.config.provisioners[type.to_s]=@provisioner
-#      Mccloud.session.config.chef=provisioner
     end
-#    def forward_port(local,remote,host)
-#      @vm.forward_port(local,remote,host)
-#    end
   end
   
 end

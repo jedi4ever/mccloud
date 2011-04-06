@@ -61,7 +61,7 @@ module Mccloud
           connected=false
           while !connected do
             begin
-              puts "trying connection"
+              #puts "trying connection"
               s = TCPSocket.new(ip, options[:port])
               s.close
               block.call(ip);
