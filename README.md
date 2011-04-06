@@ -43,30 +43,55 @@ This will create a Mccloudfile
 ### Edit your Mccloud appropriate
 
 <pre>
-Mccloud::Config.run do |config|
-  # All Mccloud configuration is done here. For a detailed explanation
-  # and listing of configuration options, please view the documentation
-  # online.
+	Mccloud::Config.run do |config|
+	  # All Mccloud configuration is done here. For a detailed explanation
+	  # and listing of configuration options, please view the documentation
+	  # online.
 
-  config.mccloud.prefix="mccloud"
+	  config.mccloud.prefix="mccloud"
 
-  config.vm.define :web do |web_config|
-    web_config.vm.ami = "ami-cef405a7"
-    web_config.vm.provider="AWS"
-    web_config.vm.provider_options={
-      #ID = "ami-cef405a7" = x64 Ubuntu 10.10
-      :image_id => 'ami-cef405a7', :flavor_id => 't1.micro',
-      :groups => %w(yoursecuritygroup), :key_name => "ec2-keyname",
-      :availability_zone => "us-east-1b" }
-    web_config.vm.forward_port("http", 80, 8080)
-    web_config.vm.user="ubuntu"
-    web_config.vm.bootstrap="ruby-bootstrap.sh"
-    web_config.vm.key="my-ec2-key.pem"
-  end
-end
+	  config.vm.define :web do |web_config|
+	    web_config.vm.ami = "ami-cef405a7"
+	    web_config.vm.provider="AWS"
+
+	    #web_config.vm.provisioner=:chef_solo
+	    #web_config.vm.provisioner=:puppet
+
+	    web_config.vm.provider_options={ 
+	      # ID = "ami-cef405a7" = x64 Ubuntu 10.10
+	      :image_id => 'ami-cef405a7', 
+	      # Flavors
+	      :flavor_id => 't1.micro',
+	      #:flavor_id => 'm1.large',
+	      :groups => %w(ec2securitygroup), :key_name => "ec2-keyname",
+	      :availability_zone => "us-east-1b" 
+	    }
+	    web_config.vm.forward_port("http", 80, 8080)
+	    web_config.vm.user="ubuntu"
+	    web_config.vm.bootstrap="ruby-bootstrap.sh"
+	    web_config.vm.key="my-ec2-key.pem"
+	  end
+
+	  ### Provisioners
+	  config.vm.provision :puppet do |puppet|
+	    puppet.pp_path = "/tmp/vagrant-puppet"
+	    #puppet.manifests_path = "puppet/manifests"
+	    #puppet.module_path = "puppet/modules"
+	    puppet.manifest_file = "newbox.pp"
+	  end
+
+	  config.vm.provision :chef_solo do |chef|
+	     chef.cookbooks_path = ["<your cookboopath>"]
+	     chef.add_recipe("<some recipe>")
+	     # You may also specify custom JSON attributes:
+	     chef.json.merge!({})
+	  end
+	end
+
 </pre>
 
 ### Start your machines
+# If the machine does not yet exist, it will also run bootstrap
 $ mccloud up web
 
 ### Check the status
@@ -85,10 +110,13 @@ $ mccloud command web "who am i"
 $ mccloud halt web
 
 ### Start the machine again
-$ mccloud start web
+$ mccloud up web
 
 ### Provision the machine
-Well , this has not been implemented.
+$ mccloud provision web
+
+### Port forwarding server
+$ mccloud server
 
 ### Destroy the machine again
 $ mccloud destroy web
