@@ -14,8 +14,9 @@ module Mccloud
         if provisioner.nil?
           # We take the first provisioner defined
           #provisioner=@session.config.provisioners.first[1]
+        else
+          provisioner.run(vm)
         end
-        provisioner.run(vm)
       end
       ##on_selected_machines(selection) do |id,vm|
       #instance=PROVIDER.servers.get(id)

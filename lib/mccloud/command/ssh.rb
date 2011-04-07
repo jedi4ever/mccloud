@@ -17,6 +17,10 @@ module Mccloud
     
     name=selection
     vm=@session.config.vms[name]
+    if vm.instance.nil?
+      puts "#{name} is not available anymore"
+      return
+    end
     if vm.instance.state != "running"
       puts "#{name} is not running, move along"
       return
