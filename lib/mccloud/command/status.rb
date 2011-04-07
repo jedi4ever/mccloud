@@ -2,11 +2,11 @@ module Mccloud
   module Command
     def status(selection=nil,options=nil)
 
-      printf "%-10s %-12s %-20s %-15s %-8s\n", "Name", "Instance Id", "IP", "Type","Status"
-      80.times { |i| printf "=" } ; puts
-
+      
       unless options.verbose?
-        filter=@session.config.mccloud.prefix
+        printf "%-10s %-12s %-20s %-15s %-8s\n", "Name", "Instance Id", "IP", "Type","Status"
+        80.times { |i| printf "=" } ; puts
+        filter=@session.config.mccloud.filter
       else
         filter=""
       end
@@ -21,8 +21,15 @@ module Mccloud
             if name.start_with?(filter)
               unless filter==""
                 name[filter+" - "]=""
+                printf "%-10s %-12s %-20s %-15s %-8s\n",name,vm.id, vm.public_ip_address, vm.flavor.name,vm.state
+              else
+                puts "Name: #{name}"
+                puts "Instance Id: #{vm.id}"
+                puts "Public Ip: #{vm.public_ip_address}"
+                puts "Flavor: #{vm.flavor.name}"
+                puts "State: #{vm.state}"
+                80.times { |i| printf "=" } ; puts
               end
-              printf "%-10s %-12s %-20s %-15s %-8s\n",name,vm.id, vm.public_ip_address, vm.flavor.name,vm.state
             end
           end #End 1 provider
         end #providers

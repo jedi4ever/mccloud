@@ -26,10 +26,10 @@ module Mccloud
           puts "Waiting for it the machine to become accessible"
           instance.wait_for { printf "."; STDOUT.flush;  ready?}
           puts
-          prefix=@session.config.mccloud.prefix
+          filter=@session.config.mccloud.filter
 
 
-          provider.create_tags(instance.id, { "Name" => "#{prefix} - #{boxname}"})
+          provider.create_tags(instance.id, { "Name" => "#{filter} - #{boxname}"})
 
           # Resetting the in memory model of the new machine
           @all_servers[boxname.to_s]=instance.id

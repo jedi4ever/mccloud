@@ -13,7 +13,7 @@ module Mccloud
         provisioner=@session.config.provisioners[vm.provisioner.to_s]
         if provisioner.nil?
           # We take the first provisioner defined
-          provisioner=@session.config.provisioners.first[1]
+          #provisioner=@session.config.provisioners.first[1]
         end
         provisioner.run(vm)
       end

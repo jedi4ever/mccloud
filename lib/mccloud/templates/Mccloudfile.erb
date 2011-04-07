@@ -7,24 +7,24 @@ Mccloud::Config.run do |config|
   config.mccloud.environment="<%= mcEnvironment %>"
   config.mccloud.identity="<%= mcIdentity %>"
 
-  config.vm.define :web do |web_config|
-    web_config.vm.provider="<%= providerId %>"
+  config.vm.define :<%= serverName %> do |<%= serverName %>_config|
+    <%= serverName %>_config.vm.provider="<%= providerId %>"
 
-    #web_config.vm.provisioner=:chef_solo
-    #web_config.vm.provisioner=:puppet
-    web_config.vm.provider_options={ 
-      # ID = "ami-cef405a7" = x64 Ubuntu 10.10
+    #<%= serverName %>_config.vm.provisioner=:chef_solo
+    #<%= serverName %>_config.vm.provisioner=:puppet
+    <%= serverName %>_config.vm.provider_options={ 
+      # ID = "<%= imageId%>" = <%= imageDescription %>
       :image_id => "<%= imageId %>" , 
       :flavor_id => "<%= flavorId %>",
       :groups => %w(<%= securityGroup %>),
       :key_name => "<%= keyName %>",
       :availability_zone => "<%= availabilityZone %>" 
     }
-    #web_config.vm.forward_port("http", 80, 8080)
-    web_config.vm.user="<%= userName %>"
-    web_config.vm.bootstrap="ruby-bootstrap.sh"
-    web_config.vm.private_key="<%= privateKeyPath %>"
-    web_config.vm.public_key="<%= publicKeyPath %>"
+    #<%= serverName %>_config.vm.forward_port("http", 80, 8080)
+    <%= serverName %>_config.vm.user="<%= userName %>"
+    <%= serverName %>_config.vm.bootstrap="ruby-bootstrap.sh"
+    <%= serverName %>_config.vm.private_key="<%= privateKeyPath %>"
+    <%= serverName %>_config.vm.public_key="<%= publicKeyPath %>"
 
   end
 

@@ -7,14 +7,21 @@ module Mccloud
         @session.config.vms.each do |name,vm|
           id=@all_servers["#{name}"]
           vm=@session.config.vms[name]
-          yield id,vm
-
+          unless vm.instance.nil?
+            yield id,vm
+          else
+            puts "name #{name} is not defined"
+          end
         end
       else
         name=selection
         id=@all_servers["#{name}"]
         vm=@session.config.vms[name]
-        yield id,vm
+        unless vm.instance.nil?
+          yield id,vm
+        else
+          puts "name #{name} is not defined"
+        end
       end
     end
   end

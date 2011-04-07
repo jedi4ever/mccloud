@@ -132,12 +132,17 @@ module Mccloud
               exit -1
           end
         end
+   
+   
+   
+   
+   
       end
       end
 
       invalid_cache=false
       @session.config.vms.each do |name,vm|
-        prefix=@session.config.mccloud.prefix
+        filter=@session.config.mccloud.filter
         id=@all_servers["#{name.to_s}"]
 
         #Check if not destroyed or something else
@@ -172,10 +177,10 @@ module Mccloud
           end
           servers_by_provider[name]=server_list
         end
-        prefix=@session.config.mccloud.prefix
+        filter=@session.config.mccloud.filter
 
         @session.config.vms.each do |name,vm|
-          id=servers_by_provider[vm.provider]["#{prefix} - #{name.to_s}"]
+          id=servers_by_provider[vm.provider]["#{filter} - #{name.to_s}"]
 
 
           if !id.nil?

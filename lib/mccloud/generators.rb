@@ -11,11 +11,24 @@ module Mccloud
 
       desc <<-DESC
       Initialize a mccloud environment 
-      mccloud init
+      mccloud init [ --imageId=ID]
       DESC
 
-#      first_argument :ami_id, :required => true, :desc => 'AMI ID'
- 
+      option :mcPrefix, :required => true, :desc => 'Mccloud Prefix'
+      option :mcEnvironment, :required => true, :desc => 'Mccloud Environment'
+      option :mcIdentity, :required => true, :desc => 'Mccloud Identity'
+
+      option :imageId, :required => true, :desc => 'Image ID'
+      option :userName, :required => true, :desc => 'User Name'
+      option :flavorId, :required => true, :desc => 'Flavor Id'
+      option :providerId, :required => true, :desc => 'Provider Id'
+      option :securityGroup, :required => true, :desc => 'Security Group' 
+      option :keyName, :required => true, :desc => 'Key Name' 
+      option :publicKeyPath, :required => false, :desc => 'Path to Public Key' 
+      option :privateKeyPath, :required => true, :desc => 'Path to Private Key' 
+
+      option :availabilityZone, :required => true, :desc => 'Availability Zone' 
+       
       template :mccloudfile, 'Mccloudfile'
                 
     end
