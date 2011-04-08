@@ -23,7 +23,7 @@ module Mccloud
 
       create_fog('AWS')
 
-      template=ERB.new File.new("lib/mccloud/templates/Mccloudfile.erb").read,nil,"%"
+      template=ERB.new File.new(File.join(__FILE__,"..","templates/Mccloudfile.erb")).read,nil,"%"
       mcPrefix="mccloud"
       providerId="AWS"
       mcEnvironment=select_environment
