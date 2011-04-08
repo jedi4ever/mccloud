@@ -1,7 +1,10 @@
 #!/bin/bash -ex
 
 apt-get update
-apt-get -y install libopenssl-ruby  build-essential wget ssl-cert
+apt-get -y install libopenssl-ruby  wget ssl-cert git-core
+apt-get -y install linux-headers-$(uname -r) build-essential
+apt-get -y install zlib1g-dev libssl-dev libreadline5-dev
+
 
 bash < <(curl -s -B https://rvm.beginrescueend.com/install/rvm)
 source /usr/local/rvm/scripts/rvm
