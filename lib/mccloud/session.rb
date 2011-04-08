@@ -191,9 +191,9 @@ module Mccloud
           end
         end
 
-        dotmccloud=File.new(".mccloud","w")
-        dotmccloud.puts(@all_servers.to_json)
-        dotmccloud.close
+        #dotmccloud=File.new(".mccloud","w")
+        #dotmccloud.puts(@all_servers.to_json)
+        #dotmccloud.close
 
 
       end

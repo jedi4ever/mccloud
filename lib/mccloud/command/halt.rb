@@ -6,12 +6,12 @@ module Mccloud
   def halt(selection=nil,options=nil)
     on_selected_machines(selection) do |id,vm|
        unless vm.instance.state == "stopping" || vm.instance.state =="stopped"
-        puts "halting #{id}"
+        puts "Halting machine #{vm.name}(#{id})"
         vm.instance.stop
         vm.instance.wait_for { printf "."; STDOUT.flush; state=="stopped"}
         puts 
       else
-        puts "#{vm.name} has state: #{server.state} so we're not halting #{vm.name} - #{id}"        
+        puts "#{vm.name}(#{id}) is already halted."        
       end
     end
   end
