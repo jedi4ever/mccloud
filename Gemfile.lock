@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    mccloud (0.0.8)
+    mccloud (0.0.9)
       fog
       highline (~> 1.6.1)
       json
