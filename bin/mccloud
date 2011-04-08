@@ -2,7 +2,6 @@
 
 require 'rubygems'
 require 'thor'
-require 'bundler'
 require 'mccloud'
 
 require 'mccloud/version'
