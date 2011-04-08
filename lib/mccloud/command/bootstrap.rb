@@ -25,7 +25,7 @@ module Mccloud
         #options={ :port => 22, :keys => [ vm.key ], :paranoid => false, :keys_only => true}
         #Mccloud::Ssh.execute(instance.public_ip_address,vm.user,options,"sudo /tmp/bootstrap.sh")
       end
-      multi(selection,"sudo /tmp/bootstrap.sh",options.merge({ "sudo" => true}))
+      multi(selection,"/tmp/bootstrap.sh",options.merge({ "sudo" => true}))
     end
   end
 end
