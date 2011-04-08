@@ -1,8 +1,8 @@
 PATH
   remote: .
   specs:
-    mccloud (0.0.9)
-      fog
+    mccloud (0.0.10)
+      fog (~> 0.7.2)
       highline (~> 1.6.1)
       json
       net-scp

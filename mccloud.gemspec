@@ -17,7 +17,7 @@ Gem::Specification.new do |s|
   s.add_dependency "net-ssh", "~> 2.1.0"
   #s.add_dependency "sshkey"
   s.add_dependency "net-scp"
-  s.add_dependency "fog"
+  s.add_dependency "fog", "~> 0.7.2"
   s.add_dependency "json"
   #s.add_dependency "templater"
   s.add_dependency "popen4", "~> 0.1.2"
