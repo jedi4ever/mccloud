@@ -117,10 +117,11 @@ module Mccloud
           confirmed=agree("Do you wan to save this?: ")
 
           if (confirmed)
-            fogfile=File.new("#{File.join(ENV['HOME'],".fog")}","w")
+            fogfilename="#{File.join(ENV['HOME'],".fog")}"
+            fogfile=File.new(fogfilename,"w")
             fogfile.puts "#{snippet}"
             fogfile.close
-            FileUtils.chmod(0600,fogfile)
+            FileUtils.chmod(0600,fogfilename)
           else
             puts "Ok, we won't write it, but we continue with your credentials in memory"
             exit -1

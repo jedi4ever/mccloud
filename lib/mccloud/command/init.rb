@@ -367,8 +367,9 @@ module Mccloud
         puts
 
         if (confirmed)
-          fogfile=File.new("#{File.join(ENV['HOME'],".fog")}","w")
-           FileUtils.chmod(0600,fogfile)
+          fogfilename="#{File.join(ENV['HOME'],".fog")}"
+          fogfile=File.new(fogfilename,"w")
+           FileUtils.chmod(0600,fogfilename)
           fogfile.puts "#{snippet}"
           fogfile.close
         else
