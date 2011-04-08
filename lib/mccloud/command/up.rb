@@ -10,7 +10,6 @@ module Mccloud
 
         provider=@session.config.providers[vm.provider]
         if (id.nil?)
-          puts "Machine #{vm.name} doesn't yet exist"
           provider_options=vm.provider_options
           boxname=vm.name
           puts "Spinning up a new machine called #{boxname}"
@@ -22,12 +21,11 @@ module Mccloud
           instance=provider.servers.create(provider_options)
           #instance=provider.servers.create(provider_options)
           
-          puts "Waiting for it the machine to become accessible"
+          puts "Waiting for the machine to become accessible"
           instance.wait_for { printf "."; STDOUT.flush;  ready?}
           puts
           filter=@session.config.mccloud.filter
-
-
+    
           provider.create_tags(instance.id, { "Name" => "#{filter} - #{boxname}"})
 
           # Resetting the in memory model of the new machine
@@ -38,6 +36,8 @@ module Mccloud
 
           # Wait for ssh to become available ...
           puts "Waiting for ssh to be come available"
+          #puts instance.console_output.body["output"]
+
           Mccloud::Util.execute_when_tcp_available(instance.public_ip_address, { :port => 22, :timeout => 60 }) do
             puts "Ok, ssh is available , proceeding with bootstrap"
           end
@@ -47,12 +47,12 @@ module Mccloud
         else 
           state=vm.instance.state
           if state =="stopped"
-            puts "Machine #{vm.name} was stopped -> starting it again"
+            puts "Booting up machine #{vm.name}"
             vm.instance.start
             vm.instance.wait_for { printf ".";STDOUT.flush;  ready?}  
             puts        
           else
-            puts "Machine #{selection} already exists but is currently in state #{state} "
+            puts "Machine #{selection} is already running."
           end
         end
 

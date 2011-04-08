@@ -1,5 +1,9 @@
-Mccloudfile
-.mccloud
-*.pp
-puppet/*
-chef/*
+/Mccloudfile
+/.mccloud
+/*.pp
+/puppet/*
+/chef/*
+/.fog
+/bootstrap*
+Mccloudfile.*
+pkg/*

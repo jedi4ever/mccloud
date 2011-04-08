@@ -41,7 +41,7 @@ module Mccloud
 
     def initialize(options=nil)
       @logger = Logger.new(STDOUT)
-      @logger.level = Logger::DEBUG
+      @logger.level = Logger::INFO
 
       #http://www.ruby-doc.org/stdlib/libdoc/logger/rdoc/classes/Logger.html
       @logger.datetime_format = "%Y-%m-%d %H:%M:%S"
@@ -120,6 +120,7 @@ module Mccloud
             fogfile=File.new("#{File.join(ENV['HOME'],".fog")}","w")
             fogfile.puts "#{snippet}"
             fogfile.close
+            FileUtils.chmod(0600,fogfile)
           else
             puts "Ok, we won't write it, but we continue with your credentials in memory"
             exit -1
@@ -148,12 +149,12 @@ module Mccloud
         #Check if not destroyed or something else
         instance=vm.instance
         if instance.nil?
-          @logger.error "Cache is invalid"
+          @logger.debug "Cache is invalid"
           invalid_cache=true
         else  
           if instance.state == "shutting-down" || instance.state == "terminated"
-            @logger.info "parsing .mccloud json" 
-            @logger.info "rebuilding cache"
+            @logger.debug "parsing .mccloud json" 
+            @logger.debug "rebuilding cache"
             invalid_cache=true
           end
         end

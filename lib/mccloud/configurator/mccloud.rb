@@ -9,7 +9,7 @@ module Mccloud
       
       def initialize()
           @prefix="mccloud"
-          @environment="development"
+          @environment=""
           @identity=""
           @loglevel=:info
       end   
@@ -19,10 +19,10 @@ module Mccloud
         if !@prefix.nil? 
            mcfilter << @prefix 
         end
-        if !@environment=="" 
-           mcfilter << @environment 
-           end
-        if !@identity==""
+        if @environment!="" 
+           mcfilter << @environment
+        end
+        if @identity!=""
            mcfilter << @identity 
         end
         return mcfilter.join(" - ")

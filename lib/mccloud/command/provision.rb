@@ -5,6 +5,7 @@ module Mccloud
 
     def provision(selection=nil,options=nil)
       on_selected_machines(selection) do |id,vm|
+        
         instance=vm.instance
         instance.private_key_path=vm.private_key
         instance.username = vm.user
@@ -15,6 +16,7 @@ module Mccloud
           # We take the first provisioner defined
           #provisioner=@session.config.provisioners.first[1]
         else
+          puts "Starting provisioning on #{vm.name} with #{vm.provisioner} as provisioner"
           provisioner.run(vm)
         end
       end

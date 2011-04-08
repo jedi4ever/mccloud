@@ -40,7 +40,9 @@ module Mccloud
       pid = fork if Mccloud::Util::Platform.leopard? || Mccloud::Util::Platform.tiger?
 
       command_exec="ssh #{command_options.join(" ")} #{options[:username]}@#{options[:host]} #{extra_command}".strip
-      puts "#{command_exec}"
+      
+      puts "Executing - #{command_exec}"
+      puts
       Kernel.exec command_exec if pid.nil?
       Process.wait(pid) if pid
     end

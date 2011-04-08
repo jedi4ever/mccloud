@@ -18,100 +18,109 @@ class MccloudCLI < Thor
 
   end
 
-  desc "init", "creates a Mccloud Config File" 
+  desc "init", "Creates a Mccloud Config File" 
   method_options :force => :boolean
   def init(amiId=nil)
     Mccloud::Command.init(amiId,options)
   end
 
-  desc "up", "bring a machine up"
+  desc "up [NAME]", "Fires up a machine, bootstrap and provision"
   method_options :force => :boolean
   def up(selection=nil)
     create_session
     @session.up(selection,options)
   end
   
-  desc "status", "show a status of all machines that are configured"
+  desc "status", "Show a status of all machines that are configured"
   method_options :verbose => false
   def status(selection=nil)
     create_session
     @session.status(selection,options)
   end
 
-  desc "halt [NAME]", "shutdown the machine"
+  desc "halt [NAME]", "Shutdown the machine"
   method_options :force => :boolean  
   def halt(selection=nil)
     create_session
      @session.halt(selection,options)
   end
   
-  desc "ssh [NAME]", "spawns an ssh to the machine"
+  desc "ssh [NAME]", "Spawns an ssh client to the machine"
    method_options :screen => :boolean  
    def ssh(selection=nil,command=nil)
     create_session
     @session.ssh(selection,command,options)
    end
    
-  desc "suspend", "freeze"
+  desc "suspend [NAME]", "Shutdown of the machine"
   method_options :force => :boolean
   def suspend(selection=nil)
     create_session
     @session.suspend(selection,options)
   end
 
-  desc "boot", "freeze"
-  method_options :force => :boolean
-  def boot(selection=nil)
-    create_session
-    @session.boot(selection,options)
-  end
+#  desc "boot", "same a"
+#  method_options :force => :boolean
+#  def boot(selection=nil)
+#    create_session
+#    @session.boot(selection,options)
+#  end
 
-  desc "destroy [NAME]", "destroys the machine"
+  desc "destroy [NAME]", "Destroys the machine"
   method_options :force => :boolean  
   def destroy(selection=nil)
     create_session
     @session.destroy(selection,options)
   end
 
-  desc "reload [NAME]", "reloads the machine"
+  desc "reload [NAME]", "Reboots the machine"
   method_options :force => :boolean  
   def reload(selection=nil?)
     create_session
     @session.reload(selection,options)
   end
 
-  desc "command [NAME] [COMMAND]", "exec a command on a box"
-  method_options :parallel => :boolean
-  def command(selection=nil,command="who am i")
-    create_session
-    @session.command(selection,command,options)
-  end
+#  desc "command [NAME] [COMMAND]", "exec a command on a box"
+#  method_options :parallel => :boolean
+#  def command(selection=nil,command="who am i")
+#    create_session
+#    @session.command(selection,command,options)
+#  end
 
-  desc "bootstrap [NAME]", "exec a command on a box"
+  desc "bootstrap [NAME]", "Executes the bootstrap sequence"
   method_options :sudo => :boolean      
   def bootstrap(selection=nil,script="who am i")
     create_session
     @session.bootstrap(selection,script,options)
   end
 
-  desc "multi","multi"
-  method_options :verbose => :boolean  
-  def multi(selection=nil,command="who am i")
-    create_session
-    @session.multi(selection,command,options)
-  end  
+#  desc "multi","multi"
+#  method_options :verbose => :boolean  
+#  def multi(selection=nil,command="who am i")
+#    create_session
+#    @session.multi(selection,command,options)
+#  end  
 
-  desc "provision", "provision the machine"
+  desc "provision [NAME]", "Runs the provisioner the machine"
   def provision(selection=nil)
     create_session
     @session.provision(selection,options)
   end
 
-  desc "server", "runs a server+ forwards"
+  desc "server", "Runs a server+ forwards network ports"
   def server(selection=nil)
     create_session
     @session.server(selection,options)
   end
 end
 
+puts 
+80.times { |i| printf "*" } ; puts
+myversion="* Mccloud v#{Mccloud::VERSION} - alpha - use at your own risk"
+puts "#{myversion}"
+80.times { |i| printf "*" } ; puts
+puts
+
+
 MccloudCLI.start
+puts

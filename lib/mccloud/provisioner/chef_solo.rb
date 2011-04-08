@@ -44,8 +44,11 @@ module Mccloud
         
         puts "Running chef-solo"
         options={ :port => 22, :keys => [ vm.private_key ], :paranoid => false, :keys_only => true}
-        Mccloud::Util.ssh(vm.instance.public_ip_address,vm.user,options,"sudo chef-solo -c /tmp/solo.rb -j /tmp/dna.json -l debug")
-        
+        if vm.user=="root"
+          Mccloud::Util.ssh(vm.instance.public_ip_address,vm.user,options,"sudo chef-solo -c /tmp/solo.rb -j /tmp/dna.json -l debug")
+        else
+          Mccloud::Util.ssh(vm.instance.public_ip_address,vm.user,options,"chef-solo -c /tmp/solo.rb -j /tmp/dna.json -l debug")
+        end
       end
       # Returns the run list for the provisioning
       def run_list

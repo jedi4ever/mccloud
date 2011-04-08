@@ -7,6 +7,7 @@ module Mccloud
     def multi(selection=nil,command="who am i",options=nil)
       trap("INT") { puts "we hit CTRL_C"; exit }
       
+      
       Net::SSH::Multi.start do |session|
          # Connect to remote machines
          ip2name=Hash.new
@@ -16,6 +17,12 @@ module Mccloud
              ip2name[instance.public_ip_address]=vm.name
              session.use "#{instance.public_ip_address}", { :user => vm.user , :keys => [ vm.private_key ], :paranoid => false, :keys_only => true}
            end
+         end
+
+         unless options["sudo"].nil?
+           #check vm.sudo
+           sudo_cmd="sudo"
+           command="#{sudo_cmd} #{command}"
          end
 
         puts "Executing #{command}"

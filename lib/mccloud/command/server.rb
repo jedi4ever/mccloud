@@ -4,6 +4,7 @@ module Mccloud
   module Command
     def server(selection=nil,options=nil)
       
+      puts "Starting server mode"
       trap("INT") { puts "You've hit CTRL-C . Stopping server now"; exit }
       threads = []
       on_selected_machines(selection) do |id,vm|
@@ -14,17 +15,21 @@ module Mccloud
             ssh_options={ :keys => [ vm.private_key ], :paranoid => false, :keys_only => true}
             Net::SSH.start(public_ip_address, vm.user, ssh_options) do |ssh|
               vm.forwardings.each do |forwarding|
-                puts "forwarding port #{forwarding.remote} from #{vm.name} to local port #{forwarding.local}"
-                ssh.forward.local(forwarding.local, private_ip_address,forwarding.remote)
+                begin
+                  puts "Forwarding remote port #{forwarding.remote} from #{vm.name} to local port #{forwarding.local}"
+                  ssh.forward.local(forwarding.local, private_ip_address,forwarding.remote)
+                rescue Errno::EACCES
+                  puts "  Error - Access denied to forward remote port #{forwarding.remote} from #{vm.name} to local port #{forwarding.local}"
+                end
               end
               ssh.loop { true }
             end
           end
         end
       end
-#      threads.each {|thr| thr.join}
-      puts "and we continue here"
-      sleep 30
+      threads.each {|thr| thr.join}
+      #puts "and we continue here"
+      #sleep 30
     end
   end
 end

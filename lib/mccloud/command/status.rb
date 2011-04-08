@@ -2,11 +2,13 @@ module Mccloud
   module Command
     def status(selection=nil,options=nil)
 
-      
       unless options.verbose?
+
+        filter=@session.config.mccloud.filter
+        puts "Using Filter: #{filter}"
+
         printf "%-10s %-12s %-20s %-15s %-8s\n", "Name", "Instance Id", "IP", "Type","Status"
         80.times { |i| printf "=" } ; puts
-        filter=@session.config.mccloud.filter
       else
         filter=""
       end
