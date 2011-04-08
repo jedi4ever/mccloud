@@ -1,4 +1,4 @@
-require 'mccloud/generators'
+#require 'mccloud/generators'
 require 'highline/import'
 require 'mccloud/util/sshkey'
 

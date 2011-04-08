@@ -1,4 +1,3 @@
-require 'templater'
 
 module Mccloud
   module Generators

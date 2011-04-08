@@ -5,6 +5,7 @@ require 'thor'
 require 'bundler'
 require 'mccloud'
 
+require 'mccloud/version'
 require 'mccloud/session'
 
 class MccloudCLI < Thor 
