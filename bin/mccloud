@@ -117,8 +117,10 @@ end
 
 puts 
 80.times { |i| printf "*" } ; puts
-myversion="* Mccloud v#{Mccloud::VERSION} - alpha - use at your own risk"
+myversion="* Mccloud v#{Mccloud::VERSION} - alpha - use at your own risk"
 puts "#{myversion}"
+puts "- github : https://github.com/jedi4ever/mccloud"
+
 80.times { |i| printf "*" } ; puts
 puts
 
