@@ -22,6 +22,9 @@ require 'mccloud/command/destroy'
 require 'mccloud/command/provision'
 require 'mccloud/command/server'
 
+require 'mccloud/type/vm'
+
+
 module Mccloud
 
   # We need some global thing for the config file to find our session
@@ -36,6 +39,7 @@ module Mccloud
     attr_accessor :config
     attr_accessor :logger
     attr_accessor :all_servers
+    attr_accessor :all_stacks
 
     include Mccloud::Command
 
@@ -65,142 +69,151 @@ module Mccloud
         exit -1
       end
 
-      @all_servers=Hash.new
-      if File.exists?(".mccloud")
+      #Loading providers for Stacks
+      Mccloud.session.config.stacks.each do |name,stack|
+        if @session.config.providers[stack.provider+"-"+stack.provider_options[:region].to_s].nil?
+          puts "adding provider #{stack.provider}-#{stack.provider_options[:region].to_s}"
 
-        @logger.debug ".mccloud exists"
-        dotmccloud=File.new(".mccloud")
-
-        @logger.debug "reading .mccloud json file"
-        json=dotmccloud.readlines.to_s
-
-        begin
-          @logger.debug "parsing .mccloud json file"
-          @all_servers=JSON.parse(json)
-        rescue Error => e
-          @logger.error "Error parsing json file - Sorry"
-          @logger.error e.message  
-          @logger.error e.backtrace.inspect  
-          exit -1
-        end
-
-      end
-
-      #Loading providers
-      Mccloud.session.config.vms.each do |name,vm|
-        if @session.config.providers[vm.provider].nil?
-        
-        @logger.debug "adding provider #{vm.provider}"
-        begin
-          @session.config.providers[vm.provider]=Fog::Compute.new(:provider => vm.provider)
-        rescue ArgumentError => e
-          #  Missing required arguments: 
-          required_string=e.message
-          required_string["Missing required arguments: "]=""
-          required_options=required_string.split(", ")
-          puts "Please provide credentials for provider [#{vm.provider}]:"
-          answer=Hash.new
-          for fog_option in required_options do 
-            answer["#{fog_option}".to_sym]=ask("- #{fog_option}: ") 
-            #{ |q| q.validate = /\A\d{5}(?:-?\d{4})?\Z/ }
-          end
-          puts "\nThe following snippet will be written to #{File.join(ENV['HOME'],".fog")}"
-
-          snippet=":default:\n"
-          for fog_option in required_options do
-            snippet=snippet+"  :#{fog_option}: #{answer[fog_option.to_sym]}\n"
-          end
-
-          puts "======== snippit start ====="
-          puts "#{snippet}"
-          puts "======== snippit end ======="
-          confirmed=agree("Do you wan to save this?: ")
-
-          if (confirmed)
-            fogfilename="#{File.join(ENV['HOME'],".fog")}"
-            fogfile=File.new(fogfilename,"w")
-            fogfile.puts "#{snippet}"
-            fogfile.close
-            FileUtils.chmod(0600,fogfilename)
-          else
-            puts "Ok, we won't write it, but we continue with your credentials in memory"
-            exit -1
-          end
+          provider_options={:provider => stack.provider}
+          provider_options.merge!(stack.provider_options)
+          @logger.debug "adding provider #{stack.provider}"
           begin
-            answer[:provider]= vm.provider
-            @session.config.providers[vm.provider]=Fog::Compute.new(answer)
-          rescue
-              puts "We tried to create the provider but failed again, sorry we give up"
-              exit -1
+            @session.config.providers["#{stack.provider+"-"+stack.provider_options[:region].to_s}"]=Fog::Compute.new(provider_options)
           end
         end
-   
-   
-   
-   
-   
-      end
-      end
-
-      invalid_cache=false
-      @session.config.vms.each do |name,vm|
-        filter=@session.config.mccloud.filter
-        id=@all_servers["#{name.to_s}"]
-
-        #Check if not destroyed or something else
-        instance=vm.instance
-        if instance.nil?
-          @logger.debug "Cache is invalid"
-          invalid_cache=true
-        else  
-          if instance.state == "shutting-down" || instance.state == "terminated"
-            @logger.debug "parsing .mccloud json" 
-            @logger.debug "rebuilding cache"
-            invalid_cache=true
-          end
-        end
-      end
-
-      #
-      if (invalid_cache)
-        #Resetting the list
-        @all_servers=Hash.new
-
-        servers_by_provider=Hash.new
-
-        # Find all providers
-        @session.config.providers.each do |name,provider|
-          server_list=Hash.new
-          provider.servers.each do |server|
-
-            if !(server.state == "terminated")
-              server_list[server.tags["Name"]]=server.id	
-            end
-          end
-          servers_by_provider[name]=server_list
-        end
-        filter=@session.config.mccloud.filter
-
-        @session.config.vms.each do |name,vm|
-          id=servers_by_provider[vm.provider]["#{filter} - #{name.to_s}"]
-
-
-          if !id.nil?
-            @all_servers[name]=id
-            #@session.config.vms[name].instance=@session.config.providers[vm.provider].servers.get(id)
-          end
-        end
-
-        #dotmccloud=File.new(".mccloud","w")
-        #dotmccloud.puts(@all_servers.to_json)
-        #dotmccloud.close
-
-
-      end
     end
 
+      #Loading providers for VMS
+      Mccloud.session.config.vms.each do |name,vm|
+        if @session.config.providers[vm.provider+"-"+vm.provider_options[:region].to_s].nil?
+          puts "adding provider #{vm.provider}-#{vm.provider_options[:region].to_s}"
+
+          provider_options={:provider => vm.provider}
+          provider_options.merge!(vm.provider_options)
+          @logger.debug "adding provider #{vm.provider}"
+          begin
+            @session.config.providers["#{vm.provider+"-"+vm.provider_options[:region].to_s}"]=Fog::Compute.new(provider_options)
+          rescue ArgumentError => e
+            #  Missing required arguments: 
+            required_string=e.message
+            required_string["Missing required arguments: "]=""
+            required_options=required_string.split(", ")
+            puts "Please provide credentials for provider [#{vm.provider}]:"
+            answer=Hash.new
+            for fog_option in required_options do 
+              answer["#{fog_option}".to_sym]=ask("- #{fog_option}: ") 
+              #{ |q| q.validate = /\A\d{5}(?:-?\d{4})?\Z/ }
+            end
+            puts "\nThe following snippet will be written to #{File.join(ENV['HOME'],".fog")}"
+
+            snippet=":default:\n"
+            for fog_option in required_options do
+              snippet=snippet+"  :#{fog_option}: #{answer[fog_option.to_sym]}\n"
+            end
+
+            puts "======== snippit start ====="
+            puts "#{snippet}"
+            puts "======== snippit end ======="
+            confirmed=agree("Do you wan to save this?: ")
+
+            if (confirmed)
+              fogfilename="#{File.join(ENV['HOME'],".fog")}"
+              fogfile=File.new(fogfilename,"w")
+              fogfile.puts "#{snippet}"
+              fogfile.close
+              FileUtils.chmod(0600,fogfilename)
+            else
+              puts "Ok, we won't write it, but we continue with your credentials in memory"
+              exit -1
+            end
+            begin
+              answer[:provider]= vm.provider
+              @session.config.providers[vm.provider]=Fog::Compute.new(answer)
+            rescue
+              puts "We tried to create the provider but failed again, sorry we give up"
+              exit -1
+            end
+          end 
+
+        end
+      end
 
 
 
+      @session.config.stacks.each do |name,stack|
+          stack.filtered_instance_names.each do |instancename|
+          puts "Stack #{name} - #{instancename}"
+          
+        end
+      end
+      
+      # Loading VMS
+      #Resetting the list
+      filter=@session.config.mccloud.filter
+      stack_filter=@session.config.mccloud.stackfilter
+
+      # For all providers
+      @session.config.providers.each do |name,provider|
+        server_list=Hash.new
+
+        # get all servers (filtered)
+        provider.servers.each do |server|
+
+          unless server.state=="terminated"
+          
+            full_name="#{server.tags['Name']}"
+            if full_name.start_with?(filter)
+
+              temp_name=String.new(full_name)
+              temp_name[filter]=""
+              short_name=temp_name
+
+              #  if the VM was not declared
+              unless !@session.config.vms[short_name].nil?
+                puts "#{short_name} - has been not been declared as a vm"
+                undeclared_vm=Mccloud::Type::Vm.new	
+                undeclared_vm.declared=false
+                undeclared_vm.server_id=server.id
+                @session.config.vms[short_name]=undeclared_vm                
+              else
+                
+              end
+            
+              # Set the server.id of the vm
+              @session.config.vms[short_name].server_id=server.id
+              @session.config.vms[short_name].provider=name
+            
+              # Check if the server is part of a stack
+              stack_name=server.tags['aws:cloudformation:stack-name']
+
+              unless stack_name.nil?
+                filtered_stack_name=stack_name
+                filtered_stack_name[stack_filter]=""
+                # Lookup stack on our config
+                puts "#{short_name} is part of #{filtered_stack_name} "
+
+                if @session.config.stacks.has_key?(filtered_stack_name)
+                  # If we found it, set the private, public and user appropriatly
+                  puts "We're in luck"
+                  @session.config.vms[short_name].private_key=@session.config.stacks[filtered_stack_name].private_key_for_instance(short_name)
+                  @session.config.vms[short_name].public_key=@session.config.stacks[filtered_stack_name].public_key_for_instance(short_name)
+                  @session.config.vms[short_name].user=@session.config.stacks[filtered_stack_name].user_for_instance(short_name)
+
+                else
+                  puts "Stack #{filtered_stack_name} is not defined "
+
+                end
+                
+                
+                
+              end
+              
+            
+            end
+          end
+        end
+      end
+      
+    end
   end
 end

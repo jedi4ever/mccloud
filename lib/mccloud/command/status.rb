@@ -13,7 +13,36 @@ module Mccloud
         filter=""
       end
 
+      cf = Fog::AWS::CloudFormation.new(:region => "eu-west-1")
+      
+      
+      cf.describe_stacks.body["Stacks"].each do |stack|
+        pp stack
+      end
+      
+      cf.describe_stacks.body["Stacks"].each do |stack|
+        puts "#{stack['StackName']} - #{stack['StackStatus']}"
+        events = cf.describe_stack_events("#{stack['StackName']}").body['StackEvents']
+         events.each do |event|
+           puts "-- Timestamp: #{event['Timestamp']}"
+           puts "-- LogicalResourceId: #{event['LogicalResourceId']}"
+           puts "-- ResourceType: #{event['ResourceType']}"
+           puts "-- ResourceStatus: #{event['ResourceStatus']}"
+           puts "-- ResourceStatusReason: #{event['ResourceStatusReason']}" if event['ResourceStatusReason']
+           puts "--"
+         end
+
+        puts 
+        puts "Outputs for stack : #{stack['StackName']}"
+        stack['Outputs'].each do |output|
+          puts "#{output['OutputKey']}: #{output['OutputValue']}"
+        end
+        puts
+      end
+  
+      
       @session.config.providers.each  do |name,provider|
+          
           provider.servers.each do |vm|
             name="<no name set>"
             if !vm.tags["Name"].nil?
@@ -22,7 +51,7 @@ module Mccloud
 
             if name.start_with?(filter)
               unless filter==""
-                name[filter+" - "]=""
+                name[filter]=""
                 printf "%-10s %-12s %-20s %-15s %-8s\n",name,vm.id, vm.public_ip_address, vm.flavor.name,vm.state
               else
                 puts "Name: #{name}"

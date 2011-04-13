@@ -6,24 +6,40 @@ module Mccloud
     attr_accessor :ami
     attr_accessor :provider
     attr_accessor :provider_options
+    attr_accessor :create_options
     attr_accessor :name
     attr_accessor :user
+    attr_accessor :server_id
     attr_accessor :private_key
     attr_accessor :public_key
     attr_accessor :bootstrap
     attr_accessor :provisioner
     attr_accessor :forwardings
+    attr_accessor :stacked
+    attr_accessor :declared
     
     attr_accessor :instance
     
     def initialize
       @forwardings=Array.new
+      @stacked=false
+      @declared=true
+      # Default to us-east-1
+      @provider_options={:region => "us-east-1"}
+    end
+    
+    def declared?
+      return declared
+    end
+    
+    def stacked?
+      return stacked
     end
     
     def instance
       if @this_instance.nil?
         begin
-          @this_instance=Mccloud.session.config.providers[provider].servers.get(Mccloud.session.all_servers[name.to_s])
+          @this_instance=Mccloud.session.config.providers[provider].servers.get(server_id)
         rescue Fog::Service::Error => e
           puts "Error: #{e.message}"
           puts "We could not request the information from your provider #{provider}. We suggest you check your credentials."
