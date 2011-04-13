@@ -17,7 +17,10 @@ class SSHKey
   attr_reader :key_object, :comment, :rsa_private_key, :rsa_public_key, :ssh_public_key, :fingerprint
 
   def initialize(private_key, options = {})
+    puts "#{private_key}"
     @key_object        = OpenSSL::PKey::RSA.new(private_key)
+    
+    
     @comment           = options[:comment] || ""
     @rsa_private_key   = @key_object.to_pem
     @rsa_public_key    = @key_object.public_key.to_pem

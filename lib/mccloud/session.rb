@@ -23,6 +23,8 @@ require 'mccloud/command/provision'
 require 'mccloud/command/server'
 
 require 'mccloud/type/vm'
+require 'mccloud/util/sshkey'
+
 
 
 module Mccloud
@@ -69,6 +71,8 @@ module Mccloud
         exit -1
       end
 
+
+      
       #Loading providers for Stacks
       Mccloud.session.config.stacks.each do |name,stack|
         if @session.config.providers[stack.provider+"-"+stack.provider_options[:region].to_s].nil?
@@ -82,6 +86,7 @@ module Mccloud
           end
         end
     end
+
 
       #Loading providers for VMS
       Mccloud.session.config.vms.each do |name,vm|
@@ -139,7 +144,45 @@ module Mccloud
       end
 
 
+       #provider_keypair=@provider.key_pairs.create(
+      #  :name => keyName,
+       # :public_key => rsa_key.ssh_public_key )
+      #  puts "Registered #{keyName} with your cloud provider"
 
+
+
+      puts "Checking keypair(s)"
+      #checking keypairs
+       Mccloud.session.config.stacks.each do |name,stack|
+        stack.key_name.each do |name,key_name|
+          
+          stack_provider=@session.config.providers["#{stack.provider+"-"+stack.provider_options[:region].to_s}"]
+          pair=stack_provider.key_pairs.get("#{key_name}")
+          if pair.nil?
+            puts "#{key_name} does not exist at #{stack.provider} in region #{stack.provider_options[:region]}"
+            puts "Key - #{key_name}"
+            puts "File - #{stack.public_key[name]}"
+            #reading private key
+            public_key=""
+            File.open("#{stack.public_key[name]}") {|f| public_key << f.read} 
+            
+            stack_provider.key_pairs.create(
+            :name => key_name,
+            :public_key => public_key )
+            end
+        end
+       end
+
+       Mccloud.session.config.vms.each do |name,vm|
+          vm_provider=@session.config.providers["#{vm.provider+"-"+vm.provider_options[:region].to_s}"]
+          pair=vm_provider.key_pairs.get("#{vm.key_name}")
+          if pair.nil?
+            puts "Key - #{vm.key_name}"
+            puts "#{key_name} does not exist at #{vm.provider} in region #{vm.provider_options[:region]}"
+          end
+       end
+
+      #listing stacks
       @session.config.stacks.each do |name,stack|
           stack.filtered_instance_names.each do |instancename|
           puts "Stack #{name} - #{instancename}"

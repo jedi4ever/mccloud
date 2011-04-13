@@ -12,6 +12,8 @@ module Mccloud
     attr_accessor :server_id
     attr_accessor :private_key
     attr_accessor :public_key
+    attr_accessor :key_name
+    
     attr_accessor :bootstrap
     attr_accessor :provisioner
     attr_accessor :forwardings

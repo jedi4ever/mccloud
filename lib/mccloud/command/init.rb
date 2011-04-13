@@ -102,6 +102,7 @@ module Mccloud
       keyset=SSHKey.generate(:comment => comment)
       return keyset
     end
+    
     def self.select_image() 
 
       # Canonical 

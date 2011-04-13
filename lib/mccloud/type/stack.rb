@@ -9,6 +9,7 @@ module Mccloud
     attr_accessor :params    
     attr_accessor :provider
     attr_accessor :provider_options
+    attr_accessor :create_options
     attr_accessor :jsonfile
     attr_accessor :instance
     attr_accessor :rewrite_names
@@ -16,6 +17,7 @@ module Mccloud
     attr_accessor :user
     attr_accessor :private_key
     attr_accessor :public_key
+    attr_accessor :key_name
     attr_accessor :userdata_file
 
     
@@ -26,7 +28,7 @@ module Mccloud
        @private_key=Hash.new
        @public_key=Hash.new
        @userdata_file=Hash.new
-       
+       @key_name=Hash.new
        @provider_options={:region => "us-east-1"}
     end
     
@@ -54,6 +56,15 @@ module Mccloud
         return default_user
       else
         return user[machinename]
+      end
+    end
+    
+    def key_name_for_instance(machinename)
+      default_key_name=key_name[:default]
+      if key_name[machinename].nil?
+        return default_key_name
+      else
+        return key_name[machinename]
       end
     end
 

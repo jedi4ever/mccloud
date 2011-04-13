@@ -13,7 +13,10 @@ module Mccloud
         filter=""
       end
 
-      cf = Fog::AWS::CloudFormation.new(:region => "eu-west-1")
+      regions=["us-east-1","eu-west-1"]
+      
+      regions.each do |region|
+      cf = Fog::AWS::CloudFormation.new(:region => region)
       
       
       cf.describe_stacks.body["Stacks"].each do |stack|
@@ -40,6 +43,7 @@ module Mccloud
         puts
       end
   
+    end
       
       @session.config.providers.each  do |name,provider|
           
