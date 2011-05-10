@@ -72,7 +72,7 @@ module Mccloud
       end
 
 
-      
+
       #Loading providers for Stacks
       Mccloud.session.config.stacks.each do |name,stack|
         if @session.config.providers[stack.provider+"-"+stack.provider_options[:region].to_s].nil?
@@ -85,7 +85,7 @@ module Mccloud
             @session.config.providers["#{stack.provider+"-"+stack.provider_options[:region].to_s}"]=Fog::Compute.new(provider_options)
           end
         end
-    end
+      end
 
 
       #Loading providers for VMS
@@ -144,18 +144,18 @@ module Mccloud
       end
 
 
-       #provider_keypair=@provider.key_pairs.create(
+      #provider_keypair=@provider.key_pairs.create(
       #  :name => keyName,
-       # :public_key => rsa_key.ssh_public_key )
+      # :public_key => rsa_key.ssh_public_key )
       #  puts "Registered #{keyName} with your cloud provider"
 
 
 
       puts "Checking keypair(s)"
       #checking keypairs
-       Mccloud.session.config.stacks.each do |name,stack|
+      Mccloud.session.config.stacks.each do |name,stack|
         stack.key_name.each do |name,key_name|
-          
+
           stack_provider=@session.config.providers["#{stack.provider+"-"+stack.provider_options[:region].to_s}"]
           pair=stack_provider.key_pairs.get("#{key_name}")
           if pair.nil?
@@ -165,32 +165,56 @@ module Mccloud
             #reading private key
             public_key=""
             File.open("#{stack.public_key[name]}") {|f| public_key << f.read} 
-            
+
             stack_provider.key_pairs.create(
             :name => key_name,
             :public_key => public_key )
-            end
-        end
-       end
-
-       Mccloud.session.config.vms.each do |name,vm|
-          vm_provider=@session.config.providers["#{vm.provider+"-"+vm.provider_options[:region].to_s}"]
-          pair=vm_provider.key_pairs.get("#{vm.key_name}")
-          if pair.nil?
-            puts "Key - #{vm.key_name}"
-            puts "#{key_name} does not exist at #{vm.provider} in region #{vm.provider_options[:region]}"
           end
-       end
-
-      #listing stacks
-      @session.config.stacks.each do |name,stack|
-          stack.filtered_instance_names.each do |instancename|
-          puts "Stack #{name} - #{instancename}"
-          
         end
       end
       
-      # Loading VMS
+      @session.config.vms.each do |name,vm|
+        vm_provider=@session.config.providers["#{vm.provider+"-"+vm.provider_options[:region].to_s}"]
+        pair=vm_provider.key_pairs.get("#{vm.key_name}")
+        if pair.nil?
+          puts "Key - #{vm.key_name}"
+          puts "#{key_name} does not exist at #{vm.provider} in region #{vm.provider_options[:region]}"
+        end
+      end
+
+      
+      puts "Checking security group(s)"
+      @session.config.vms.each do |name,vm|
+        vm_provider=@session.config.providers["#{vm.provider+"-"+vm.provider_options[:region].to_s}"]
+      
+        mcgroup=vm_provider.security_groups.get("#{vm.create_options[:groups].first}")
+        if mcgroup.nil?
+          "#{vm.create_options[:groups].first} does not exist at region #{vm.provider_options[:region].to_s}"
+          sg=vm_provider.security_groups.new
+          sg.name="#{vm.create_options[:groups].first}"
+          sg.description="#{vm.create_options[:groups].first}"
+          sg.save
+          
+          puts "Authorizing access to port 22"
+          sg.authorize_port_range(22..22)
+        end
+      end      
+
+
+
+      #listing stacks
+      @session.config.stacks.each do |name,stack|
+        stack.filtered_instance_names.each do |instancename|
+          puts "Stack #{name} - #{instancename}"
+
+        end
+      end
+
+      # Loading defined VMS 
+#      @session.config.vms.each do |name,vm|
+#        
+#      end
+      
       #Resetting the list
       filter=@session.config.mccloud.filter
       stack_filter=@session.config.mccloud.stackfilter
@@ -199,11 +223,11 @@ module Mccloud
       @session.config.providers.each do |name,provider|
         server_list=Hash.new
 
-        # get all servers (filtered)
+        # get all servers running on each provider (filtered)
         provider.servers.each do |server|
 
           unless server.state=="terminated"
-          
+
             full_name="#{server.tags['Name']}"
             if full_name.start_with?(filter)
 
@@ -219,13 +243,14 @@ module Mccloud
                 undeclared_vm.server_id=server.id
                 @session.config.vms[short_name]=undeclared_vm                
               else
-                
+
               end
-            
+
+  
               # Set the server.id of the vm
               @session.config.vms[short_name].server_id=server.id
               @session.config.vms[short_name].provider=name
-            
+
               # Check if the server is part of a stack
               stack_name=server.tags['aws:cloudformation:stack-name']
 
@@ -246,17 +271,17 @@ module Mccloud
                   puts "Stack #{filtered_stack_name} is not defined "
 
                 end
-                
-                
-                
+
+
+
               end
-              
-            
+
+
             end
           end
         end
       end
-      
+
     end
   end
 end

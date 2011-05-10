@@ -1,0 +1,5 @@
+* Mcollective stack - http://docs.puppetlabs.com/mcollective/ec2demo.html
+http://mcollective-101-demo.s3.amazonaws.com/cloudfront_demo.json
+
+* Drupal stack - http://bitnami.org/stack/drupal
+http://bitnami.org/cloudformation/drupal.template

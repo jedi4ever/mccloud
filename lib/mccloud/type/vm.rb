@@ -13,7 +13,7 @@ module Mccloud
     attr_accessor :private_key
     attr_accessor :public_key
     attr_accessor :key_name
-    
+
     attr_accessor :bootstrap
     attr_accessor :provisioner
     attr_accessor :forwardings
@@ -26,6 +26,7 @@ module Mccloud
       @forwardings=Array.new
       @stacked=false
       @declared=true
+      @provisioner=nil
       # Default to us-east-1
       @provider_options={:region => "us-east-1"}
     end
@@ -38,10 +39,35 @@ module Mccloud
       return stacked
     end
     
+    def provision(type)
+      case type
+      when :chef_solo
+        @provisioner=Mccloud::Provisioner::ChefSolo.new
+      when :puppet
+        @provisioner=Mccloud::Provisioner::Puppet.new        
+      else
+      end
+      yield @provisioner
+      
+      #Mccloud.session.config.provisioners[type.to_s]=@provisioner
+#      @vm.provisioner=@provisioner
+    end
+    
     def instance
+    
       if @this_instance.nil?
         begin
-          @this_instance=Mccloud.session.config.providers[provider].servers.get(server_id)
+         # puts "#{provider}"
+         # puts " - #{provider_options[:region]} - testing"
+         #pp Mccloud.session.config.providers
+         #-#{provider_options[:region]}"
+         full_provider="#{@provider}"
+         #puts full_provider
+         #"#{@provider}"
+
+
+         #TODO !!!! - hardcoded is here
+          @this_instance=Mccloud.session.config.providers["AWS-eu-west-1"].servers.get(server_id)
         rescue Fog::Service::Error => e
           puts "Error: #{e.message}"
           puts "We could not request the information from your provider #{provider}. We suggest you check your credentials."

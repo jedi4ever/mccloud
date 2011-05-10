@@ -1,12 +1,24 @@
 require 'mccloud/util/rsync'
 require 'mccloud/util/ssh'
+require 'erb'
+require 'ostruct'
+ 
+
+    
 module Mccloud
   module Provisioner
+    class ErbBinding < OpenStruct
+        def get_binding
+            return binding()
+        end
+    end
+    
     class ChefSolo
       attr_accessor :cookbooks_path 
       attr_accessor :role_path 
       attr_accessor :provisioning_path
       attr_accessor :json
+      attr_accessor :json_erb
       attr_reader   :roles
       attr_accessor :node_name
       attr_accessor :log_level
@@ -21,12 +33,46 @@ module Mccloud
       def initialize
         @provisioning_path="/tmp/mccloud-chef"
         @json={ :instance_role => "mccloud"}
+        @json_erb=true
       end
       
       def run(vm)
-        puts "we ran mylord"
-        json=@json.to_json
-        puts json
+        if @json_erb
+          # http://stackoverflow.com/questions/1338960/ruby-templates-how-to-pass-variables-into-inlined-erb
+ 
+           
+          public_ips=Hash.new
+          private_ips=Hash.new
+          
+          Mccloud::Config.config.vms.each do |name,vm|
+            unless vm.instance.nil?
+              public_ips[name]=vm.instance.public_ip_address
+              private_ips[name]=vm.instance.private_ip_address
+            end
+          end
+
+          # http://www.techques.com/question/1-3242470/Problem-using-OpenStruct-with-ERB
+          # We only want specific variables for ERB
+          data = { :public_ips => public_ips, :private_ips => private_ips}
+          vars = ErbBinding.new(data)
+          
+          template = @json.to_json.to_s
+          erb = ERB.new(template)
+          
+          vars_binding = vars.send(:get_binding)
+          result=erb.result(vars_binding)
+          
+          #Result = String
+          #JSON.parse result = Hash
+          #.to_json = String containing JSON formatting of Hash
+           
+          json=JSON.parse(result).to_json
+          
+
+        else
+          json=@json.to_json
+        end
+                
         cooks=Array.new
         @cookbooks_path.each do |cook|
           cooks << File.join("/tmp/"+File.basename(cook))
@@ -42,12 +88,13 @@ module Mccloud
           Mccloud::Util.rsync(path,vm,vm.instance)
         end
         
-        puts "Running chef-solo"
+        puts "[#{vm.name}] - running chef-solo"
         options={ :port => 22, :keys => [ vm.private_key ], :paranoid => false, :keys_only => true}
+        puts "#{vm.user}"
         if vm.user=="root"
-          Mccloud::Util.ssh(vm.instance.public_ip_address,vm.user,options,"sudo chef-solo -c /tmp/solo.rb -j /tmp/dna.json -l debug")
-        else
           Mccloud::Util.ssh(vm.instance.public_ip_address,vm.user,options,"chef-solo -c /tmp/solo.rb -j /tmp/dna.json -l debug")
+        else
+          Mccloud::Util.ssh(vm.instance.public_ip_address,vm.user,options,"sudo -i chef-solo -c /tmp/solo.rb -j /tmp/dna.json -l debug")
         end
       end
       # Returns the run list for the provisioning

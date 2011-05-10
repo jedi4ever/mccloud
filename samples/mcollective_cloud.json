@@ -1,0 +1,198 @@
+{
+  "AWSTemplateFormatVersion" : "2010-09-09",
+
+  "Description" : "Marionette Collective 1.0.1 demo network with 1 ActiveMQ broker and 5 managed instances",
+
+  "Parameters" : {
+    "KeyName" : {
+      "Description" : "Name of an existing EC2 KeyPair to enable SSH access to the instances",
+      "Type" : "String"
+    },
+
+    "Password" : {
+      "Description" : "Password for ActiveMQ",
+      "NoEcho": "true",
+      "Type" : "String"
+    },
+
+    "PSK" : {
+      "Description" : "Pre Shared Key for MCollective",
+      "NoEcho": "true",
+      "Type" : "String"
+    }
+  },
+
+  "Resources" : {
+    "ActiveMQInstance" : {
+      "Type" : "AWS::EC2::Instance",
+      "Properties" : {
+        "InstanceType" : "m1.small",
+        "SecurityGroups" : [ { "Ref" : "ActiveMQSecurityGroup" } ],
+        "AvailabilityZone" : "eu-west-1b",
+	"ImageId" : "ami-3fb4804b",
+        "KeyName" : { "Ref" : "KeyName" },
+	"Tags" : [ { "Key" : "Name",
+		     "Value" : "management_node"
+		 } ],
+        "UserData" : {"Fn::Base64" :
+	                 {"Fn::Join": [ "\n", [
+			                         "mcollective=server",
+			                         {"Fn::Join": [ "", ["mcollective_password=", { "Ref": "Password" }]]},
+			                         {"Fn::Join": [ "", ["mcollective_psk=", { "Ref": "PSK" }]]}
+					      ]
+				      ]
+
+			 }
+	             }
+      }
+    },
+
+    "ManagedInstance1" : {
+      "Type" : "AWS::EC2::Instance",
+      "Properties" : {
+        "InstanceType" : "m1.small",
+        "AvailabilityZone" : "eu-west-1b",
+        "SecurityGroups" : [ { "Ref" : "ActiveMQSecurityGroup" } ],
+	"ImageId" : "ami-3fb4804b",
+        "KeyName" : { "Ref" : "KeyName" },
+	"Tags" : [ { "Key" : "Name",
+		     "Value" : "node1"
+		 } ],
+        "UserData" : {"Fn::Base64" :
+	                 {"Fn::Join": [ "\n", [
+			                         {"Fn::Join": [ "", ["mcollective=", {"Fn::GetAtt": [ "ActiveMQInstance", "PublicIp"  ]}]] },
+			                         {"Fn::Join": [ "", ["mcollective_password=", { "Ref": "Password" }]]},
+			                         {"Fn::Join": [ "", ["mcollective_psk=", { "Ref": "PSK" }]]}
+					      ]
+				      ]
+
+			 }
+	             }
+      }
+    },
+
+    "ManagedInstance2" : {
+      "Type" : "AWS::EC2::Instance",
+      "Properties" : {
+        "InstanceType" : "m1.small",
+        "AvailabilityZone" : "eu-west-1b",
+        "SecurityGroups" : [ { "Ref" : "ActiveMQSecurityGroup" } ],
+	"ImageId" : "ami-3fb4804b",
+        "KeyName" : { "Ref" : "KeyName" },
+	"Tags" : [ { "Key" : "Name",
+		     "Value" : "node2"
+		 } ],
+        "UserData" : {"Fn::Base64" :
+	                 {"Fn::Join": [ "\n", [
+			                         {"Fn::Join": [ "", ["mcollective=", {"Fn::GetAtt": [ "ActiveMQInstance", "PublicIp"  ]}]] },
+			                         {"Fn::Join": [ "", ["mcollective_password=", { "Ref": "Password" }]]},
+			                         {"Fn::Join": [ "", ["mcollective_psk=", { "Ref": "PSK" }]]}
+					      ]
+				      ]
+
+			 }
+	             }
+      }
+    },
+
+    "ManagedInstance3" : {
+      "Type" : "AWS::EC2::Instance",
+      "Properties" : {
+        "InstanceType" : "m1.small",
+        "AvailabilityZone" : "eu-west-1a",
+        "SecurityGroups" : [ { "Ref" : "ActiveMQSecurityGroup" } ],
+	"ImageId" : "ami-3fb4804b",
+        "KeyName" : { "Ref" : "KeyName" },
+	"Tags" : [ { "Key" : "Name",
+		     "Value" : "node3"
+		 } ],
+        "UserData" : {"Fn::Base64" :
+	                 {"Fn::Join": [ "\n", [
+			                         {"Fn::Join": [ "", ["mcollective=", {"Fn::GetAtt": [ "ActiveMQInstance", "PublicIp"  ]}]] },
+			                         {"Fn::Join": [ "", ["mcollective_password=", { "Ref": "Password" }]]},
+			                         {"Fn::Join": [ "", ["mcollective_psk=", { "Ref": "PSK" }]]}
+					      ]
+				      ]
+
+			 }
+	             }
+      }
+    },
+
+    "ManagedInstance4" : {
+      "Type" : "AWS::EC2::Instance",
+      "Properties" : {
+        "InstanceType" : "m1.small",
+        "AvailabilityZone" : "eu-west-1a",
+        "SecurityGroups" : [ { "Ref" : "ActiveMQSecurityGroup" } ],
+	"ImageId" : "ami-3fb4804b",
+        "KeyName" : { "Ref" : "KeyName" },
+	"Tags" : [ { "Key" : "Name",
+		     "Value" : "node4"
+		 } ],
+        "UserData" : {"Fn::Base64" :
+	                 {"Fn::Join": [ "\n", [
+			                         {"Fn::Join": [ "", ["mcollective=", {"Fn::GetAtt": [ "ActiveMQInstance", "PublicIp"  ]}]] },
+			                         {"Fn::Join": [ "", ["mcollective_password=", { "Ref": "Password" }]]},
+			                         {"Fn::Join": [ "", ["mcollective_psk=", { "Ref": "PSK" }]]}
+					      ]
+				      ]
+
+			 }
+	             }
+      }
+    },
+
+    "ManagedInstance5" : {
+      "Type" : "AWS::EC2::Instance",
+      "Properties" : {
+        "InstanceType" : "m1.small",
+        "AvailabilityZone" : "eu-west-1a",
+        "SecurityGroups" : [ { "Ref" : "ActiveMQSecurityGroup" } ],
+	"ImageId" : "ami-3fb4804b",
+        "KeyName" : { "Ref" : "KeyName" },
+	"Tags" : [ { "Key" : "Name",
+		     "Value" : "node5"
+		 } ],
+        "UserData" : {"Fn::Base64" :
+	                 {"Fn::Join": [ "\n", [
+			                         {"Fn::Join": [ "", ["mcollective=", {"Fn::GetAtt": [ "ActiveMQInstance", "PublicIp"  ]}]] },
+			                         {"Fn::Join": [ "", ["mcollective_password=", { "Ref": "Password" }]]},
+			                         {"Fn::Join": [ "", ["mcollective_psk=", { "Ref": "PSK" }]]}
+					      ]
+				      ]
+
+			 }
+	             }
+      }
+    },
+
+    "ActiveMQSecurityGroup" : {
+      "Type" : "AWS::EC2::SecurityGroup",
+      "Properties" : {
+        "GroupDescription" : "Enable SSH and ActiveMQ access",
+        "SecurityGroupIngress" : [
+	  {
+            "IpProtocol" : "tcp",
+            "FromPort" : "22",
+            "ToPort" : "22",
+            "CidrIp" : "0.0.0.0/0"
+          },
+	  {
+            "IpProtocol" : "tcp",
+            "FromPort" : "6163",
+            "ToPort" : "6163",
+            "CidrIp" : "0.0.0.0/0"
+	  }
+	  ]
+      }
+    }
+  },
+
+  "Outputs": {
+    "ManagementConsole": {
+      "Value" : { "Fn::GetAtt" : [ "ActiveMQInstance", "PublicIp" ] },
+      "Description" : "Address for the management instance"
+    }
+  }
+}

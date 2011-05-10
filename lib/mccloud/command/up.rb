@@ -78,11 +78,12 @@ module Mccloud
       end
 
       #only do stacks for now
-      return
       
       on_selected_machines(selection) do |id,vm|
 
-        provider=@session.config.providers[vm.provider]
+        # We need to get the correct provider  + region
+        
+        provider=@session.config.providers[vm.provider+"-"+vm.provider_options[:region]]
         if (id.nil?)
           create_options=vm.create_options
           boxname=vm.name
@@ -102,7 +103,8 @@ module Mccloud
           provider.create_tags(instance.id, { "Name" => "#{filter}#{boxname}"})
 
           # Resetting the in memory model of the new machine
-          @all_servers[boxname.to_s]=instance.id
+          @session.config.vms[boxname.to_s].server_id=instance.id
+          @session.config.vms[boxname.to_s].provider=@session.config.vms[boxname.to_s].provider+"-"+@session.config.vms[boxname.to_s].provider_options[:region]
           unless @session.config.vms[boxname.to_s].nil?
             @session.config.vms[boxname.to_s].reload
           end
@@ -125,14 +127,14 @@ module Mccloud
             vm.instance.wait_for { printf ".";STDOUT.flush;  ready?}  
             puts        
           else
-            puts "Machine #{selection} is already running."
+            puts "[#{vm.name}] - already running."
           end
         end
 
-
+        @session.provision(boxname.to_s,options) 
       end
 
-      @session.provision(selection,options)       
+            
 
     end
  

@@ -1,0 +1,102 @@
+{
+  "AWSTemplateFormatVersion" : "2010-09-09",
+
+  "Description" : "The BitNami Drupal 7.0: Drupal is a content management platform that allows an individual or community of users to easily publish, manage, and organize a wide variety of content on a website. In general, Drupal is used for community web portals, discussion sites, corporate web sites, intranet applications, personal web sites or blogs, aficionado sites, e-commerce applications, resource directories, and social networking sites. Drupal is easy to extend by plugging in one or more of the dozens of freely available modules. For more information, please visit:  http://bitnami.org.",
+
+  "Parameters" : {
+    "BitnamiInstanceType" : {
+      "Default" : "m1.small",
+      "Type" : "String",
+      "Description" : "The type of EC2 instances: only t1.micro, m1.small and m1.medium supported"
+    },
+    "KeyName": {
+      "Description" : "Name of an existing EC2 KeyPair to enable SSH access",
+      "Type": "String",
+      "Default" : "default"
+    },
+    "BitnamiUser" : {
+      "Default" : "user",
+      "Type" : "String",
+      "Description" : "The BitNami Drupal user login"
+    },
+    "BitnamiPassword" : {
+      "Default" : "bitnami",
+      "Type" : "String",
+      "Description" : "The BitNami Drupal user password (minimum 6 characters, default value: bitnami )",
+      "NoEcho" : "TRUE"
+    },
+    "BitnamiEmail" : {
+      "Default" : "user@example.com",
+      "Description" : "The BitNami Drupal user email",
+      "Type" : "String"
+    },
+    "BitnamiUserName" : {
+      "Default" : "BitNami User",
+      "Description" : "The BitNami Drupal user full name",
+      "Type" : "String"
+    }
+  },
+  "Resources" : {
+    "BitnamiSecurityGroup" : {
+      "Type" : "AWS::EC2::SecurityGroup",
+      "Properties" : {
+        "GroupDescription" : "Allow HTTP/SSH to BitNami machine.",
+        "SecurityGroupIngress" : [ {
+          "IpProtocol" : "tcp",
+          "FromPort" : "80",
+          "ToPort" : "80",
+          "CidrIp" : "0.0.0.0/0"
+        }, {
+          "IpProtocol" : "tcp",
+          "FromPort" : "22",
+          "ToPort" : "22",
+          "CidrIp" : "0.0.0.0/0"
+        } ]
+      }
+    },
+    "BitnamiServer" : {
+      "Type" : "AWS::EC2::Instance",
+      "Properties" : {
+        "ImageId" : { "Fn::FindInMap": [ "AWSRegionArch2AMI", { "Ref": "AWS::Region" }, { "Fn::FindInMap": [ "AWSInstanceType2Arch", {"Ref": "BitnamiInstanceType" },"Arch" ] } ]},
+        "KeyName" : {"Ref": "KeyName"},
+        "SecurityGroups" : [ { "Ref" : "BitnamiSecurityGroup" } ],
+        "UserData" : { "Fn::Base64" : { "Fn::Join" : [ "\n", [ 
+        { "Fn::Join" : [ "=", [ "base_user", { "Ref" : "BitnamiUser" } ] ] }, 
+        { "Fn::Join" : [ "=", [ "base_mail", { "Ref" : "BitnamiEmail" } ] ] }, 
+        { "Fn::Join" : [ "=", [ "base_user_name", { "Ref" : "BitnamiUserName" } ] ] }, 
+        { "Fn::Join" : [ "=", [ "base_password", { "Ref" : "BitnamiPassword" } ] ] },
+        { "Fn::Join" : [ "=", [ "stack_name", "drupal" ] ] },
+        { "Fn::Join" : [ "=", [ "stack_version", "7.0-0" ] ] }
+         ] ] } },
+        "InstanceType" : { "Ref" : "BitnamiInstanceType" },
+        "Tags" : [ {
+          "Key" : "Name",
+          "Value" : "The BitNami Drupal 7.0"
+        } ]
+      }
+    },
+    "BitnamiIP" : {
+      "Type" : "AWS::EC2::EIP",
+      "Properties" : {
+        "InstanceId" : { "Ref" : "BitnamiServer" }
+      }
+    }
+
+  },
+  "Mappings": {
+    "AWSInstanceType2Arch" : {
+      "t1.micro"    : { "Arch" : "32" },
+      "m1.small"    : { "Arch" : "32" },
+      "c1.medium"   : { "Arch" : "32" }
+    },
+    "AWSRegionArch2AMI" : {
+      "us-east-1" : { "32" : "ami-986497f1"} 
+    }
+  },
+  "Outputs" : {
+    "URL" : {
+      "Description" : "URL of the BitNami Drupal 7.0 server:",
+      "Value" : { "Fn::Join" : [ "", [ "http://", { "Ref" : "BitnamiIP" } ] ] }
+    }
+  }
+}

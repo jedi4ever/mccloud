@@ -1,0 +1,93 @@
+{
+	"AWSTemplateFormatVersion" : "2010-09-09",
+
+	"Description": "Create a fully functioning stack installation." ,
+	"Parameters": {
+		"InstanceType": {
+			"Description": "Type of EC2 instance to launch",
+			"Type": "String",
+			"Default": "t1.micro"
+		},
+		"WebServerPort": {
+			"Description": "TCP/IP port fo the webserver",
+			"Type": "String",
+			"Default": "80"
+		},
+		"KeyName": {
+			"Description": "Name of an existing EC2 KeyPair to enable SSH access to the instances",
+			"Type": "String"
+		}
+	},
+
+	"Mappings": {
+		"AWSInstanceType2Arch": {
+			"t1.micro"    : { "Arch": "64" },
+			"m1.small"    : { "Arch" : "32" },
+			"m1.large"    : { "Arch" : "64" },
+			"m1.xlarge"   : { "Arch" : "64" },
+			"m2.xlarge"   : { "Arch" : "64" },
+			"m2.2xlarge"  : { "Arch" : "64" },
+			"m2.4xlarge"  : { "Arch" : "64" },
+			"c1.medium"   : { "Arch" : "32" },
+			"c1.xlarge"   : { "Arch" : "64" },
+			"cc1.4xlarge" : { "Arch" : "64" } 
+		}, 
+		"AWSRegionArch2AMI": {
+			"us-east-1": { "32": "ami-3e02f257", "64": "ami-3202f25b" }
+		}
+	},
+
+	"Resources": {
+		"webcf": {
+			"Type": "AWS::EC2::Instance",
+			"Properties": {
+				"InstanceType": { "Ref": "InstanceType" },
+				"SecurityGroups": [ { "Ref": "patrickweb" }, "default"  ],
+				"KeyName": { "Ref": "KeyName" },
+				"Tags": [ {
+						"Key": "Name",
+						"Value": "drupal"
+				} ],
+				"ImageId": { "Fn::FindInMap" : [
+				 	"AWSRegionArch2AMI", { "Ref": "AWS::Region" },
+					{ "Fn::FindInMap": [ "AWSInstanceType2Arch", { "Ref": "InstanceType" }, "Arch" ] } 
+				] }
+			}
+		},
+
+		"patrickweb": {
+			"Type": "AWS::EC2::SecurityGroup",
+			"Properties": {
+				"GroupDescription": "Web security group, allows port 80 in",
+				"SecurityGroupIngress": [ {
+					"IpProtocol": "tcp",
+					"FromPort": "22",
+					"ToPort": "22",
+					"CidrIp": "0.0.0.0/0"
+					},
+					{
+						"IpProtocol": "tcp",
+						"FromPort": { "Ref": "WebServerPort" },
+						"ToPort": { "Ref": "WebServerPort" },
+						"CidrIp": "0.0.0.0/0"
+				} ]
+			}
+		}
+	},
+
+	"Outputs" : {
+		"InstanceId" : {
+			"Description" : "InstanceId of the newly created EC2 instance",
+			"Value" : { "Ref" : "webcf" }
+		},
+		"AZ" : {
+			"Description" : "Availability Zone of the newly created EC2 instance",
+			"Value" : { "Fn::GetAtt" : [ "webcf", "AvailabilityZone" ] }
+		},
+		"PublicIP" : {
+			"Description" : "Public IP address of the newly created EC2 instance",
+			"Value" : { "Fn::GetAtt" : [ "webcf", "PublicIp" ] }
+		}
+	}
+
+}

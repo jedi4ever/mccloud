@@ -20,17 +20,7 @@ module Mccloud
       @vm.name=name
       Mccloud.session.config.vms[name.to_s]=@vm
     end
-    def provision(type)
-      case type
-      when :chef_solo
-        @provisioner=Mccloud::Provisioner::ChefSolo.new
-      when :puppet
-        @provisioner=Mccloud::Provisioner::Puppet.new        
-      else
-      end
-      yield @provisioner
-      Mccloud.session.config.provisioners[type.to_s]=@provisioner
-    end
+
   end
   
 end

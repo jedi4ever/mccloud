@@ -11,12 +11,12 @@ module Mccloud
         instance.username = vm.user
   
         #p vm.provisioner
-        provisioner=@session.config.provisioners[vm.provisioner.to_s]
+        provisioner=vm.provisioner
         if provisioner.nil?
           # We take the first provisioner defined
           #provisioner=@session.config.provisioners.first[1]
         else
-          puts "Starting provisioning on #{vm.name} with #{vm.provisioner} as provisioner"
+          puts "[#{vm.name}] - starting provisioning with #{vm.provisioner} as provisioner"
           provisioner.run(vm)
         end
       end

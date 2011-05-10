@@ -1,0 +1,117 @@
+Mccloud::Config.run do |config|
+  # All Mccloud configuration is done here. For a detailed explanation
+  # and listing of configuration options, please view the documentation
+  # online.
+
+  config.mccloud.prefix="mccloud"
+  config.mccloud.environment="development"
+  config.mccloud.identity="patrick"
+
+ config.vm.define "backend" do |sqr_be_config|
+   sqr_be_config.vm.provider="AWS"
+   sqr_be_config.vm.provider_options={ :region => "eu-west-1"}
+
+   #admin_config.vm.provisioner=:chef_solo
+   sqr_be_config.vm.create_options={ 
+     # ID = "ami-e59ca991" = Ubuntu 10.10 - Maverick 64-bit (Canonical/EBS) - Euwest1
+     :image_id => "ami-e59ca991" , 
+     :flavor_id => "m1.large",
+     :groups => %w(mccloud-development-patrick-securitygroup),
+     :key_name => "mccloud-key-patrick",
+     :availability_zone => "eu-west-1a" 
+   }
+   sqr_be_config.vm.forward_port("redis", 6379, 6379)
+   sqr_be_config.vm.forward_port("postgres", 5432, 5432)
+   sqr_be_config.vm.forward_port("sphinx", 9312, 9312)
+   sqr_be_config.vm.user="ubuntu"
+   sqr_be_config.vm.bootstrap="definitions/project-ubuntu/bootstrap-ubuntu-system.sh"
+   sqr_be_config.vm.key_name="mccloud-key-patrick"
+   sqr_be_config.vm.private_key="/Users/patrick/.ssh/mccloud_rsa"
+   sqr_be_config.vm.public_key="/Users/patrick/.ssh/mccloud_rsa.pub"
+   
+   sqr_be_config.vm.provision :chef_solo do |chef|
+       chef.cookbooks_path = ["../project-chefrepo/cookbooks","../project-chefrepo/site-cookbooks"]
+       chef.log_level = "debug"
+       chef.add_recipe("myapp::backend")
+       chef.json.merge!({
+    	      :myapp => {
+             :redis_host_ip => "<%= private_ips['backend'] %>",
+             :postgres_host_ip => "<%= private_ips['backend'] %>",
+             :sphinx_host_ip => "<%= private_ips['backend'] %>"
+       }})
+   end
+   
+
+ end
+ 
+ config.vm.define "frontend" do |sqr_fe_config|
+ 
+    sqr_fe_config.vm.provider="AWS"
+    sqr_fe_config.vm.provider_options={ :region => "eu-west-1"}
+
+    sqr_fe_config.vm.provisioner=:chef_solo
+    sqr_fe_config.vm.create_options={ 
+      # ID = "ami-e59ca991" = Ubuntu 10.10 - Maverick 64-bit (Canonical/EBS) - Euwest1
+      :image_id => "ami-e59ca991" , 
+      :flavor_id => "m1.large",
+      :groups => %w(mccloud-development-patrick-securitygroup),
+      :key_name => "mccloud-key-patrick",
+      :availability_zone => "eu-west-1a" 
+    }
+    sqr_fe_config.vm.forward_port("http", 8080, 8080)
+    sqr_fe_config.vm.forward_port("http", 9000, 9000)
+    sqr_fe_config.vm.user="ubuntu"
+    sqr_fe_config.vm.bootstrap="definitions/project-ubuntu/bootstrap-ubuntu-system.sh"
+    sqr_fe_config.vm.key_name="mccloud-key-patrick"
+    sqr_fe_config.vm.private_key="/Users/patrick/.ssh/mccloud_rsa"
+    sqr_fe_config.vm.public_key="/Users/patrick/.ssh/mccloud_rsa.pub"
+
+    sqr_fe_config.vm.provision :chef_solo do |chef|
+        chef.cookbooks_path = ["../project-chefrepo/cookbooks","../project-chefrepo/site-cookbooks"]
+        chef.log_level = "debug"
+        chef.add_recipe("myapp::frontend")
+        chef.json.merge!({
+     	      :myapp => {
+              :redis_host_ip => "<%= private_ips['backend'] %>",
+              :postgres_host_ip => "<%= private_ips['backend'] %>",
+              :sphinx_host_ip => "<%= private_ips['backend'] %>"
+              
+        }})
+    end
+    
+  end
+
+
+  config.vm.define "logger" do |logger_config|
+    logger_config.vm.provider="AWS"
+    logger_config.vm.provider_options={ :region => "eu-west-1"}
+
+    #admin_config.vm.provisioner=:chef_solo
+    logger_config.vm.create_options={ 
+      # ID = "ami-e59ca991" = Ubuntu 10.10 - Maverick 64-bit (Canonical/EBS) - Euwest1
+      :image_id => "ami-476d5b33" , 
+      :flavor_id => "m1.large",
+      :groups => %w(mccloud-development-patrick-securitygroup),
+      :key_name => "mccloud-key-patrick",
+      :availability_zone => "eu-west-1a" 
+    }
+    logger_config.vm.forward_port("http", 8080, 8080)
+    logger_config.vm.user="ubuntu"
+    logger_config.vm.bootstrap="definitions/project-ubuntu/bootstrap-ubuntu-system.sh"
+    logger_config.vm.key_name="mccloud-key-patrick"
+    logger_config.vm.private_key="/Users/patrick/.ssh/mccloud_rsa"
+    logger_config.vm.public_key="/Users/patrick/.ssh/mccloud_rsa.pub"
+
+    logger_config.vm.provision :chef_solo do |chef|
+        chef.cookbooks_path = ["../project-chefrepo/cookbooks","../project-chefrepo/site-cookbooks"]
+        chef.log_level = "debug"
+        chef.add_recipe("app_logger::default")
+        chef.json.merge!({
+     	      :app_logger => {
+              :redis_host_ip => "<%= private_ips['backend'] %>",
+        }})
+    end
+
+  end
+  
+end

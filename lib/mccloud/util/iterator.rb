@@ -4,16 +4,19 @@ module Mccloud
     def on_selected_machines(selection=nil)
       if selection.nil? || selection == "all"
         #puts "no selection - all machines"
+
         @session.config.vms.each do |name,vm|
-          id=@all_servers["#{name}"]
+          id=@session.config.vms[name].server_id
           vm=@session.config.vms[name]
-            yield id,vm
+          yield id,vm
         end
       else
         name=selection
-        id=@all_servers["#{name}"]
-        vm=@session.config.vms[name]
+        if @session.config.vms.has_key?(name)
+          id=@session.config.vms[name].server_id
+          vm=@session.config.vms[name]
           yield id,vm
+        end
       end
     end
 
@@ -28,10 +31,13 @@ module Mccloud
         end
       else
         name=selection
+
         #Would this be StackId?
-        id=-1
-        stack=@session.config.stacks[name]
+        if @session.config.stacks.has_key?(name)
+          id=-1
+          stack=@session.config.stacks[name]
           yield id,stack
+        end
       end
     end
 
