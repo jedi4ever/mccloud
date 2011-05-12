@@ -6,9 +6,14 @@ module Mccloud
         #puts "no selection - all machines"
 
         @session.config.vms.each do |name,vm|
-          id=@session.config.vms[name].server_id
-          vm=@session.config.vms[name]
-          yield id,vm
+          
+          if vm.auto_selected?
+            id=@session.config.vms[name].server_id
+            vm=@session.config.vms[name]
+            yield id,vm
+          else
+            puts "[#{name}] Skipping because it has autoselection off"
+          end
         end
       else
         name=selection

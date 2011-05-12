@@ -14,6 +14,8 @@ module Mccloud
     attr_accessor :public_key
     attr_accessor :key_name
 
+    attr_accessor :auto_selection
+    
     attr_accessor :bootstrap
     attr_accessor :provisioner
     attr_accessor :forwardings
@@ -25,6 +27,7 @@ module Mccloud
     def initialize
       @forwardings=Array.new
       @stacked=false
+      @auto_selection=true
       @declared=true
       @provisioner=nil
       # Default to us-east-1
@@ -37,6 +40,10 @@ module Mccloud
     
     def stacked?
       return stacked
+    end
+    
+    def auto_selected?
+      return auto_selection
     end
     
     def provision(type)
