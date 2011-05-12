@@ -6,7 +6,7 @@ module Mccloud
         #puts "no selection - all machines"
 
         @session.config.vms.each do |name,vm|
-          
+#          puts "#{name}"
           if vm.auto_selected?
             id=@session.config.vms[name].server_id
             vm=@session.config.vms[name]
@@ -17,7 +17,12 @@ module Mccloud
         end
       else
         name=selection
+#        puts "#{name}"
+#        pp  @session.config.vms
+        #puts "#{@session.config.vms.keys}"
+        
         if @session.config.vms.has_key?(name)
+          #puts "found #{name} key"
           id=@session.config.vms[name].server_id
           vm=@session.config.vms[name]
           yield id,vm

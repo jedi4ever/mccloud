@@ -110,7 +110,7 @@ module Mccloud
           end
 
           # Wait for ssh to become available ...
-          puts "Waiting for ssh to be come available"
+          puts "Waiting for ssh to become available"
           #puts instance.console_output.body["output"]
 
           Mccloud::Util.execute_when_tcp_available(instance.public_ip_address, { :port => 22, :timeout => 60 }) do
