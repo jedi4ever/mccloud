@@ -7,6 +7,9 @@ module Mccloud
         filter=@session.config.mccloud.filter
         puts "Using Filter: #{filter}"
 
+        puts
+        puts "Server(s)"
+          
         printf "%-10s %-12s %-20s %-15s %-8s\n", "Name", "Instance Id", "IP", "Type","Status"
         80.times { |i| printf "=" } ; puts
       else
@@ -45,6 +48,8 @@ module Mccloud
   
     end
       
+       
+        
       @session.config.providers.each  do |name,provider|
           
           provider.servers.each do |vm|
@@ -67,7 +72,24 @@ module Mccloud
               end
             end
           end #End 1 provider
+          
         end #providers
+
+        puts
+        puts "Images"
+        80.times { |i| printf "=" } ; puts
+        # Loop over images
+        @session.config.providers.each  do |name,provider|
+          puts "#{name}"
+          #pp provider
+          images_list=provider.images.all({"Owner" => "self"}) 
+          images_list.each do |image|
+              printf "%-10s %-10s %-10s %-40s\n",image.id,image.name.gsub(/"#{filter}"/,''),image.state, image.description
+              #pp image
+          end
+          
+        end 
+        
     end #def
   end #module
 end

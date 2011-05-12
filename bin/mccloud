@@ -31,7 +31,7 @@ class MccloudCLI < Thor
     @session.up(selection,options)
   end
   
-  desc "status", "Show a status of all machines that are configured"
+  desc "status", "Show a status of all machines and images that are configured"
   method_options :verbose => false
   def status(selection=nil)
     create_session
@@ -94,6 +94,22 @@ class MccloudCLI < Thor
     @session.bootstrap(selection,script,options)
   end
 
+  desc "package [NAME]", "Packages the current state of a machine into an image"
+  method_options :name => :string      
+  method_options :description => :string      
+  method_options :dontwait => :boolean      
+  def package(selection=nil)
+    create_session
+    @session.package(selection,options)
+  end
+  
+  desc "deregister [IMAGE-ID]", "Deregisters an image"
+  def deregister(imageId=nil)
+    create_session
+    @session.deregister(imageId,options)
+  end
+  
+  
 #  desc "multi","multi"
 #  method_options :verbose => :boolean  
 #  def multi(selection=nil,command="who am i")

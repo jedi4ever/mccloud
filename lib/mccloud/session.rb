@@ -21,6 +21,8 @@ require 'mccloud/command/suspend'
 require 'mccloud/command/destroy'
 require 'mccloud/command/provision'
 require 'mccloud/command/server'
+require 'mccloud/command/package'
+require 'mccloud/command/deregister'
 
 require 'mccloud/type/vm'
 require 'mccloud/util/sshkey'
