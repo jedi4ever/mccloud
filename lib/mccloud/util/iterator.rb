@@ -30,6 +30,28 @@ module Mccloud
       end
     end
 
+    def on_selected_lbs(selection=nil)
+      if selection.nil? || selection == "all"
+        #puts "no selection - all loadbalancers"
+        @session.config.lbs.each do |name,lb|
+          #Would this be StackId?
+          id=-1
+          lb=@session.config.lbs[name]
+            yield id,lb
+        end
+      else
+        name=selection
+
+        #Would this be StackId?
+        if @session.config.lbs.has_key?(name)
+          id=-1
+          stack=@session.config.lbs[name]
+          yield id,stack
+        end
+      end
+      
+    end
+    
     def on_selected_stacks(selection=nil)
       if selection.nil? || selection == "all"
         #puts "no selection - all machines"

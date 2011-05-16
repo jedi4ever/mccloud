@@ -59,12 +59,26 @@ class MccloudCLI < Thor
     @session.suspend(selection,options)
   end
 
+  desc "flavors", "Lists all available flavors"
+  method_options :force => :boolean
+  def flavors()
+    create_session
+    @session.flavors()
+  end
+  
 #  desc "boot", "same a"
 #  method_options :force => :boolean
 #  def boot(selection=nil)
 #    create_session
 #    @session.boot(selection,options)
 #  end
+
+  desc "loadbalance [NAME]", "Updates the server instances of the loadbalancer"
+  method_options :force => :boolean   
+  def loadbalance(selection=nil)
+    create_session
+    @session.loadbalance(selection,options)
+  end
 
   desc "destroy [NAME]", "Destroys the machine"
   method_options :force => :boolean  

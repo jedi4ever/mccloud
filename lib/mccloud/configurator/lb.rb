@@ -1,6 +1,3 @@
-require 'mccloud/provisioner/chef_solo'
-require 'mccloud/provisioner/puppet'
-
 require 'mccloud/type/lb'
 
 module Mccloud

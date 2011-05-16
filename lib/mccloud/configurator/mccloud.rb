@@ -10,7 +10,7 @@ module Mccloud
       
       def initialize()
           @prefix="mccloud"
-          @delimiter=" - "
+          @delimiter="-"
           @environment=""
           @identity=""
           @loglevel=:info

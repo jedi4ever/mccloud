@@ -3,7 +3,7 @@ module Mccloud
 
     def self.when_ssh_login_works(ip="localhost", options = {  } , &block)
 
-      defaults={ :port => '22', :timeout => 2000 , :user => 'vagrant', :password => 'vagrant'}
+      defaults={ :port => '22', :timeout => 20000 , :user => 'vagrant', :password => 'vagrant'}
 
       options=defaults.merge(options)
 
@@ -52,7 +52,7 @@ module Mccloud
     #after the machine boots
     def self.execute_when_tcp_available(ip="localhost", options = { } , &block)
 
-      defaults={ :port => 22, :timeout => 2000 , :pollrate => 5}
+      defaults={ :port => 22, :timeout => 20000 , :pollrate => 5}
 
       options=defaults.merge(options)
 

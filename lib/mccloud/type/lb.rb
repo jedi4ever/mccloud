@@ -1,4 +1,3 @@
-require 'mccloud/type/forwarding'
 module Mccloud
   module Type
     
@@ -17,7 +16,13 @@ module Mccloud
     def instance
       if @this_instance.nil?
         begin
-          @this_instance=Mccloud.session.config.providers[provider].servers.get(Mccloud.session.all_servers[name.to_s])
+          if @provider=="AWS"
+            fullname= "#{Mccloud.session.config.mccloud.filter}#{name}"
+            @this_instance=Fog::AWS::ELB.new(provider_options).load_balancers.get(fullname)
+            if @this_instance.nil?
+              puts "Sorry we can't find Loadbalancer with #{fullname} "
+            end
+          end
         rescue Fog::Service::Error => e
           puts "Error: #{e.message}"
           puts "We could not request the information from your provider #{provider}. We suggest you check your credentials."

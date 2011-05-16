@@ -47,8 +47,7 @@ module Mccloud
       end
   
     end
-      
-       
+           
         
       @session.config.providers.each  do |name,provider|
           
@@ -76,7 +75,7 @@ module Mccloud
         end #providers
 
         puts
-        puts "Images"
+        puts "Images:"
         80.times { |i| printf "=" } ; puts
         # Loop over images
         @session.config.providers.each  do |name,provider|
@@ -84,11 +83,22 @@ module Mccloud
           #pp provider
           images_list=provider.images.all({"Owner" => "self"}) 
           images_list.each do |image|
-              printf "%-10s %-10s %-10s %-40s\n",image.id,image.name.gsub(/"#{filter}"/,''),image.state, image.description
+              printf "%-10s %-10s %-10s %-20s\n",image.id,image.name.gsub(/"#{filter}"/,''),image.state, image.description[0..20]
               #pp image
           end
           
         end 
+
+        puts 
+        puts "Loadbalancers:"
+        80.times { |i| printf "=" } ; puts
+
+        @session.config.lbs.each do |name,lb|
+          puts "[#{name}] #{lb.instance.dns_name}" 
+          puts "[#{name}] - In  service: #{lb.instance.instances_in_service}"
+          puts "[#{name}] - Out service: #{lb.instance.instances_out_of_service}"
+          
+        end
         
     end #def
   end #module
