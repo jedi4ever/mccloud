@@ -1,6 +1,7 @@
 require 'mccloud/configurator/mccloud'
 require 'mccloud/configurator/vm'
 require 'mccloud/configurator/lb'
+require 'mccloud/configurator/ip'
 require 'mccloud/configurator/stack'
 
 module Mccloud
@@ -9,6 +10,7 @@ module Mccloud
     attr_accessor :vms
     attr_accessor :lbs
     attr_accessor :stacks
+    attr_accessor :ips
     attr_accessor :providers
     attr_accessor :provisioners
     
@@ -16,16 +18,21 @@ module Mccloud
     attr_accessor :vm
     attr_accessor :stack
     attr_accessor :lb
+    attr_accessor :ip
     attr_accessor :session
     
     def initialize
       @vms=Hash.new
       @lbs=Hash.new
+      @ips=Hash.new
+      
       @stacks=Hash.new
       @providers=Hash.new
       
       @vm=Mccloud::Configurator::VmConfigurator.new
       @lb=Mccloud::Configurator::LbConfigurator.new
+      @ip=Mccloud::Configurator::IpConfigurator.new
+
       @stack=Mccloud::Configurator::StackConfigurator.new
       @mccloud=Mccloud::Configurator::MccloudConfigurator.new	
       @provisioners=Hash.new
@@ -47,6 +54,7 @@ module Mccloud
       
       @config.vm=nil
       @config.lb=nil
+      @config.ip=nil
       @config.stack=nil
     end
   end

@@ -52,6 +52,29 @@ module Mccloud
       
     end
     
+    def on_selected_ips(selection=nil)
+      if selection.nil? || selection == "all"
+        #puts "no selection - all loadbalancers"
+        @session.config.ips.each do |name,ip|
+          #Would this be StackId?
+          id=-1
+          lb=@session.config.ips[name]
+            yield id,ip
+        end
+      else
+        name=selection
+
+        #Would this be StackId?
+        if @session.config.ips.has_key?(name)
+          id=-1
+          stack=@session.config.ips[name]
+          yield id,ip
+        end
+      end
+      
+    end
+    
+    
     def on_selected_stacks(selection=nil)
       if selection.nil? || selection == "all"
         #puts "no selection - all machines"

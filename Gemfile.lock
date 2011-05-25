@@ -2,7 +2,7 @@ PATH
   remote: .
   specs:
     mccloud (0.0.13)
-      fog (~> 0.7.2)
+      fog (~> 0.8.1)
       highline (~> 1.6.1)
       json
       net-scp
@@ -17,17 +17,17 @@ GEM
     Platform (0.4.0)
     builder (3.0.0)
     excon (0.6.3)
-    fog (0.7.2)
+    fog (0.8.1)
       builder
-      excon (>= 0.6.1)
+      excon (~> 0.6.1)
       formatador (>= 0.1.3)
       json
       mime-types
       net-ssh (>= 2.1.3)
       nokogiri (>= 1.4.4)
       ruby-hmac
-    formatador (0.1.3)
-    highline (1.6.1)
+    formatador (0.1.4)
+    highline (1.6.2)
     json (1.5.1)
     mime-types (1.16)
     net-scp (1.0.4)

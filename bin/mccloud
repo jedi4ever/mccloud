@@ -80,6 +80,13 @@ class MccloudCLI < Thor
     @session.loadbalance(selection,options)
   end
 
+  desc "ips [NAME]", "Associates instances with Ips"
+  method_options :force => :boolean   
+  def ips(selection=nil)
+    create_session
+    @session.ips(selection,options)
+  end
+  
   desc "destroy [NAME]", "Destroys the machine"
   method_options :force => :boolean  
   def destroy(selection=nil)

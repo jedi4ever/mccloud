@@ -100,6 +100,14 @@ module Mccloud
           
         end
         
+        puts 
+        puts "Ips:"
+        80.times { |i| printf "=" } ; puts
+
+        @session.config.ips.each do |name,ip|
+          puts "[#{name}] #{ip.address} - #{ip.instance.server_id}"   
+        end
+        
     end #def
   end #module
 end
