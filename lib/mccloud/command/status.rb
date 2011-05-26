@@ -60,7 +60,7 @@ module Mccloud
             if name.start_with?(filter)
               unless filter==""
                 name[filter]=""
-                printf "%-10s %-12s %-20s %-15s %-8s\n",name,vm.id, vm.public_ip_address, vm.flavor.name,vm.state
+                printf "%-10s %-12s %-20s %-20s %-15s %-8s\n",name,vm.id, vm.public_ip_address, vm.private_ip_address,vm.flavor.name,vm.state
               else
                 puts "Name: #{name}"
                 puts "Instance Id: #{vm.id}"
