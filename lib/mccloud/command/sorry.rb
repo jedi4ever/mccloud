@@ -4,16 +4,19 @@ module Mccloud
   module Command
     include Mccloud::Util
     
-    def loadbalance(selection, options)
+    def sorry(selection, options)
       filter=@session.config.mccloud.stackfilter
-
-      puts
-       on_selected_lbs(selection) do |id,lb|
       
+      puts
+      on_selected_lbs(selection) do |id,lb|
+        
+        if lb.sorry_members.nil?
+          puts "[#{lb.name}] has no sorry_members defined, skipping"
+        else
         member_ids=Array.new
         lb_instance=lb.instance
         #Adding new member first
-        lb.members.each do |member|
+        lb.sorry_members.each do |member|
           vm=@session.config.vms[member]
           server_instance=vm.instance
           unless server_instance.nil?
@@ -38,6 +41,8 @@ module Mccloud
             
           end
         end
+      end
+ 
       end
 
     end

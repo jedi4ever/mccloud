@@ -80,6 +80,13 @@ class MccloudCLI < Thor
     @session.loadbalance(selection,options)
   end
 
+  desc "sorry [NAME]", "Activates the sorry server instances of the loadbalancer"
+  method_options :force => :boolean   
+  def sorry(selection=nil)
+    create_session
+    @session.sorry(selection,options)
+  end
+  
   desc "ips [NAME]", "Associates instances with Ips"
   method_options :force => :boolean   
   def ips(selection=nil)

@@ -7,6 +7,7 @@ module Mccloud
     attr_accessor :name
     
     attr_accessor :members
+    attr_accessor :sorry_members
     
     attr_accessor :instance
     
