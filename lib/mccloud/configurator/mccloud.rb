@@ -7,12 +7,16 @@ module Mccloud
 
       attr_accessor :identity
       attr_accessor :loglevel
+      attr_accessor :check_keypairs
+      attr_accessor :check_securitygroups
       
       def initialize()
           @prefix="mccloud"
           @delimiter="-"
           @environment=""
           @identity=""
+          @check_securitygroups=true
+          @check_keypairs=true
           @loglevel=:info
       end   
       

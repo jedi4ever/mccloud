@@ -156,7 +156,7 @@ module Mccloud
       #  puts "Registered #{keyName} with your cloud provider"
 
 
-
+      if Mccloud.session.config.mccloud.check_keypairs
       puts "Checking keypair(s)"
       #checking keypairs
       Mccloud.session.config.stacks.each do |name,stack|
@@ -178,6 +178,7 @@ module Mccloud
           end
         end
       end
+
       
       @session.config.vms.each do |name,vm|
         vm_provider=@session.config.providers["#{vm.provider+"-"+vm.provider_options[:region].to_s}"]
@@ -187,8 +188,8 @@ module Mccloud
           puts "#{key_name} does not exist at #{vm.provider} in region #{vm.provider_options[:region]}"
         end
       end
-
-      
+    end
+      if Mccloud.session.config.mccloud.check_securitygroups
       puts "Checking security group(s)"
       @session.config.vms.each do |name,vm|
         vm_provider=@session.config.providers["#{vm.provider+"-"+vm.provider_options[:region].to_s}"]
@@ -205,9 +206,9 @@ module Mccloud
           sg.authorize_port_range(22..22)
         end
       end      
+     end
 
-
-
+      puts "Loading Stacks"
       #listing stacks
       @session.config.stacks.each do |name,stack|
         stack.filtered_instance_names.each do |instancename|
@@ -220,6 +221,8 @@ module Mccloud
 #      @session.config.vms.each do |name,vm|
 #        
 #      end
+      
+      puts "Loading Vms"
       
       #Resetting the list
       filter=@session.config.mccloud.filter
