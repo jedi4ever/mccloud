@@ -131,10 +131,16 @@ module Mccloud
           end
         end
 
-        @session.provision(boxname.to_s,options) 
+        unless options["noprovision"]
+           puts "Waiting for ssh to become available"
+          Mccloud::Util.execute_when_tcp_available(vm.instance.public_ip_address, { :port => 22, :timeout => 6000 }) do
+             puts "Ok, ssh is available , proceeding with bootstrap"
+           end
+           
+          puts "# provision step #{vm.name}"
+          @session.provision(vm.name,options) 
+        end
       end
-
-            
 
     end
  

@@ -26,6 +26,7 @@ class MccloudCLI < Thor
 
   desc "up [NAME]", "Fires up a machine, bootstrap and provision"
   method_options :force => :boolean
+  method_options :noprovision => :boolean
   def up(selection=nil)
     create_session
     @session.up(selection,options)

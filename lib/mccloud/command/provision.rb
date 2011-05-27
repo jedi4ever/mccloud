@@ -6,19 +6,29 @@ module Mccloud
     def provision(selection=nil,options=nil)
       on_selected_machines(selection) do |id,vm|
         
+        
         instance=vm.instance
+        
+        unless instance.nil?
         instance.private_key_path=vm.private_key
         instance.username = vm.user
   
-        #p vm.provisioner
-        provisioner=vm.provisioner
-        if provisioner.nil?
-          # We take the first provisioner defined
-          #provisioner=@session.config.provisioners.first[1]
+          if instance.state=="running"
+            #p vm.provisioner
+            provisioner=vm.provisioner
+            if provisioner.nil?
+              # We take the first provisioner defined
+              #provisioner=@session.config.provisioners.first[1]
+            else
+              puts "[#{vm.name}] - starting provisioning with #{vm.provisioner} as provisioner"
+              provisioner.run(vm)
+            end
         else
-          puts "[#{vm.name}] - starting provisioning with #{vm.provisioner} as provisioner"
-          provisioner.run(vm)
+          puts "[#{vm.name}] machine is not running, skipping provisioning"
         end
+      else
+        puts "[#{vm.name}] machine doesn't exit yet"
+      end
       end
       ##on_selected_machines(selection) do |id,vm|
       #instance=PROVIDER.servers.get(id)
