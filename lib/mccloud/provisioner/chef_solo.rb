@@ -2,17 +2,17 @@ require 'mccloud/util/rsync'
 require 'mccloud/util/ssh'
 require 'erb'
 require 'ostruct'
- 
 
-    
+
+
 module Mccloud
   module Provisioner
     class ErbBinding < OpenStruct
-        def get_binding
-            return binding()
-        end
+      def get_binding
+        return binding()
+      end
     end
-    
+
     class ChefSolo
       attr_accessor :cookbooks_path 
       attr_accessor :role_path 
@@ -35,15 +35,15 @@ module Mccloud
         @json={ :instance_role => "mccloud"}
         @json_erb=true
       end
-      
+
       def run(vm)
         if @json_erb
           # http://stackoverflow.com/questions/1338960/ruby-templates-how-to-pass-variables-into-inlined-erb
- 
-           
+
+
           public_ips=Hash.new
           private_ips=Hash.new
-          
+
           Mccloud::Config.config.vms.each do |name,vm|
             unless vm.instance.nil?
               public_ips[name]=vm.instance.public_ip_address
@@ -55,26 +55,26 @@ module Mccloud
           # We only want specific variables for ERB
           data = { :public_ips => public_ips, :private_ips => private_ips}
           vars = ErbBinding.new(data)
-          
-	 # Added vmname in mccloud
-	  @json.merge!({ :mccloud => {:name => vm.name }})
+
+          # Added vmname in mccloud
+          @json.merge!({ :mccloud => {:name => vm.name }})
 
           template = @json.to_json.to_s
           erb = ERB.new(template)
-          
+
           vars_binding = vars.send(:get_binding)
           result=erb.result(vars_binding)
-          
+
           #Result = String
           #JSON.parse result = Hash
           #.to_json = String containing JSON formatting of Hash
-           
+
           json=JSON.parse(result).to_json
 
         else
           json=@json.to_json
         end
-                
+
         cooks=Array.new
         @cookbooks_path.each do |cook|
           cooks << File.join("/tmp/"+File.basename(cook))
@@ -89,15 +89,31 @@ module Mccloud
         cookbooks_path.each do |path|
           Mccloud::Util.rsync(path,vm,vm.instance)
         end
-        
+
         puts "[#{vm.name}] - running chef-solo"
         options={ :port => 22, :keys => [ vm.private_key ], :paranoid => false, :keys_only => true}
         puts "#{vm.user}"
-        if vm.user=="root"
-          Mccloud::Util.ssh(vm.instance.public_ip_address,vm.user,options,"chef-solo -c /tmp/solo.rb -j /tmp/dna.json -l debug")
-        else
-          Mccloud::Util.ssh(vm.instance.public_ip_address,vm.user,options,"sudo -i chef-solo -c /tmp/solo.rb -j /tmp/dna.json -l debug")
+        begin
+          if vm.user=="root"
+            Mccloud::Util.ssh(vm.instance.public_ip_address,vm.user,options,"chef-solo -c /tmp/solo.rb -j /tmp/dna.json -l debug")
+          else
+            Mccloud::Util.ssh(vm.instance.public_ip_address,vm.user,options,"sudo -i chef-solo -c /tmp/solo.rb -j /tmp/dna.json -l debug")
+          end
+        rescue Exception
+        ensure
+          puts "Cleaning up dna.json"
+          vm.instance.ssh("rm /tmp/dna.json")
+          puts "Cleaning up solo.json"
+          vm.instance.ssh("rm /tmp/solo.rb")
+          cookbooks_path.each do |path|
+            puts "Cleaning cookbook_path #{path}"
+            vm.instance.ssh("rm -rf /tmp/#{File.basename(path)}")
+          end
+          
         end
+
+        #Cleaning up
+
       end
       # Returns the run list for the provisioning
       def run_list
@@ -138,7 +154,7 @@ module Mccloud
 
           json = Mccloud::Config.config.chef.json.to_json
           #vm.ssh.upload!(StringIO.new(json), File.join(config.provisioning_path, "dna.json"))
-	  return json
+          return json
         end
 
         def prepare
@@ -171,7 +187,7 @@ module Mccloud
             :node_name => config.node_name,
             :provisioning_path => config.provisioning_path,
             :cookbooks_path => cookbooks_path,
-      		:log_level        => :debug,
+            :log_level        => :debug,
             :recipe_url => config.recipe_url,
             :roles_path => roles_path,
             })
@@ -195,7 +211,7 @@ module Mccloud
     end #Module Mccloud
 
 
-#cookbook_path     "/etc/chef/recipes/cookbooks" 
-#log_level         :info
-#file_store_path  "/etc/chef/recipes/" 
-#file_cache_path  "/etc/chef/recipes/" 
+    #cookbook_path     "/etc/chef/recipes/cookbooks" 
+    #log_level         :info
+    #file_store_path  "/etc/chef/recipes/" 
+    #file_cache_path  "/etc/chef/recipes/" 
