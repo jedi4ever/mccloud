@@ -17,7 +17,8 @@ module Mccloud
       @ip.name=name
       Mccloud.session.config.ips[name.to_s]=@ip
     end
-  end
+
+  end #Class IPConfigurator
   
-end
+end #Module Configurator
 end #Module Mccloud

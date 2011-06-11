@@ -23,27 +23,31 @@ module Mccloud
       
       
       cf.describe_stacks.body["Stacks"].each do |stack|
-        pp stack
-      end
-      
-      cf.describe_stacks.body["Stacks"].each do |stack|
-        puts "#{stack['StackName']} - #{stack['StackStatus']}"
-        events = cf.describe_stack_events("#{stack['StackName']}").body['StackEvents']
-         events.each do |event|
-           puts "-- Timestamp: #{event['Timestamp']}"
-           puts "-- LogicalResourceId: #{event['LogicalResourceId']}"
-           puts "-- ResourceType: #{event['ResourceType']}"
-           puts "-- ResourceStatus: #{event['ResourceStatus']}"
-           puts "-- ResourceStatusReason: #{event['ResourceStatusReason']}" if event['ResourceStatusReason']
-           puts "--"
-         end
+        name="#{stack['StackName']}"
+        stackfilter=filter.gsub(/-/,//)
+        puts "#{stackfilter}"
+        if name.starts_with?(stackfilter)
+          puts "#{stack['StackName']} - #{stack['StackStatus']}"
+          events = cf.describe_stack_events("#{stack['StackName']}").body['StackEvents']
+           events.each do |event|
+             puts "-- Timestamp: #{event['Timestamp']}"
+             puts "-- LogicalResourceId: #{event['LogicalResourceId']}"
+             puts "-- ResourceType: #{event['ResourceType']}"
+             puts "-- ResourceStatus: #{event['ResourceStatus']}"
+             puts "-- ResourceStatusReason: #{event['ResourceStatusReason']}" if event['ResourceStatusReason']
+             puts "--"
+           end
 
-        puts 
-        puts "Outputs for stack : #{stack['StackName']}"
-        stack['Outputs'].each do |output|
-          puts "#{output['OutputKey']}: #{output['OutputValue']}"
+          puts 
+          puts "Outputs for stack : #{stack['StackName']}"
+          stack['Outputs'].each do |output|
+            puts "#{output['OutputKey']}: #{output['OutputValue']}"
+          end
+          puts
+
         end
-        puts
+
+
       end
   
     end

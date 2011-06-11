@@ -18,8 +18,6 @@ module Mccloud
         provider=@session.config.providers[stack.provider]
         unless (stack.exists?)            
           cf = Fog::AWS::CloudFormation.new(stack.provider_options)
-          pp stack.provider_options
-          pp cf
 
           begin
             cf.validate_template({'TemplateBody' => template_body})
@@ -33,12 +31,10 @@ module Mccloud
           rescue  Excon::Errors::BadRequest => e
             puts "Error getting the remote template:\n #{e.response.body}"
           end  
-
-          
+         
                     
           begin
             cf.describe_stacks.body["Stacks"].each do |stack|
-              pp stack
             end
           rescue  Excon::Errors::BadRequest => e
             puts "Error fetching the stacks:\n #{e.response.body}"
@@ -48,8 +44,6 @@ module Mccloud
           #DisableRollback, TemplateURL, TimeoutInMinutes
 
           begin
-            pp template_body
-            
             cf.create_stack(stack_fullname, {'TemplateBody' => template_body, 'Parameters' => stack_params})
           rescue Excon::Errors::BadRequest => e
             puts "Error creating the stack:\n #{e.response.body}"
