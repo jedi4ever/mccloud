@@ -7,41 +7,41 @@ module Mccloud
         filter=@session.config.mccloud.filter
         puts "Using Filter: #{filter}"
 
-        puts
-        puts "Server(s)"
-          
-        printf "%-10s %-12s %-20s %-15s %-8s\n", "Name", "Instance Id", "IP", "Type","Status"
-        80.times { |i| printf "=" } ; puts
+
       else
         filter=""
       end
 
       regions=["us-east-1","eu-west-1"]
       
+      puts
+      puts "Stack(s)"        
+      
       regions.each do |region|
       cf = Fog::AWS::CloudFormation.new(:region => region)
-      
-      
+         
       cf.describe_stacks.body["Stacks"].each do |stack|
         name="#{stack['StackName']}"
         stackfilter=filter.gsub(/-/,'')
-        puts "#{stackfilter}"
         if name.start_with?(stackfilter)
-          puts "#{stack['StackName']} - #{stack['StackStatus']}"
+          short_name=stack['StackName'].dup
+          short_name[stackfilter]=""
+          puts "[#{short_name}] - #{stack['StackStatus']}"
+          
+          printf "  %-25s %-30s %-30s %-20s %-15s\n", "Timestamp", "Resource Tyoe", "LogicalResourceId", "ResourceStatus","ResourceStatusReaon"
+          120.times { |i| printf "=" } ; puts
+          
           events = cf.describe_stack_events("#{stack['StackName']}").body['StackEvents']
-           events.each do |event|
-             puts "-- Timestamp: #{event['Timestamp']}"
-             puts "-- LogicalResourceId: #{event['LogicalResourceId']}"
-             puts "-- ResourceType: #{event['ResourceType']}"
-             puts "-- ResourceStatus: #{event['ResourceStatus']}"
-             puts "-- ResourceStatusReason: #{event['ResourceStatusReason']}" if event['ResourceStatusReason']
-             puts "--"
+          sorted_events=events.reverse
+          sorted_events.each do |event|
+             printf "  %-25s %-30s %-30s %-20s %-15s\n", event['Timestamp'],event['ResourceType'],event['LogicalResourceId'], event['ResourceStatus'],event['ResourceStatusReason']
+
            end
 
           puts 
-          puts "Outputs for stack : #{stack['StackName']}"
+          puts "  Outputs:"
           stack['Outputs'].each do |output|
-            puts "#{output['OutputKey']}: #{output['OutputValue']}"
+            puts "  - #{output['OutputKey']}: #{output['OutputValue']}"
           end
           puts
 
@@ -52,6 +52,12 @@ module Mccloud
   
     end
            
+        
+        puts
+        puts "Server(s)"
+          
+        printf "%-10s %-12s %-20s %-15s %-8s\n", "Name", "Instance Id", "IP", "Type","Status"
+        80.times { |i| printf "=" } ; puts
         
       @session.config.providers.each  do |name,provider|
           

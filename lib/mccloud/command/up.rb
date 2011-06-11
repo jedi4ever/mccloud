@@ -4,17 +4,17 @@ require 'mccloud/util/iterator'
 module Mccloud
   module Command
     include Mccloud::Util
-    
+
     def up(selection,options)
       filter=@session.config.mccloud.stackfilter
-      
-      
+
+
       # http://allanfeid.com/content/using-amazons-cloudformation-cloud-init-chef-and-fog-automate-infrastructure
       on_selected_stacks(selection) do |id,stack|
         stack_fullname="#{filter}#{stack.name}"
         stack_params=stack.params
         template_body=stack.json_rewrite
-        
+
         provider=@session.config.providers[stack.provider]
         unless (stack.exists?)            
           cf = Fog::AWS::CloudFormation.new(stack.provider_options)
@@ -22,78 +22,72 @@ module Mccloud
           begin
             cf.validate_template({'TemplateBody' => template_body})
           rescue  Excon::Errors::BadRequest => e
-            puts "Error validating template #{stack.jsonfile}:\n #{e.response.body}"
+            puts "[#{stack.name}] - Error validating template #{stack.jsonfile}:\n #{e.response.body}"
           end  
 
+          template_exists=false
           begin
             cf.get_template("#{stack_fullname}")
-            #cf.describe_stacks.get(stack_name)
+            template_exists=true
           rescue  Excon::Errors::BadRequest => e
-            puts "Error getting the remote template:\n #{e.response.body}"
+            #            puts "[#{stack.name}] - Error getting the remote template:\n #{e.response.body}"
           end  
-         
-                    
-          begin
-            cf.describe_stacks.body["Stacks"].each do |stack|
-            end
-          rescue  Excon::Errors::BadRequest => e
-            puts "Error fetching the stacks:\n #{e.response.body}"
-          end  
- 
 
-          #DisableRollback, TemplateURL, TimeoutInMinutes
-
-          begin
-            cf.create_stack(stack_fullname, {'TemplateBody' => template_body, 'Parameters' => stack_params})
-          rescue Excon::Errors::BadRequest => e
-            puts "Error creating the stack:\n #{e.response.body}"
-
-            #lets try to remove it
+          unless template_exists
+            #DisableRollback, TemplateURL, TimeoutInMinutes
             begin
-              sleep 5
-              puts "Trying delete_stack"
-              cf.delete_stack(stack_fullname)
+              cf.create_stack(stack_fullname, {'TemplateBody' => template_body, 'Parameters' => stack_params})
+              puts "[#{stack.name}] - Stack creation started"           
             rescue Excon::Errors::BadRequest => e
-              puts "Error deleting the stacks:\n #{e.response.body}"
+              puts "[#{stack.name}] - Error creating the stack:\n #{e.response.body}"            
             end
-            #Throttling
-            sleep 5
             
-           puts "New creation"           
-           
-           #cf.create_stack(stack_fullname,{'TemplateBody' => template_body, 'Parameters' => stack_params})
+            begin
+              events=cf.describe_stack_events(stack_fullname).body
+              sorted_events=events['StackEvents']
+              sorted_events.reverse.each do |event|
+                printf "  %-25s %-30s %-30s %-20s %-15s\n", event['Timestamp'],event['ResourceType'],event['LogicalResourceId'], event['ResourceStatus'],event['ResourceStatusReason']
+              end
+            rescue  Excon::Errors::BadRequest => e
+              puts "[#{stack.name}] - Error fetching stack events:\n #{e.response.body}"
+            end  
 
- 
+          else
+            puts "[#{stack.name}] - Already exists"
+
+            events=cf.describe_stack_events(stack_fullname).body
+            sorted_events=events['StackEvents']
+            sorted_events.reverse.each do |event|
+              printf "  %-25s %-30s %-30s %-20s %-15s\n", event['Timestamp'],event['ResourceType'],event['LogicalResourceId'], event['ResourceStatus'],event['ResourceStatusReason']
+            end
           end
-          #exit
-          
+
         end
-        
+
       end
 
-      #only do stacks for now
-      
+
       on_selected_machines(selection) do |id,vm|
 
         # We need to get the correct provider  + region
-        
+
         provider=@session.config.providers[vm.provider+"-"+vm.provider_options[:region]]
         if (id.nil?)
           create_options=vm.create_options
           boxname=vm.name
           puts "Spinning up a new machine called #{boxname}"
-          
+
           create_options=create_options.merge({ :private_key_path => vm.private_key , :public_key_path => vm.public_key, :username => vm.user})
-          
+
           #instance=provider.servers.bootstrap(create_options)
 
           instance=provider.servers.create(create_options)
-          
+
           puts "Waiting for the machine to become accessible"
           instance.wait_for { printf "."; STDOUT.flush;  ready?}
           puts
           filter=@session.config.mccloud.filter
-    
+
           provider.create_tags(instance.id, { "Name" => "#{filter}#{boxname}"})
 
           # Resetting the in memory model of the new machine
@@ -126,21 +120,21 @@ module Mccloud
         end
 
         unless options["noprovision"]
-           puts "Waiting for ssh to become available"
+          puts "Waiting for ssh to become available"
           Mccloud::Util.execute_when_tcp_available(vm.instance.public_ip_address, { :port => 22, :timeout => 6000 }) do
-             puts "Ok, ssh is available , proceeding with bootstrap"
-           end
-           
+            puts "Ok, ssh is available , proceeding with bootstrap"
+          end
+
           puts "# provision step #{vm.name}"
           @session.provision(vm.name,options) 
         end
       end
 
     end
- 
- 
- 
- 
- 
+
+
+
+
+
   end
 end

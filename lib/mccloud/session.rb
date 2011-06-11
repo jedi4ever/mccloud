@@ -246,7 +246,7 @@ module Mccloud
 
               #  if the VM was not declared
               unless !@session.config.vms[short_name].nil?
-                puts "#{short_name} - has been not been declared as a vm"
+                #puts "#{short_name} - has been not been declared as a vm"
                 undeclared_vm=Mccloud::Type::Vm.new	
                 undeclared_vm.declared=false
                 undeclared_vm.server_id=server.id
@@ -267,11 +267,12 @@ module Mccloud
                 filtered_stack_name=stack_name
                 filtered_stack_name[stack_filter]=""
                 # Lookup stack on our config
-                puts "#{short_name} is part of #{filtered_stack_name} "
+                #puts "Note: #{short_name} is part of #{filtered_stack_name} "
 
                 if @session.config.stacks.has_key?(filtered_stack_name)
                   # If we found it, set the private, public and user appropriatly
-                  puts "We're in luck"
+                  
+                  #puts "  [#{short_name}] Adjusting public and private keys for stack"
                   @session.config.vms[short_name].private_key=@session.config.stacks[filtered_stack_name].private_key_for_instance(short_name)
                   @session.config.vms[short_name].public_key=@session.config.stacks[filtered_stack_name].public_key_for_instance(short_name)
                   @session.config.vms[short_name].user=@session.config.stacks[filtered_stack_name].user_for_instance(short_name)
