@@ -20,7 +20,7 @@ module Mccloud
               # We take the first provisioner defined
               #provisioner=@session.config.provisioners.first[1]
             else
-              puts "[#{vm.name}] - starting provisioning with #{vm.provisioner} as provisioner"
+              puts "[#{vm.name}] - starting provisioning with #{vm.provisioner.name} as provisioner"
               provisioner.run(vm)
             end
         else

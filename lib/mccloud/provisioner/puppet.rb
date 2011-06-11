@@ -8,6 +8,7 @@ module Mccloud
             attr_accessor :manifests_path
             attr_accessor :module_path
             attr_accessor :pp_path
+            attr_accessor :name
             attr_accessor :options
 
             def initialize
@@ -15,6 +16,7 @@ module Mccloud
               @manifests_path = "manifests"
               @module_path = nil
               @pp_path = "/tmp/vagrant-puppet"
+              @name="puppet"
               @options = []
             end
       

@@ -75,7 +75,7 @@ module Mccloud
         if (id.nil?)
           create_options=vm.create_options
           boxname=vm.name
-          puts "Spinning up a new machine called #{boxname}"
+          puts "[#{boxname}] - Spinning up a new machine"
 
           create_options=create_options.merge({ :private_key_path => vm.private_key , :public_key_path => vm.public_key, :username => vm.user})
 
@@ -83,7 +83,7 @@ module Mccloud
 
           instance=provider.servers.create(create_options)
 
-          puts "Waiting for the machine to become accessible"
+          puts "[#{boxname}] - Waiting for the machine to become accessible"
           instance.wait_for { printf "."; STDOUT.flush;  ready?}
           puts
           filter=@session.config.mccloud.filter
@@ -98,11 +98,11 @@ module Mccloud
           end
 
           # Wait for ssh to become available ...
-          puts "Waiting for ssh to become available"
+          puts "[#{boxname}] - Waiting for ssh to become available"
           #puts instance.console_output.body["output"]
 
           Mccloud::Util.execute_when_tcp_available(instance.public_ip_address, { :port => 22, :timeout => 6000 }) do
-            puts "Ok, ssh is available , proceeding with bootstrap"
+            puts "[#{boxname}] - Ssh is available , proceeding with bootstrap"
           end
 
           @session.bootstrap(boxname.to_s,nil,options)       
@@ -122,10 +122,10 @@ module Mccloud
         unless options["noprovision"]
           puts "Waiting for ssh to become available"
           Mccloud::Util.execute_when_tcp_available(vm.instance.public_ip_address, { :port => 22, :timeout => 6000 }) do
-            puts "Ok, ssh is available , proceeding with bootstrap"
+            puts "[#{boxname}] - Ssh is available , proceeding with bootstrap"
           end
 
-          puts "# provision step #{vm.name}"
+          puts "[#{boxname}] - provision step #{vm.name}"
           @session.provision(vm.name,options) 
         end
       end

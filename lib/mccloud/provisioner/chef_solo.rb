@@ -20,6 +20,7 @@ module Mccloud
       attr_accessor :json
       attr_accessor :json_erb
       attr_reader   :roles
+      attr_reader   :name
       attr_accessor :node_name
       attr_accessor :log_level
       attr_accessor :http_proxy
@@ -34,6 +35,8 @@ module Mccloud
         @provisioning_path="/tmp/mccloud-chef"
         @json={ :instance_role => "mccloud"}
         @json_erb=true
+        @name ="chef_solo"
+        @log_level="info"
       end
 
       def run(vm)
@@ -92,21 +95,21 @@ module Mccloud
 
         puts "[#{vm.name}] - running chef-solo"
         options={ :port => 22, :keys => [ vm.private_key ], :paranoid => false, :keys_only => true}
-        puts "#{vm.user}"
+        puts "[#{vm.name}] - login as #{vm.user}"
         begin
           if vm.user=="root"
-            Mccloud::Util.ssh(vm.instance.public_ip_address,vm.user,options,"chef-solo -c /tmp/solo.rb -j /tmp/dna.json -l debug")
+            Mccloud::Util.ssh(vm.instance.public_ip_address,vm.user,options,"chef-solo -c /tmp/solo.rb -j /tmp/dna.json -l #{@log_level}")
           else
-            Mccloud::Util.ssh(vm.instance.public_ip_address,vm.user,options,"sudo -i chef-solo -c /tmp/solo.rb -j /tmp/dna.json -l debug")
+            Mccloud::Util.ssh(vm.instance.public_ip_address,vm.user,options,"sudo -i chef-solo -c /tmp/solo.rb -j /tmp/dna.json -l #{@log_level}")
           end
         rescue Exception
         ensure
-          puts "Cleaning up dna.json"
+          puts "[#{vm.name}] - Cleaning up dna.json"
           vm.instance.ssh("rm /tmp/dna.json")
-          puts "Cleaning up solo.json"
+          puts "[#{vm.name}]- Cleaning up solo.json"
           vm.instance.ssh("rm /tmp/solo.rb")
           cookbooks_path.each do |path|
-            puts "Cleaning cookbook_path #{path}"
+            puts "[#{vm.name}]- Cleaning cookbook_path #{path}"
             vm.instance.ssh("rm -rf /tmp/#{File.basename(path)}")
           end
           
