@@ -6,6 +6,7 @@ module Mccloud
     def provision(selection=nil,options=nil)
       on_selected_machines(selection) do |id,vm|
         
+        puts
         
         instance=vm.instance
         
@@ -24,10 +25,10 @@ module Mccloud
               provisioner.run(vm)
             end
         else
-          puts "[#{vm.name}] machine is not running, skipping provisioning"
+          puts "[#{vm.name}] - machine is not running, skipping provisioning"
         end
       else
-        puts "[#{vm.name}] machine doesn't exit yet"
+        puts "[#{vm.name}] - machine doesn't exit yet"
       end
       end
       ##on_selected_machines(selection) do |id,vm|
