@@ -24,9 +24,9 @@ module Mccloud
       
       cf.describe_stacks.body["Stacks"].each do |stack|
         name="#{stack['StackName']}"
-        stackfilter=filter.gsub(/-/,//)
+        stackfilter=filter.gsub(/-/,'')
         puts "#{stackfilter}"
-        if name.starts_with?(stackfilter)
+        if name.start_with?(stackfilter)
           puts "#{stack['StackName']} - #{stack['StackStatus']}"
           events = cf.describe_stack_events("#{stack['StackName']}").body['StackEvents']
            events.each do |event|
