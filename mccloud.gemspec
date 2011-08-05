@@ -17,7 +17,7 @@ Gem::Specification.new do |s|
   s.add_dependency "net-ssh", "~> 2.1.0"
   #s.add_dependency "sshkey"
   s.add_dependency "net-scp"
-  s.add_dependency "fog", "~> 0.8.1"
+  s.add_dependency "fog", "~> 0.10.0"
   s.add_dependency "json"
   #s.add_dependency "templater"
   s.add_dependency "popen4", "~> 0.1.2"
@@ -26,10 +26,14 @@ Gem::Specification.new do |s|
   #s.add_dependency "progressbar"
   #s.add_development_dependency "cucumber", "0.8.5"
 
+  
   s.add_dependency "net-ssh-multi"
   #s.add_dependency "rspec"
 
   s.add_development_dependency "bundler", ">= 1.0.0"
+  s.add_development_dependency('ruby-libvirt','~>0.4.0')
+  s.add_development_dependency('fog','~>0.10.0')
+
 
   s.files        = `git ls-files`.split("\n")
   s.executables  = `git ls-files`.split("\n").map{|f| f =~ /^bin\/(.*)/ ? $1 : nil}.compact
