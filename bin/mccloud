@@ -4,67 +4,63 @@ require 'rubygems'
 require 'thor'
 require 'mccloud'
 
-require 'mccloud/version'
-require 'mccloud/session'
 
 class MccloudCLI < Thor 
 
-  attr_accessor :all_servers
   no_tasks do
-    def create_session
-      @session=Mccloud::Session.new
-      @session.load_config
-    end
-
+#    def create_session
+#      @session=Mccloud::Session.new.
+#      @session.load_config
+#    end
   end
 
   desc "init", "Creates a Mccloud Config File" 
   method_options :force => :boolean
   def init(amiId=nil)
-    Mccloud::Command.init(amiId,options)
+    Mccloud::Session.new().init(amiId,options)
   end
 
   desc "up [NAME]", "Fires up a machine, bootstrap and provision"
   method_options :force => :boolean
   method_options :noprovision => :boolean
   def up(selection=nil)
-    create_session
-    @session.up(selection,options)
+     Mccloud::Session.new().up(selection,options)
   end
   
   desc "status", "Show a status of all machines and images that are configured"
   method_options :verbose => false
   def status(selection=nil)
-    create_session
-    @session.status(selection,options)
+    Mccloud::Session.new().status(selection,options)
   end
 
   desc "halt [NAME]", "Shutdown the machine"
   method_options :force => :boolean  
   def halt(selection=nil)
-    create_session
-     @session.halt(selection,options)
+    Mccloud::Session.new().halt(selection,options)
   end
   
   desc "ssh [NAME]", "Spawns an ssh client to the machine"
    method_options :screen => :boolean  
    def ssh(selection=nil,command=nil)
-    create_session
-    @session.ssh(selection,command,options)
+    Mccloud::Session.new().ssh(selection,command,options)
    end
+   
+   desc "rsync [PATH]", "Syncs the directory to the remote machine"
+    method_options :screen => :boolean  
+    def rsync(selection=nil,path)
+     Mccloud::Session.new().rsync(selection,path,options)
+    end
    
   desc "suspend [NAME]", "Shutdown of the machine"
   method_options :force => :boolean
   def suspend(selection=nil)
-    create_session
-    @session.suspend(selection,options)
+    Mccloud::Session.new().suspend(selection,options)
   end
 
   desc "flavors", "Lists all available flavors"
   method_options :force => :boolean
   def flavors()
-    create_session
-    @session.flavors()
+    Mccloud::Session.new().flavors()
   end
   
 #  desc "boot", "same a"
@@ -77,36 +73,31 @@ class MccloudCLI < Thor
   desc "loadbalance [NAME]", "Updates the server instances of the loadbalancer"
   method_options :force => :boolean   
   def loadbalance(selection=nil)
-    create_session
-    @session.loadbalance(selection,options)
+    Mccloud::Session.new().loadbalance(selection,options)
   end
 
   desc "sorry [NAME]", "Activates the sorry server instances of the loadbalancer"
   method_options :force => :boolean   
   def sorry(selection=nil)
-    create_session
-    @session.sorry(selection,options)
+    Mccloud::Session.new().sorry(selection,options)
   end
   
   desc "ips [NAME]", "Associates instances with Ips"
   method_options :force => :boolean   
   def ips(selection=nil)
-    create_session
-    @session.ips(selection,options)
+    Mccloud::Session.new().ips(selection,options)
   end
   
   desc "destroy [NAME]", "Destroys the machine"
   method_options :force => :boolean  
   def destroy(selection=nil)
-    create_session
-    @session.destroy(selection,options)
+    Mccloud::Session.new().destroy(selection,options)
   end
 
   desc "reload [NAME]", "Reboots the machine"
   method_options :force => :boolean  
   def reload(selection=nil?)
-    create_session
-    @session.reload(selection,options)
+    Mccloud::Session.new().reload(selection,options)
   end
 
 #  desc "command [NAME] [COMMAND]", "exec a command on a box"
@@ -118,9 +109,8 @@ class MccloudCLI < Thor
 
   desc "bootstrap [NAME]", "Executes the bootstrap sequence"
   method_options :sudo => :boolean      
-  def bootstrap(selection=nil,script="who am i")
-    create_session
-    @session.bootstrap(selection,script,options)
+  def bootstrap(selection=nil)
+    Mccloud::Session.new().bootstrap(selection,options)
   end
 
   desc "package [NAME]", "Packages the current state of a machine into an image"
@@ -128,14 +118,12 @@ class MccloudCLI < Thor
   method_options :description => :string      
   method_options :dontwait => :boolean      
   def package(selection=nil)
-    create_session
-    @session.package(selection,options)
+    Mccloud::Session.new().package(selection,options)
   end
   
   desc "deregister [IMAGE-ID]", "Deregisters an image"
   def deregister(imageId=nil)
-    create_session
-    @session.deregister(imageId,options)
+    Mccloud::Session.new().deregister(imageId,options)
   end
   
   
@@ -148,14 +136,12 @@ class MccloudCLI < Thor
 
   desc "provision [NAME]", "Runs the provisioner the machine"
   def provision(selection=nil)
-    create_session
-    @session.provision(selection,options)
+    Mccloud::Session.new().provision(selection,options)
   end
 
   desc "server", "Runs a server+ forwards network ports"
   def server(selection=nil)
-    create_session
-    @session.server(selection,options)
+    Mccloud::Session.new().server(selection,options)
   end
 end
 
