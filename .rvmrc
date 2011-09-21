@@ -1,5 +1,6 @@
-#rvm use ruby-1.8.7
-rvm use ruby-1.9.2
+rvm use ruby-1.8.7
+#rvm use ruby-1.9.2
 rvm gemset use mccloud
 alias mccloud="bundle exec mccloud"
 alias irb="bundle exec irb"
+alias rake="bundle exec rake"

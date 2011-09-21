@@ -1,9 +1,22 @@
-GIT
-  remote: git@github.com:jedi4ever/fog.git
-  revision: e7904edecf68ed4ad85f83d3030a2aae41c83811
-  branch: libvirt
+PATH
+  remote: .
   specs:
-    fog (0.10.0)
+    mccloud (0.0.13)
+      ansi
+      fog (~> 0.11.0)
+      highline (~> 1.6.1)
+      json
+      net-scp
+      net-ssh (~> 2.1.0)
+      net-ssh-multi
+      popen4 (~> 0.1.2)
+      rake (~> 0.8.1)
+      thor (~> 0.14.6)
+
+PATH
+  remote: /Users/patrick/imac/fog
+  specs:
+    fog (0.11.0)
       builder
       excon (~> 0.6.5)
       formatador (~> 0.2.0)
@@ -13,20 +26,6 @@ GIT
       net-ssh (~> 2.1.4)
       nokogiri (~> 1.5.0)
       ruby-hmac
-
-PATH
-  remote: .
-  specs:
-    mccloud (0.0.13)
-      ansi
-      fog (~> 0.10.0)
-      highline (~> 1.6.1)
-      json
-      net-scp
-      net-ssh (~> 2.1.0)
-      net-ssh-multi
-      popen4 (~> 0.1.2)
-      thor (~> 0.14.6)
 
 GEM
   remote: http://rubygems.org/
@@ -53,6 +52,7 @@ GEM
     popen4 (0.1.2)
       Platform (>= 0.4.0)
       open4 (>= 0.4.0)
+    rake (0.8.7)
     ruby-hmac (0.4.0)
     thor (0.14.6)
 
@@ -62,3 +62,4 @@ PLATFORMS
 DEPENDENCIES
   fog!
   mccloud!
+  rake
