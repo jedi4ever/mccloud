@@ -1,8 +1,11 @@
 require 'mccloud/config/mccloud'
 require 'mccloud/config/provider'
 require 'mccloud/config/template'
+require 'mccloud/config/keypair'
 require 'mccloud/config/collection'
 require 'mccloud/template'
+require 'mccloud/keypair'
+
 
 module Mccloud
   class Config
@@ -13,15 +16,18 @@ module Mccloud
 
     attr_reader :env
 
-    attr_accessor :vms,:lbs,:stacks,:ips
+    attr_accessor :vms,:lbs,:stacks,:ips,:keystores,
 
     attr_accessor :providers
-    attr_accessor :templates
+    
+    attr_accessor :templates,:keypairs
 
     def initialize(options)
       @env=options[:env]
       env.logger.info("config") { "Initializing empty list of vms,lbs,stacks, ips in config" }
-      @vms=Hash.new;@lbs=Hash.new;@stacks=Hash.new;@ips=Hash.new
+
+      @vms=Hash.new;@lbs=Hash.new;@stacks=Hash.new;@ips=Hash.new; @keystores=Hash.new; @keypairs=Hash.new;
+
       @providers=Hash.new; @templates=Hash.new
     end
 
@@ -35,6 +41,10 @@ module Mccloud
       config.template=::Mccloud::Config::Template.new(self)
       @templates=config.template.components
 
+      # Assign keypairs
+      config.key_pair=::Mccloud::Config::Keypair.new(self)
+      @keypairs=config.key_pair.components
+
       # Assign providers
       config.provider=::Mccloud::Config::Provider.new(self)
       @providers=config.provider.components
@@ -44,12 +54,12 @@ module Mccloud
       config.lb=::Mccloud::Config::Collection.new("lb",self)
       config.ip=::Mccloud::Config::Collection.new("ip",self)
       config.stack=::Mccloud::Config::Collection.new("stack",self)
+#      config.key_store=::Mccloud::Config::Collection.new("keystore",self)
 
       # Process config file
       yield config
 
       @mccloud=config.mccloud
-
 
     end
 
@@ -58,7 +68,7 @@ module Mccloud
       mccloud_configurator=self
       begin
         mccloudfile=File.read(File.join(Dir.pwd,"Mccloudfile"))
-        mccloudfile["Mccloud::Config.run"]="mccloud_configurator.define"
+        mccloudfile.gsub!("Mccloud::Config.run","mccloud_configurator.define")
         #        http://www.dan-manges.com/blog/ruby-dsls-instance-eval-with-delegation
         instance_eval(mccloudfile)
       rescue LoadError => e
