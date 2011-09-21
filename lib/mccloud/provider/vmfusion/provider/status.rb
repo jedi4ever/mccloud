@@ -5,7 +5,7 @@ module Mccloud::Provider
     def status(selection=nil,options=nil)
       
       puts ""
-      puts 80.times("=")
+      80.times { |i| printf "*"}; puts
       all_vms = ::Fission::VM.all
       all_running_vms = ::Fission::VM.all_running
 

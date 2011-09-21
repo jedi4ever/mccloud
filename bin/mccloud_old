@@ -1,0 +1,159 @@
+#!/usr/bin/env ruby
+
+require 'rubygems'
+require 'thor'
+require 'mccloud'
+
+
+class MccloudCLI < Thor 
+
+  no_tasks do
+#    def create_environment
+#      @environment=Mccloud::Environment.new.
+#      @environment.load_config
+#    end
+  end
+
+  desc "init", "Creates a Mccloud Config File" 
+  method_options :force => :boolean
+  def init(name=nil)
+    Mccloud::Environment.new().load!().init(name,options)
+  end
+
+  desc "up [NAME]", "Fires up a machine, bootstrap and provision"
+  method_options :force => :boolean
+  method_options :noprovision => :boolean
+  def up(selection=nil)
+     Mccloud::Environment.new().load!().up(selection,options)
+  end
+  
+  desc "status", "Show a status of all machines and images that are configured"
+  method_options :verbose => false
+  def status(selection=nil)
+    Mccloud::Environment.new().load!().status(selection,options)
+  end
+
+  desc "halt [NAME]", "Shutdown the machine"
+  method_options :force => :boolean  
+  def halt(selection=nil)
+    Mccloud::Environment.new().load!().halt(selection,options)
+  end
+  
+  desc "ssh [NAME]", "Spawns an ssh client to the machine"
+   method_options :screen => :boolean  
+   def ssh(selection=nil,command=nil)
+    Mccloud::Environment.new().load!().ssh(selection,command,options)
+   end
+   
+   desc "rsync [PATH]", "Syncs the directory to the remote machine"
+    method_options :screen => :boolean  
+   def rsync(selection=nil,path=nil)
+     Mccloud::Environment.new().load!().rsync(selection,path,options)
+    end
+   
+  desc "suspend [NAME]", "Shutdown of the machine"
+  method_options :force => :boolean
+  def suspend(selection=nil)
+    Mccloud::Environment.new().load!().suspend(selection,options)
+  end
+
+  desc "flavors", "Lists all available flavors"
+  method_options :force => :boolean
+  def flavors()
+    Mccloud::Environment.new().load!().flavors()
+  end
+  
+#  desc "boot", "same a"
+#  method_options :force => :boolean
+#  def boot(selection=nil)
+#    create_environment
+#    @environment.boot(selection,options)
+#  end
+
+  desc "loadbalance [NAME]", "Updates the server instances of the loadbalancer"
+  method_options :force => :boolean   
+  def loadbalance(selection=nil)
+    Mccloud::Environment.new().load!().loadbalance(selection,options)
+  end
+
+  desc "sorry [NAME]", "Activates the sorry server instances of the loadbalancer"
+  method_options :force => :boolean   
+  def sorry(selection=nil)
+    Mccloud::Environment.new().load!().sorry(selection,options)
+  end
+  
+  desc "ips [NAME]", "Associates instances with Ips"
+  method_options :force => :boolean   
+  def ips(selection=nil)
+    Mccloud::Environment.new().load!().ips(selection,options)
+  end
+  
+  desc "destroy [NAME]", "Destroys the machine"
+  method_options :force => :boolean  
+  def destroy(selection=nil)
+    Mccloud::Environment.new().load!().destroy(selection,options)
+  end
+
+  desc "reload [NAME]", "Reboots the machine"
+  method_options :force => :boolean  
+  def reload(selection=nil?)
+    Mccloud::Environment.new().load!().reload(selection,options)
+  end
+
+#  desc "command [NAME] [COMMAND]", "exec a command on a box"
+#  method_options :parallel => :boolean
+#  def command(selection=nil,command="who am i")
+#    create_environment
+#    @environment.command(selection,command,options)
+#  end
+
+  desc "bootstrap [NAME]", "Executes the bootstrap sequence"
+  method_options :sudo => :boolean      
+  def bootstrap(selection=nil)
+    Mccloud::Environment.new().load!().bootstrap(selection,options)
+  end
+
+  desc "package [NAME]", "Packages the current state of a machine into an image"
+  method_options :name => :string      
+  method_options :description => :string      
+  method_options :dontwait => :boolean      
+  def package(selection=nil)
+    Mccloud::Environment.new().load!().package(selection,options)
+  end
+  
+  desc "deregister [IMAGE-ID]", "Deregisters an image"
+  def deregister(imageId=nil)
+    Mccloud::Environment.new().load!().deregister(imageId,options)
+  end
+  
+  
+#  desc "multi","multi"
+#  method_options :verbose => :boolean  
+#  def multi(selection=nil,command="who am i")
+#    create_environment
+#    @environment.multi(selection,command,options)
+#  end  
+
+  desc "provision [NAME]", "Runs the provisioner the machine"
+  def provision(selection=nil)
+    Mccloud::Environment.new().load!().provision(selection,options)
+  end
+
+  desc "server", "Runs a server+ forwards network ports"
+  def server(selection=nil)
+    Mccloud::Environment.new().load!().server(selection,options)
+  end
+end
+
+puts 
+80.times { |i| printf "*" } ; puts
+myversion="* Mccloud v#{Mccloud::VERSION} - alpha - use at your own risk"
+puts "#{myversion}"
+puts "- github : https://github.com/jedi4ever/mccloud"
+
+80.times { |i| printf "*" } ; puts
+puts
+
+
+MccloudCLI.start
+puts

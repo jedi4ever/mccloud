@@ -1,38 +1,36 @@
+require 'mccloud/provider/core/lb'
+require 'mccloud/provider/aws/lb/associate'
+require 'mccloud/provider/aws/lb/sorry'
+
 module Mccloud::Provider
   module Aws
-    
-  class Lb
-    attr_accessor :provider
 
-    attr_accessor :name
-    
-    attr_accessor :members
-    attr_accessor :sorry_members
-    
-    def initialize
-    end
-    
-    def instance
-      if @this_instance.nil?
-        begin
-          if @provider=="AWS"
-            fullname= "#{Mccloud.session.config.mccloud.filter}#{name}"
-            @this_instance=Fog::AWS::ELB.new(provider_options).load_balancers.get(fullname)
-            if @this_instance.nil?
-              puts "Sorry we can't find Loadbalancer with #{fullname} "
-            end
-          end
-        rescue Fog::Service::Error => e
-          puts "Error: #{e.message}"
-          puts "We could not request the information from your provider #{provider}. We suggest you check your credentials."
-          puts "Check configuration file: #{File.join(ENV['HOME'],".fog")}"
-          exit -1
-        end
+    class Lb < ::Mccloud::Provider::Core::Lb
+
+      #Inherits     :name
+      #             :provider
+      attr_accessor :members
+      attr_accessor :sorry_members
+
+      include Mccloud::Provider::Aws::LbCommand
+
+      def initialize(env)
+        members=Array.new
+        sorry_members=Array.new
+        super(env)
       end
-      return @this_instance
+
+      def raw
+        if @raw.nil?
+          rawname="#{@name}"
+          #rawname="#{@provider.filter}#{@name}"
+          @raw=Fog::AWS::ELB.new({:region => provider.region}).load_balancers.get(@name)
+          env.logger.info("LB found #{@raw}")
+        end
+        return @raw
+      end
+
     end
-    
+
   end
-  
-end
 end #Module Mccloud

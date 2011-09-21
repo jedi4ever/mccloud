@@ -5,11 +5,11 @@ module Mccloud
     def destroy(selection=nil,options=nil)
 
       on_selected_stacks(selection) do |id,stack|
-        stackfilter=@session.config.mccloud.stackfilter        
+        stackfilter=@environment.config.mccloud.stackfilter        
         stack_fullname="#{stackfilter}#{stack.name}"
 
         stack_exists=false
-        provider=@session.config.providers[stack.provider]         
+        provider=@environment.config.providers[stack.provider]         
         cf = Fog::AWS::CloudFormation.new(stack.provider_options)
 
         begin

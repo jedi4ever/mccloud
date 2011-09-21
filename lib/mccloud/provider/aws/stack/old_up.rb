@@ -1,4 +1,4 @@
-filter=@session.config.mccloud.stackfilter
+filter=@environment.config.mccloud.stackfilter
 
 # http://allanfeid.com/content/using-amazons-cloudformation-cloud-init-chef-and-fog-automate-infrastructure
 on_selected_stacks(selection) do |id,stack|
@@ -6,7 +6,7 @@ on_selected_stacks(selection) do |id,stack|
   stack_params=stack.params
   template_body=stack.json_rewrite
 
-  provider=@session.config.providers[stack.provider]
+  provider=@environment.config.providers[stack.provider]
   unless (stack.exists?)
     cf = Fog::AWS::CloudFormation.new(stack.provider_options)
 

@@ -34,7 +34,7 @@
       end
       begin
         answer[:provider]= vm.provider
-        session.config.providers[vm.provider]=Fog::Compute.new(answer)
+        environment.config.providers[vm.provider]=Fog::Compute.new(answer)
       rescue
         puts "We tried to create the provider but failed again, sorry we give up"
         exit -1

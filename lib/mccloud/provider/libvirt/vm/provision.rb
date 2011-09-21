@@ -3,7 +3,7 @@ module Mccloud::Provider
     module VmCommand
 
         def _provision(options)
-                  
+
           unless raw.nil?
 
             if raw.ready?
@@ -17,9 +17,9 @@ module Mccloud::Provider
           else
             puts "[#{@name}] - machine doesn't exit yet"
           end
-          
+
         end
- 
+
     end #module
   end #module
 end #module

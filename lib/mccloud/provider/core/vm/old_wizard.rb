@@ -496,7 +496,7 @@ module Mccloud
         else
           puts "#{public_key_path} does not exist"
         end
-      end              
+      end
 
 
       if private_key_path==""

@@ -3,44 +3,116 @@ Mccloud::Config.run do |config|
   # and listing of configuration options, please view the documentation
   # online.
 
-  config.mccloud.prefix="<%= mcPrefix %>"
-  config.mccloud.environment="<%= mcEnvironment %>"
-  config.mccloud.identity="<%= mcIdentity %>"
+  ### Providers ###
+  config.provider.define "libvirt-juno" do |config|
+    config.provider.type=:libvirt
+    config.provider.options={ :libvirt_uri => "qemu+ssh://patrick.debois@juno/system" }
+    config.provider.namespace="test"
+  end 
 
-  config.vm.define "<%= serverName %>" do |<%= serverName %>_config|
-    <%= serverName %>_config.vm.provider="<%= providerId %>"
-
-    #<%= serverName %>_config.vm.provisioner=:chef_solo
-    #<%= serverName %>_config.vm.provisioner=:puppet
-    <%= serverName %>_config.vm.provider_options={ 
-      # ID = "<%= imageId%>" = <%= imageDescription %>
-      :image_id => "<%= imageId %>" , 
-      :flavor_id => "<%= flavorId %>",
-      :groups => %w(<%= securityGroup %>),
-      :key_name => "<%= keyName %>",
-      :availability_zone => "<%= availabilityZone %>" 
+  config.provider.define "aws-europe" do |config|
+    config.provider.type=:aws
+    config.provider.options={
+      :region => "eu-west-1"
     }
-	#Forward 80 remote to localport 8080
-    <%= serverName %>_config.vm.forward_port("http", 8080, 80)
-    <%= serverName %>_config.vm.user="<%= userName %>"
-    <%= serverName %>_config.vm.bootstrap="<%= bootstrapScript %>"
-    <%= serverName %>_config.vm.private_key="<%= privateKeyPath %>"
-    <%= serverName %>_config.vm.public_key="<%= publicKeyPath %>"
-
+    config.provider.check_keypairs=false
+    config.provider.check_securitygroups=false
+    config.provider.namespace="mccloud-development-patrick"
   end
 
-  ### Provisioners
-  config.vm.provision :puppet do |puppet|
-    puppet.pp_path = "/tmp/vagrant-puppet"
-    #puppet.manifests_path = "puppet/manifests"
-    #puppet.module_path = "puppet/modules"
-    puppet.manifest_file = "newbox.pp"
+  config.provider.define "hosts" do |config|
+    config.provider.type=:host
   end
 
-  config.vm.provision :chef_solo do |chef|
-     chef.cookbooks_path = ["<your cookboopath>"]
-     chef.add_recipe("<some recipe>")
-     # You may also specify custom JSON attributes:
-     chef.json.merge!({})
+  config.provider.define "vmfusion" do |config|
+    config.provider.type=:vmfusion
   end
-end
+
+  config.provider.define "virtualbox" do |config|
+    config.provider.type=:virtualbox
+  end
+
+  config.vm.define "lucid64" do |config|
+    config.vm.provider=:vmfusion
+    config.vm.user="veewee"
+  end
+
+  config.vm.define "cooke" do |config|
+    config.vm.provider=:hosts
+    config.vm.ip_address="cooke.sos.be"
+    config.vm.user="deboispa"
+    config.vm.provision :shell do |command|
+      command.inline="who am i"
+      command.path="a.sh"
+    end
+  end
+
+  config.vm.define "vagrant-demo" do |config|
+    config.vm.provider=:virtualbox
+  end
+
+ config.vm.define "aws-demo" do |config|
+   config.vm.provider="aws-europe"
+   config.vm.provider="juno-libvirt"
+
+   #admin_config.vm.provisioner=:chef_solo
+   config.vm.create_options={
+     # ID = "ami-e59ca991" = Ubuntu 10.10 - Maverick 64-bit (Canonical/EBS) - Euwest1
+     :image_id => "ami-e59ca991" ,
+     :flavor_id => "c1.xlarge",
+     :groups => %w(villa-prod),
+     :key_name => "mccloud-key-patrick",
+     :availability_zone => "eu-west-1a"
+   }
+     config.vm.create_options={
+          :network_interface_type => "bridge",
+          :volume_template_name => "test-baseimage.img",
+          :cpus => "3",
+          :memory_size => 2*1024*1024, #2 GB
+     }
+   #config.vm.auto_selection=false
+   config.vm.forward_port("redis", 6379, 6379)
+   config.vm.forward_port("postgres", 5432, 5432)
+   config.vm.forward_port("sphinx", 9312, 9312)
+   config.vm.user="ubuntu"
+   config.vm.bootstrap="definitions/villa-ubuntu/bootstrap-ubuntu-system.sh"
+   config.vm.key_name="mccloud-key-patrick"
+   config.vm.private_key_path="keys/mccloud_rsa"
+   config.vm.public_key_path="keys/mccloud_rsa.pub"
+
+   config.vm.provision :chef_solo do |chef|
+       chef.cookbooks_path = ["villa-chefrepo/cookbooks","villa-chefrepo/site-cookbooks"]
+       chef.log_level = "info"
+       default_node(chef)
+       chef.add_recipe("mediasquare_rails::backend")
+       #chef.add_recipe("mediasquare_daemons::default")
+       #chef.add_recipe("mediasquare_rails::test_data")
+       chef.json.merge!({
+          :rvm => {
+            :version => "1.6.8",
+          :ruby => {
+          :version => "1.9.2",
+        :patch_level => "p180"
+      }
+    }, :mediasquare_daemons => {
+             :sphinx_host_ip => "<%%= private_ips['backend'] %>"
+       }})
+   end
+
+
+ end
+
+  config.lb.define "lb-frontend" do |lb_config|
+   lb_config.lb.provider="aws-europe"
+    ##lb_config.lb.members = [ "frontend1"]
+    lb_config.lb.members = [ "frontend1","frontend2"]
+    lb_config.lb.sorry_members = [ "sorry"]
+  end
+
+  config.ip.define "ip-monitoring" do |config2|
+    config2.ip.provider="aws-europe"
+    config2.ip.address="79.125.105.12"
+    config2.ip.vmname = "monitoring"
+  end
+
+end #End Mcloud

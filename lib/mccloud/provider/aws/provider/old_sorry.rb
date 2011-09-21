@@ -5,7 +5,7 @@ module Mccloud
     include Mccloud::Util
 
     def sorry(selection, options)
-      filter=@session.config.mccloud.stackfilter
+      filter=@environment.config.mccloud.stackfilter
 
       puts
       on_selected_lbs(selection) do |id,lb|
@@ -17,7 +17,7 @@ module Mccloud
           lb_instance=lb.instance
           #Adding new member first
           lb.sorry_members.each do |member|
-            vm=@session.config.vms[member]
+            vm=@environment.config.vms[member]
             server_instance=vm.instance
             unless server_instance.nil?
               unless lb_instance.nil?

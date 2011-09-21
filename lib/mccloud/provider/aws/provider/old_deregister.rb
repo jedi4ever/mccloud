@@ -16,7 +16,7 @@ module Mccloud
       # f.deregister_image("ami-796d5b0d")
 
       puts "Looking for imageId: #{imageId}"
-      @session.config.providers.each do |name,provider|
+      @environment.config.providers.each do |name,provider|
         begin
           image=provider.images.get(imageId)
           if image.nil?

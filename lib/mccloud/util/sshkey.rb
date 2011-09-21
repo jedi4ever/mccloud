@@ -7,7 +7,7 @@ require 'digest/md5'
 
 module Mccloud
   module Util
-    
+
 class SSHKey
 
   def self.generate(options = {})
@@ -17,15 +17,13 @@ class SSHKey
   attr_reader :key_object, :comment, :rsa_private_key, :rsa_public_key, :ssh_public_key, :fingerprint
 
   def initialize(private_key, options = {})
-    puts "#{private_key}"
     @key_object        = OpenSSL::PKey::RSA.new(private_key)
-    
-    
+
     @comment           = options[:comment] || ""
     @rsa_private_key   = @key_object.to_pem
     @rsa_public_key    = @key_object.public_key.to_pem
     raw_ssh_public_key = ssh_public_key_conversion
-    
+
 #    @ssh_public_key    = ["ssh-rsa", Base64.strict_encode64(raw_ssh_public_key), @comment].join(" ").strip
 
     @ssh_public_key    = ["ssh-rsa", [raw_ssh_public_key].pack("m0").gsub(/\n/,''), @comment].join(" ").strip

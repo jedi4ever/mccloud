@@ -5,6 +5,8 @@ require 'mccloud/provisioner/shell'
 require 'mccloud/provider/core/forwarding'
 
 require 'mccloud/provider/core/vm/ssh.rb'
+require 'mccloud/provider/core/vm/ssh_bootstrap.rb'
+require 'mccloud/provider/core/vm/ssh_forward.rb'
 require 'mccloud/provider/core/vm/rsync.rb'
 
 module Mccloud
@@ -22,10 +24,12 @@ module Mccloud
           @status=status
         end
       end
-      
+
     class Vm
 
       include Mccloud::Provider::Core::VmCommand
+
+      attr_reader   :env
 
       attr_accessor :provider
 
@@ -45,13 +49,15 @@ module Mccloud
       attr_accessor :stacked
       attr_accessor :declared
 
-      def initialize
+      def initialize(env)
+        @env=env
         @forwardings=Array.new
         @stacked=false
         @auto_selection=true
         @declared=true
         @provisioners=Array.new
         @port=22
+        @create_options={}
       end
 
       def declared?
@@ -83,16 +89,16 @@ module Mccloud
           yield @provisioners.last
         end
       end
-      
+
       def forward_port(name,local,remote)
         forwarding=Forwarding.new(name,local,remote)
         forwardings << forwarding
       end
-      
-      def method_missing(m, *args, &block)  
-          #puts "There's no keyword #{m} defined  for vm #{@name}-- ignoring it"  
+
+      def method_missing(m, *args, &block)
+          env.logger.info "There's no keyword #{m} defined for vm #{@name}-- ignoring it"
       end
-      
+
     end #Class
   end #Module
   end #Module

@@ -8,7 +8,7 @@ module Mccloud
       options=defaults.merge(options)
 
       puts
-      puts "Waiting for ssh login with user #{options[:user]} to sshd on port => #{options[:port]} to work"
+      puts "Waiting for ssh login on #{ip} with user #{options[:user]} to sshd on port => #{options[:port]} to work"
 
       begin
         Timeout::timeout(options[:timeout]) do
@@ -43,7 +43,7 @@ module Mccloud
           print "."
 
         end
-      end 
+      end
       puts
     end
 
@@ -79,7 +79,7 @@ module Mccloud
     end
 
     def self.ssh(host ,user , options = { :progress => "on" } ,command=nil ,exitcode=0)
-      
+
       defaults= { :port => "22",  :user => "root", :paranoid => false }
       options=defaults.merge(options)
       @pid=""
@@ -97,8 +97,8 @@ module Mccloud
         channel = ssh.open_channel do |ch|
 
           #request pty for sudo stuff and so
-          ch.request_pty do |ch, success| 
-            raise "Error requesting pty" unless success 
+          ch.request_pty do |ch, success|
+            raise "Error requesting pty" unless success
           end
 
 
@@ -153,7 +153,7 @@ module Mccloud
         if (exitcode=="*")
           #its a test so we don't need to worry
         else
-	  puts "Exitcode = #{exitcode} - #{@status.to_s}"	
+          puts "Exitcode = #{exitcode} - #{@status.to_s}"
           raise "Exitcode was not what we expected"
         end
 

@@ -2,62 +2,80 @@ module Mccloud::Provider
   module Aws
     module VmCommand
 
-        def up(options)
-          
-          puts "Upping of aws vm #{@name}"
+      def up(options)
 
-            if raw.nil? || raw.state =="terminated"
-              puts "[#{@name}] - Spinning up a new machine"
+        puts "Upping of aws vm #{@name}"
 
-              create_options=@create_options.merge({ :private_key_path => @private_key_path , :public_key_path => @public_key_path, :username => @user})
+        if raw.nil? || raw.state =="terminated"
+          puts "[#{@name}] - Spinning up a new machine"
 
-              @raw=@provider.raw.servers.create(create_options)
+          create_options= {
+            :private_key_path => @private_key_path ,
+            :public_key_path => @public_key_path,
+            :availability_zone => @zone,
+            :image_id => @ami,
+            :flavor_id => @flavor,
+            :key_name => @key_name,
+            :groups => @security_groups
+          }.merge(@create_options)
 
-              puts "[#{@name}] - Waiting for the machine to become accessible"
-              raw.wait_for { printf "."; STDOUT.flush;  ready?}
-              puts
-              @provider.raw.create_tags(raw.id, { "Name" => "#{@provider.filter}#{@name}"})
+          env.logger.info "Creating new vm for provider AWS with options #{create_options}"
+          begin
+            @raw=@provider.raw.servers.create(create_options)
+          rescue Fog::Compute::AWS::NotFound => ex
+            #Oh we got an error
+            #Let's see if we need to create keypair mccloud
 
-              # Wait for ssh to become available ...
-              puts "[#{@name}] - Waiting for ssh to become available"
-              #puts instance.console_output.body["output"]
+            env.ui.error "Error creating the new server: #{ex}"
+            return
+          end
 
-              Mccloud::Util.execute_when_tcp_available(self.ip_address, { :port => @port, :timeout => 6000 }) do
-                puts "[#{@name}] - Ssh is available , proceeding with bootstrap"
-              end
+          puts "[#{@name}] - Waiting for the machine to become accessible"
+          raw.wait_for { printf "."; STDOUT.flush;  ready?}
+          puts
+          @provider.raw.create_tags(raw.id, { "Name" => "#{@provider.filter}#{@name}"})
 
-              self._bootstrap(options)
+          # Wait for ssh to become available ...
+          puts "[#{@name}] - Waiting for ssh to become available"
+          #puts instance.console_output.body["output"]
 
+          Mccloud::Util.execute_when_tcp_available(self.ip_address, { :port => @port, :timeout => 6000 }) do
+            puts "[#{@name}] - Ssh is available , proceeding with bootstrap"
+          end
+
+          # No bootstrap to provide
+          self._bootstrap(nil,options)
+
+        else
+          state=raw.state
+          if state =="stopped"
+            puts "Booting up machine #{@name}"
+            raw.start
+            raw.wait_for { printf ".";STDOUT.flush;  ready?}
+            puts
+          else
+            unless raw.state == "shutting-down" || raw.state =="terminated"
+              puts "[#{@name}] - already running."
             else
-              state=raw.state
-              if state =="stopped"
-                puts "Booting up machine #{@name}"
-                raw.start
-                raw.wait_for { printf ".";STDOUT.flush;  ready?}
-                puts
-              else
-                unless raw.state == "shutting-down" || raw.state =="terminated"
-                  puts "[#{@name}] - already running."
-                else
-                  puts "[#{@name}] - can't start machine because it is in state #{raw.state}"
-                  return
-                end
-              end
+              puts "[#{@name}] - can't start machine because it is in state #{raw.state}"
+              return
             end
-
-            unless options["noprovision"]
-              puts "[#{@name}] - Waiting for ssh to become available"
-              Mccloud::Util.execute_when_tcp_available(self.ip_address, { :port => @port, :timeout => 6000 }) do
-                puts "[#{@name}] - Ssh is available , proceeding with provisioning"
-              end
-
-              puts "[#{@name}] - provision step #{@name}"
-              self._provision(options)
-            end
-           
-          
+          end
         end
- 
+
+        unless options["noprovision"]
+          puts "[#{@name}] - Waiting for ssh to become available"
+          Mccloud::Util.execute_when_tcp_available(self.ip_address, { :port => @port, :timeout => 6000 }) do
+            puts "[#{@name}] - Ssh is available , proceeding with provisioning"
+          end
+
+          puts "[#{@name}] - provision step #{@name}"
+          self._provision(options)
+        end
+
+
+      end
+
     end #module
   end #module
 end #module

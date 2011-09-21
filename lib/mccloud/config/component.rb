@@ -3,8 +3,11 @@ module Mccloud
     class Component
 
       attr_accessor :provider
+      
+      attr_reader   :env
 
-      def initialize()
+      def initialize(config)
+        @env=config.env
       end
 
       def method_missing(m, *args, &block)  

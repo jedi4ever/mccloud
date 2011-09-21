@@ -34,16 +34,16 @@ module Mccloud
           description=options["description"]
         end
 
-        filter=@session.config.mccloud.filter
-        fullname="#{@session.config.mccloud.filter}#{name}"
+        filter=@environment.config.mccloud.filter
+        fullname="#{@environment.config.mccloud.filter}#{name}"
 
-        provider= @session.config.providers[vm.provider]
+        provider= @environment.config.providers[vm.provider]
         begin
           result=provider.create_image(id,name,description)
           imageId=result.body["imageId"]
           puts "[#{vm.name}] image #{imageId} with #{description} being created"
 
-          unless options["dontwait"]   
+          unless options["dontwait"]
             sleep 3
             counter=0
             max_tries=5
@@ -58,7 +58,7 @@ module Mccloud
                 sleep 3
                 print "."
               else
-                state=image.state              
+                state=image.state
               end
             end
             puts ""

@@ -5,12 +5,12 @@ module Mccloud
     include Mccloud::Util
 
     def ips(selection, options)
-      filter=@session.config.mccloud.stackfilter
+      filter=@environment.config.mccloud.stackfilter
 
       on_selected_ips(selection) do |id,ip|
         ip_instance=ip.instance
         unless ip_instance.nil?
-          vm=@session.config.vms[ip.vmname]
+          vm=@environment.config.vms[ip.vmname]
           puts "[#{ip.name}] Associating #{ip.address} with #{ip.vmname}"
           ip_instance.server=vm.instance
         else
@@ -19,7 +19,7 @@ module Mccloud
         #        ipaddress=ip.instance
 
         #        .each do |member|
-        #          vm=@session.config.vms[member]
+        #          vm=@environment.config.vms[member]
         #          server_instance=vm.instance
         #          unless server_instance.nil?
         #            lb_instance=lb.instance

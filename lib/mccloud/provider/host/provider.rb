@@ -11,16 +11,19 @@ module Mccloud
       attr_accessor :type
 
       attr_accessor :options
-      
+
       attr_accessor :vms
 
       include Mccloud::Provider::Host::ProviderCommand
 
 
-    def initialize(name,options)
+    def initialize(name,options,env)
+
+      super(name,options,env)
+
       @vms=Hash.new
-      
-      @options=options    
+
+      @options=options
       @type=self.class.to_s.split("::")[-2]
       @name=name
     end
@@ -35,13 +38,13 @@ module Mccloud
       end
     end
 
-    def bootstrap(selection,options)
+    def bootstrap(selection,script,options)
       on_selected_components("vm",selection) do |id,vm|
-        vm.bootstrap(options)
+        vm.bootstrap(script,options)
       end
 
     end
-    
+
     def destroy(selection,options)
 
       on_selected_components("vm",selection) do |id,vm|
@@ -49,7 +52,7 @@ module Mccloud
       end
 
     end
-    
+
     def ssh(selection,command,options)
 
       on_selected_components("vm",selection) do |id,vm|
@@ -65,8 +68,8 @@ module Mccloud
       end
 
     end
-    
-    
+
+
     def provision(selection,options)
 
       on_selected_components("vm",selection) do |id,vm|
@@ -74,7 +77,7 @@ module Mccloud
       end
 
     end
-    
+
     def halt(selection,options)
       on_selected_components("vm",selection) do |id,vm|
         puts "Matched #{vm.name}"

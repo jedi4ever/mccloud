@@ -1,15 +1,15 @@
 module Mccloud::Provider
   module Aws
     module ProviderCommand
-  
+
     def status(selection=nil,options=nil)
 
       puts
       puts "Server(s) - provider #{@name}"
-        
+
       printf "%-10s %-12s %-20s %-15s %-8s\n", "Name", "Instance Id", "IP", "Type","Status"
       80.times { |i| printf "=" } ; puts
-      
+
       raw.servers.each do |vm|
           name="<no name set>"
           if !vm.tags["Name"].nil?
@@ -30,24 +30,24 @@ module Mccloud::Provider
             end
           end
         end #End 1 provider
-        
+
                 puts
                 puts "Image(s) - provider #{@name}"
                 80.times { |i| printf "=" } ; puts
-                  images_list=raw.images.all({"Owner" => "self"}) 
+                  images_list=raw.images.all({"Owner" => "self"})
                   images_list.each do |image|
                       printf "%-10s %-10s %-10s %-20s\n",image.id,image.name.gsub(/"#{filter}"/,''),image.state, image.description[0..20]
                   end
 
           puts "Volume(s) - provider #{@name}"
           80.times { |i| printf "=" } ; puts
-            volume_list=raw.volumes.all() 
+            volume_list=raw.volumes.all()
             volume_list.each do |volume|
                 printf "%-10s %-10s %-10s %-20s\n",volume.id,volume.device,volume.server_id, volume.size
             end
 
     end
-    
-    end #module  
+
+    end #module
   end #module
 end #module

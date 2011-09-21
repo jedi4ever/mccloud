@@ -1,36 +1,37 @@
 module Mccloud
   class Config
     class Mccloud
-      
+
+      attr_reader :env
+
       attr_accessor :prefix
       attr_accessor :environment
       attr_accessor :identity
-      
+
       attr_accessor :delimiter
-
       attr_accessor :loglevel
-      
 
-      def initialize()
-          @prefix="mccloud"
-          @delimiter="-"
-          @environment=""
-          @identity=""
+      attr_accessor :template_path
+      attr_accessor :vm_path
 
-          @loglevel=:info
-      end   
+      def initialize(config)
+        @env=config.env
 
-#      def to_hash
-#        result={}
-#        [:prefix, :environment,:delimiter,:identity,:loglevel,:check_keypairs,:check_securitygroups].each do |param|
-#          value=self.instance_variable_defined?("@#{param.to_s}") ? self.instance_variable_get("@#{param.to_s}") : nil
-#          unless value.nil?
-#            result[param]= value
-#          end 
-#        end
-#        return result
-#      end
-      
+        @prefix="mccloud"
+        @environment=""
+        @identity=""
+
+        @delimiter="-"
+        @loglevel=:info
+
+        @template_path=[:internal,"templates"]
+        @vm_path=["vms"]
+
+        env.logger.debug("done")
+
+      end
+
+
     end #Class
-    end #Module
+  end #Module
 end #Module

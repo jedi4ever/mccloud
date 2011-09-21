@@ -5,7 +5,7 @@ module Mccloud::Provider
         def suspend(command,options={})
             raw.suspend
         end
- 
+
     end #module
   end #module
 end #module

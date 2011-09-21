@@ -22,7 +22,8 @@ module Mccloud
     attr_accessor :userdata_file
 
     
-    def initialize
+    def initialize(env)
+      super(env)
 #      @forwardings=Array.new
        @rewrite_names=true
        @user=Hash.new
@@ -81,7 +82,7 @@ module Mccloud
     def instance
 #      if @this_instance.nil?
 #        begin
-#          @this_instance=Mccloud.session.config.providers[provider].servers.get(Mccloud.session.all_servers[name.to_s])
+#          @this_instance=Mccloud.environment.config.providers[provider].servers.get(Mccloud.environment.all_servers[name.to_s])
 #        rescue Fog::Service::Error => e
 #          puts "Error: #{e.message}"
 #          puts "We could not request the information from your provider #{provider}. We suggest you check your credentials."
@@ -113,7 +114,7 @@ module Mccloud
                   # If we found the Name tag rewrite it
                    if tag_hash["Key"]="Name"
                      # Need to rewrite name
-                     new_tag_hash={"Value"=>"#{Mccloud.session.config.mccloud.filter}#{tag_hash["Value"]}", "Key"=>"Name"}
+                     new_tag_hash={"Value"=>"#{Mccloud.environment.config.mccloud.filter}#{tag_hash["Value"]}", "Key"=>"Name"}
                      instance_name="#{tag_hash["Value"]}"
                      foundName=true
                    end
@@ -126,7 +127,7 @@ module Mccloud
                    
                 end #Hash Tags iteration
                 unless foundName
-                  rewrittenTags << {"Value"=>"#{Mccloud.session.config.mccloud.filter}noname-#{unkown_counter}", "Key"=>"Name"}
+                  rewrittenTags << {"Value"=>"#{Mccloud.environment.config.mccloud.filter}noname-#{unkown_counter}", "Key"=>"Name"}
                   instance_name="noname-#{unkown_counter}"
                   unknown_counter=unknown_counter+1
                 end
@@ -192,7 +193,7 @@ module Mccloud
     def filtered_instance_names
       fullname_instances=self.instance_names
       short_instances=[]
-      filter=Mccloud.session.config.mccloud.filter
+      filter=Mccloud.environment.config.mccloud.filter
       fullname_instances.each do |instancename|
         if instancename.start_with?(filter)
           short=instancename
