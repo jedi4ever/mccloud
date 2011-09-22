@@ -3,6 +3,7 @@ require 'mccloud/provider/core/provider'
 require 'mccloud/provider/aws/provider/status'
 require 'mccloud/provider/aws/provider/ip_list'
 require 'mccloud/provider/aws/provider/lb_list'
+require 'mccloud/provider/aws/provider/keystore_list'
 require 'mccloud/provider/aws/provider/image_list'
 require 'mccloud/provider/aws/provider/image_destroy'
 require 'mccloud/provider/aws/vm'
@@ -23,8 +24,10 @@ module Mccloud
         attr_accessor :vms
         attr_accessor :lbs
         attr_accessor :ips
+        
+        attr_accessor :keystores
 
-        attr_accessor :check_keypairs
+        attr_accessor :check_key_pairs
         attr_accessor :check_securitygroups
 
         include Mccloud::Provider::Aws::ProviderCommand
@@ -34,8 +37,8 @@ module Mccloud
 
           super(name,options,env)
 
-          @check_securitygroups=true
-          @check_keypairs=true
+          @check_security_groups=true
+          @check_key_pairs=true
 
           @options=options
           @type=self.class.to_s.split("::")[-2]
@@ -46,6 +49,7 @@ module Mccloud
           @vms=Hash.new
           @lbs=Hash.new
           @ips=Hash.new
+          @keystores=Hash.new
 
           required_gems=%w{fog}
           check_gem_availability(required_gems)

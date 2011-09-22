@@ -6,7 +6,6 @@ module Mccloud
     attr_accessor :env
 
     def initialize(name,env)
-      puts "we get called?"
       @name=name
       @env=env
       @private_key_path=nil

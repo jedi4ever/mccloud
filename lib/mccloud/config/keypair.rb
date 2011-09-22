@@ -19,16 +19,16 @@ module Mccloud
         # We do this for vagrant syntax
         # Depending on type, we create a variable of that type
         # f.i. component_stub.vm or component_stub.lb
-        key_pair_stub=OpenStruct.new
-        key_pair_stub.key_pair=::Mccloud::Keypair.new(name,env)
+        keypair_stub=OpenStruct.new
+        keypair_stub.keypair=::Mccloud::Keypair.new(name,env)
 
         env.logger.debug("config keypair"){ "Start reading keypair"}
 
-        yield key_pair_stub
+        yield keypair_stub
 
-        env.logger.debug("config keypair"){ "End reading keypair #{key_pair_stub.key_pair.name}"}
+        env.logger.debug("config keypair"){ "End reading keypair #{keypair_stub.keypair.name}"}
 
-        components[name.to_s]=key_pair_stub.key_pair
+        components[name.to_s]=keypair_stub.keypair
       end
 
     end

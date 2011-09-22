@@ -16,7 +16,7 @@ module Mccloud
 
     attr_reader :env
 
-    attr_accessor :vms,:lbs,:stacks,:ips,:keystores,
+    attr_accessor :vms,:lbs,:stacks,:ips,:keystores
 
     attr_accessor :providers
     
@@ -34,7 +34,7 @@ module Mccloud
     def define()
       config=OpenStruct.new
 
-      # These two don't depend on a provider
+      # These don't depend on a provider
       config.mccloud=::Mccloud::Config::Mccloud.new(self)
 
       # Assign templates
@@ -42,8 +42,8 @@ module Mccloud
       @templates=config.template.components
 
       # Assign keypairs
-      config.key_pair=::Mccloud::Config::Keypair.new(self)
-      @keypairs=config.key_pair.components
+      config.keypair=::Mccloud::Config::Keypair.new(self)
+      @keypairs=config.keypair.components
 
       # Assign providers
       config.provider=::Mccloud::Config::Provider.new(self)
@@ -54,7 +54,7 @@ module Mccloud
       config.lb=::Mccloud::Config::Collection.new("lb",self)
       config.ip=::Mccloud::Config::Collection.new("ip",self)
       config.stack=::Mccloud::Config::Collection.new("stack",self)
-#      config.key_store=::Mccloud::Config::Collection.new("keystore",self)
+      config.keystore=::Mccloud::Config::Collection.new("keystore",self)
 
       # Process config file
       yield config
@@ -101,6 +101,7 @@ module Mccloud
           File.expand_path(path)
         else
           env.logger.info "Template path #{path} does not exist, skipping"
+          return nil
         end
       }
 
@@ -146,6 +147,7 @@ module Mccloud
           File.expand_path(path)
         else
           env.logger.info "VM #{path} does not exist, skipping"
+          return nil
         end
       }
 
@@ -155,7 +157,7 @@ module Mccloud
       config.vm=::Mccloud::Config::Collection.new("vm",self)
 
       # For all paths that exist
-      valid_paths.each do |path|
+      valid_paths.compact.each do |path|
 
         # Read definitions
         Dir.new(path).each do |definition|
