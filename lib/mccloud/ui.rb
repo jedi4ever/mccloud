@@ -67,6 +67,7 @@ module Mccloud
 
       def format_message(message, opts=nil)
         opts = { :prefix => true }.merge(opts || {})
+        opts[:prefix]=false if env.resource=="mccloud"
         message = "[#{env.resource}] #{message}" if opts[:prefix]
         message
       end
