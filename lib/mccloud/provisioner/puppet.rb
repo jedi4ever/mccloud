@@ -37,7 +37,7 @@ module Mccloud
         if vm.user=="root"
           Mccloud::Util.ssh(vm.instance.public_ip_address,vm.user,options,"puppet #{@pp_path}/manifest.pp")
         else
-          Mccloud::Util.ssh(vm.instance.public_ip_address,vm.user,options,"sudo puppet #{@pp_path}/manifest.pp")
+          Mccloud::Util.ssh(vm.instance.public_ip_address,vm.user,options,"sudo -H -i puppet #{@pp_path}/manifest.pp")
         end
       end
     end #Class
