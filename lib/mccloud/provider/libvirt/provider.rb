@@ -39,7 +39,7 @@ module Mccloud
             begin
               @raw=Fog::Compute.new({:provider => "Libvirt"}.merge(@options))
             rescue ArgumentError => e
-              puts "Error loading raw provider : #{e.to_s} #{$!}"
+              env.ui.error "Error loading raw provider : #{e.to_s} #{$!}"
               @raw=nil
             end
           end

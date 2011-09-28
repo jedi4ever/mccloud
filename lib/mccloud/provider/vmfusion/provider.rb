@@ -36,7 +36,7 @@ module Mccloud
             begin
               @raw=Fission::VM.all
             rescue ArgumentError => e
-              puts "Error loading raw provider : #{e.to_s} #{$!}"
+              env.ui.error "Error loading raw provider : #{e.to_s} #{$!}"
               @raw=nil
             end
           end
@@ -91,7 +91,7 @@ module Mccloud
 
         def halt(selection,options)
           on_selected_components("vm",selection) do |id,vm|
-            puts "Matched #{vm.name}"
+            env.ui.info "Matched #{vm.name}"
             vm.halt(options)
           end
 

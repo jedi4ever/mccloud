@@ -10,19 +10,19 @@ module Mccloud::Provider
         volume=@provider.raw.volumes.all(:name => volname)
 
         unless server.nil?
-          puts "[#{@name}] - Destroying machine #{@provider.namespace}::#{@name}"
+          env.ui.info "[#{@name}] - Destroying machine #{@provider.namespace}::#{@name}"
 
           server.first.destroy
         else
-          puts "[#{@name}] - Server #{@provider.namespace}::#{@name} does not exist"
+          env.ui.info "[#{@name}] - Server #{@provider.namespace}::#{@name} does not exist"
         end
 
         unless volume.nil?
-          puts "[#{@name}] - Destroying volume #{@provider.namespace}::#{@name}.img"
+          env.ui.info "[#{@name}] - Destroying volume #{@provider.namespace}::#{@name}.img"
 
           volume.first.destroy
         else
-          puts "[#{@name}] - Volume #{@provider.namespace}::#{@name}.img does not exist"
+          env.ui.info "[#{@name}] - Volume #{@provider.namespace}::#{@name}.img does not exist"
 
         end
 

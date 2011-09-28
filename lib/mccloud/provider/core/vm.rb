@@ -78,11 +78,11 @@ module Mccloud
         if block_given?
           case type
           when :chef_solo
-            @provisioners<< Mccloud::Provisioner::ChefSolo.new
+            @provisioners<< Mccloud::Provisioner::ChefSolo.new(env)
           when :puppet
-            @provisioners<<Mccloud::Provisioner::Puppet.new
+            @provisioners<<Mccloud::Provisioner::Puppet.new(env)
           when :shell
-            @provisioners<<Mccloud::Provisioner::Shell.new
+            @provisioners<<Mccloud::Provisioner::Shell.new(env)
 
           else
           end

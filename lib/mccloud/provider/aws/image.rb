@@ -11,7 +11,7 @@ module Mccloud::Provider
       def package(selection=nil,options=nil)
 
         if selection.nil?
-          puts "[Error] We need at least a name of a machine."
+          env.ui.info "[Error] We need at least a name of a machine."
           exit
         end
 
@@ -47,7 +47,7 @@ module Mccloud::Provider
           begin
             result=provider.create_image(id,name,description)
             imageId=result.body["imageId"]
-            puts "[#{vm.name}] image #{imageId} with #{description} being created"
+            env.ui.info "[#{vm.name}] image #{imageId} with #{description} being created"
 
             unless options["dontwait"]
               sleep 3
@@ -67,11 +67,11 @@ module Mccloud::Provider
                   state=image.state
                 end
               end
-              puts ""
-              puts "[#{vm.name}] creation done!"
+              env.ui.info ""
+              env.ui.info "[#{vm.name}] creation done!"
             end
           rescue Fog::Service::Error => fogerror
-            puts "[Error] #{fogerror}"
+            env.ui.info "[Error] #{fogerror}"
 
           end
           #      vm.instance.start
@@ -84,19 +84,19 @@ module Mccloud::Provider
         # f.images.all({ "Owner" => "self"})
         # f.deregister_image("ami-796d5b0d")
 
-        puts "Looking for imageId: #{imageId}"
+        env.ui.info "Looking for imageId: #{imageId}"
         @environment.config.providers.each do |name,provider|
           begin
             image=provider.images.get(imageId)
             if image.nil?
-              puts "[#{name}] - ImageId #{imageId} not found"
+              env.ui.info "[#{name}] - ImageId #{imageId} not found"
             else
-              puts "[#{name}] - ImageId #{imageId} found"
-              puts "[#{name}] - Deregistering #{imageId} now"
+              env.ui.info "[#{name}] - ImageId #{imageId} found"
+              env.ui.info "[#{name}] - Deregistering #{imageId} now"
               begin
                 provider.deregister_image(imageId)
               rescue Fog::Service::Error => fogerror
-                puts "[Error] #{fogerror}"
+                env.ui.info "[Error] #{fogerror}"
               end
             end
           end

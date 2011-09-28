@@ -24,7 +24,7 @@ module Mccloud
         attr_accessor :vms
         attr_accessor :lbs
         attr_accessor :ips
-        
+
         attr_accessor :keystores
 
         attr_accessor :check_key_pairs
@@ -65,7 +65,7 @@ module Mccloud
             begin
               @raw=Fog::Compute.new({:provider => "Aws", :region => @region}.merge(@options))
             rescue ArgumentError => e
-              puts "Error loading raw provider : #{e.to_s} #{$!}"
+              env.ui.info "Error loading raw provider : #{e.to_s} #{$!}"
               @raw=nil
             end
           end
@@ -132,7 +132,7 @@ module Mccloud
           fogfilename="#{File.join(ENV['HOME'],".fog")}"
           fogfile=File.new(fogfilename,"w")
           FileUtils.chmod(0600,fogfilename)
-          fogfile.puts "#{snippet}"
+          fogfile.env.ui.info "#{snippet}"
           fogfile.close
         end
 
@@ -224,7 +224,7 @@ module Mccloud
 
         def halt(selection,options)
           on_selected_components("vm",selection) do |id,vm|
-            puts "Matched #{vm.name}"
+            env.ui.info "Matched #{vm.name}"
             vm.halt(options)
           end
 

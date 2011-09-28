@@ -5,13 +5,13 @@ module Mccloud::Provider
       def destroy(options)
 
         unless raw.nil? || raw.state == "shutting-down" || raw.state =="terminated"
-          puts "[#{@name}] - Destroying machine (#{raw.id})"
+          env.ui.info "[#{@name}] - Destroying machine (#{raw.id})"
           raw.destroy
 
           raw.wait_for {  print "."; STDOUT.flush; state=="terminated"}
-          puts
+          env.ui.info ""
         else
-          puts "[#{@name}] - Machine is already terminated #{@raw.id}"
+          env.ui.info "[#{@name}] - Machine is already terminated #{@raw.id}"
         end
 
       end

@@ -14,14 +14,15 @@ module Mccloud
     class ChefSolo
 
       attr_reader   :name
+      attr_reader   :env
 
-      attr_accessor :cookbooks_path 
-      attr_accessor :role_path 
+      attr_accessor :cookbooks_path
+      attr_accessor :role_path
       attr_accessor :provisioning_path
       attr_accessor :json
       attr_accessor :json_erb
       attr_reader   :roles
-      
+
       attr_accessor :node_name
       attr_accessor :log_level
       attr_accessor :http_proxy
@@ -32,7 +33,8 @@ module Mccloud
       attr_accessor :https_proxy_pass
       attr_accessor :no_proxy
 
-      def initialize
+      def initialize(env)
+        @env=env
         @provisioning_path="/tmp/mccloud-chef"
         @json={ :instance_role => "mccloud"}
         @json_erb=true
@@ -42,7 +44,7 @@ module Mccloud
 
       def mccloudconfig_to_json
       end
-      
+
       def run(server)
         if @json_erb
           # http://stackoverflow.com/questions/1338960/ruby-templates-how-to-pass-variables-into-inlined-erb
@@ -94,24 +96,24 @@ module Mccloud
           server.share(path,{:mute => true})
         end
 
-        puts "[#{server.name}] - [#{@name}] - running chef-solo"
-        puts "[#{server.name}] - [#{@name}] - login as #{server.user}"
+        env.ui.info "[#{server.name}] - [#{@name}] - running chef-solo"
+        env.ui.info "[#{server.name}] - [#{@name}] - login as #{server.user}"
         begin
           if server.user=="root"
             server.execute("chef-solo -c /tmp/solo.rb -j /tmp/dna.json -l #{@log_level}")
           else
-#             server.execute("sudo -i chef-solo -c /tmp/solo.rb -j /tmp/dna.json -l #{@log_level}")
+            #             server.execute("sudo -i chef-solo -c /tmp/solo.rb -j /tmp/dna.json -l #{@log_level}")
 
             server.execute("sudo chef-solo -c /tmp/solo.rb -j /tmp/dna.json -l #{@log_level}")
           end
         rescue Exception
         ensure
-          puts "[#{server.name}] - [#{@name}] - Cleaning up dna.json"
+          env.ui.info "[#{server.name}] - [#{@name}] - Cleaning up dna.json"
           server.execute("rm /tmp/dna.json",{:mute => true})
-          puts "[#{server.name}] - [#{@name}] - Cleaning up solo.json"
+          env.ui.info "[#{server.name}] - [#{@name}] - Cleaning up solo.json"
           server.execute("rm /tmp/solo.rb", {:mute => true})
           cookbooks_path.each do |path|
-            puts "[#{server.name}] - [#{@name}] - Cleaning cookbook_path #{path}"
+            env.ui.info "[#{server.name}] - [#{@name}] - Cleaning cookbook_path #{path}"
             server.execute("rm -rf /tmp/#{File.basename(path)}",{:mute => true})
           end
 
@@ -216,7 +218,7 @@ module Mccloud
 end #Module Mccloud
 
 
-#cookbook_path     "/etc/chef/recipes/cookbooks" 
+#cookbook_path     "/etc/chef/recipes/cookbooks"
 #log_level         :info
-#file_store_path  "/etc/chef/recipes/" 
-#file_cache_path  "/etc/chef/recipes/" 
+#file_store_path  "/etc/chef/recipes/"
+#file_cache_path  "/etc/chef/recipes/"

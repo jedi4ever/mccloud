@@ -24,7 +24,7 @@ module Mccloud
             real_component=Object.const_get("Mccloud").const_get("Provider").const_get(@type.to_s.capitalize).const_get(type.to_s.capitalize).new(env)
 
           rescue Error => e
-            puts "Error getting component - #{e}"
+            env.ui.error "Error getting component - #{e}"
           end
           return real_component
         end
@@ -43,7 +43,7 @@ module Mccloud
               if component.auto_selected?
                 yield name,component
               else
-                puts "[#{name}] Skipping because it has autoselection off"
+                env.ui.info "[#{name}] Skipping because it has autoselection off"
               end
             end
           else # a specific component
