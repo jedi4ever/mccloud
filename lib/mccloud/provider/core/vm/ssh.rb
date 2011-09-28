@@ -38,6 +38,8 @@ module Mccloud
           pid = nil
           pid = fork if Mccloud::Util::Platform.leopard? || Mccloud::Util::Platform.tiger?
 
+          env.logger.info "Executing internal ssh command"
+          env.logger.info ssh_command
           Kernel.exec ssh_command if pid.nil?
           Process.wait(pid) if pid
         end
