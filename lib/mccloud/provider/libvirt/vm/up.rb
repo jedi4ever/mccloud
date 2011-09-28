@@ -18,9 +18,11 @@ module Mccloud::Provider
           raw.wait_for { printf "."; STDOUT.flush;  ready?}
 
           # Wait for ssh to become available ...
-          puts "[#{@name}] - Waiting for ssh to become available"
+          puts "[#{@name}] - Waiting for ip address"
           #puts instance.console_output.body["output"]
+          raw.wait_for { printf "."; STDOUT.flush;  !public_ip_address.nil?}
 
+          puts "[#{@name}] - Waiting for ssh on #{self.ip_address} to become available"
           Mccloud::Util.execute_when_tcp_available(self.ip_address, { :port => @port, :timeout => 6000 }) do
             puts "[#{@name}] - Ssh is available , proceeding with bootstrap"
           end
