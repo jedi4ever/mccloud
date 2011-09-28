@@ -132,7 +132,7 @@ module Mccloud
           fogfilename="#{File.join(ENV['HOME'],".fog")}"
           fogfile=File.new(fogfilename,"w")
           FileUtils.chmod(0600,fogfilename)
-          fogfile.env.ui.info "#{snippet}"
+          fogfile.puts"#{snippet}"
           fogfile.close
         end
 

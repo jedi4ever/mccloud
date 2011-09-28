@@ -25,7 +25,7 @@ module Mccloud
     # The configuration as loaded by the Mccloudfile
     attr_accessor :config
 
-#    attr_accessor :providers
+    #    attr_accessor :providers
 
 
     def initialize(options=nil)
@@ -33,17 +33,24 @@ module Mccloud
         :cwd => nil,
         :mccloudfile_name => nil}.merge(options || {})
 
-      # Set the default working directory to look for the Mccloudfile
-      options[:mccloudfile_name] ||=["Mccloudfile",""]
+       # We need to set this variable before the first call to the logger object
+       if options.has_key?("debug")
+         ENV['MCCLOUD_LOG']="STDOUT"
+         ui.info "Debugging enabled"
+       end
 
-      logger.info("environment") { "Environment initialized (#{self})" }
-      logger.info("environment") { " - cwd : #{cwd}" }
 
-      options.each do |key, value|
-        instance_variable_set("@#{key}".to_sym, options[key])
-      end
+        # Set the default working directory to look for the Mccloudfile
+        options[:mccloudfile_name] ||=["Mccloudfile",""]
 
-      return self
+        logger.info("environment") { "Environment initialized (#{self})" }
+        logger.info("environment") { " - cwd : #{cwd}" }
+
+        options.each do |key, value|
+          instance_variable_set("@#{key}".to_sym, options[key])
+        end
+
+        return self
     end
 
     #---------------------------------------------------------------
@@ -67,7 +74,7 @@ module Mccloud
     def ui
       @ui ||=  UI.new(self)
     end
-    
+
     #---------------------------------------------------------------
     # Load Methods
     #---------------------------------------------------------------
@@ -95,62 +102,62 @@ module Mccloud
     end
 
     def load_config!
-        @config=Config.new({:env => self}).load_mccloud_config()
-        @config.load_templates
-        @config.load_vms
-        @ui.info "Loaded #{@config.providers.length} providers "+"#{@config.vms.length} vms"+" #{@config.ips.length} ips"+" #{@config.stacks.length} stacks"+" #{@config.templates.length} templates"
+      @config=Config.new({:env => self}).load_mccloud_config()
+      @config.load_templates
+      @config.load_vms
+      @ui.info "Loaded #{@config.providers.length} providers "+"#{@config.vms.length} vms"+" #{@config.ips.length} ips"+" #{@config.stacks.length} stacks"+" #{@config.templates.length} templates"
 
-        return self
+      return self
     end
 
-      # Reloads the configuration of this environment.
-      def reload_config!
-        @config = nil
-        load_config!
-        self
-      end
+    # Reloads the configuration of this environment.
+    def reload_config!
+      @config = nil
+      load_config!
+      self
+    end
 
-      # Makes a call to the CLI with the given arguments as if they
-      # came from the real command line (sometimes they do!). An example:
-      #
-      #     env.cli("package", "--mccloudfile", "Mccloudfile")
-      #
-      def cli(*args)
-        CLI.start(args.flatten, :env => self)
-      end
+    # Makes a call to the CLI with the given arguments as if they
+    # came from the real command line (sometimes they do!). An example:
+    #
+    #     env.cli("package", "--mccloudfile", "Mccloudfile")
+    #
+    def cli(*args)
+      CLI.start(args.flatten, :env => self)
+    end
 
-      def resource
-        "mccloud"
-      end
+    def resource
+      "mccloud"
+    end
 
-      # Accesses the logger for Vagrant. This logger is a _detailed_
-      # logger which should be used to log internals only. For outward
-      # facing information, use {#ui}.
-      #
-      # @return [Logger]
-      def logger
-        return @logger if @logger
+    # Accesses the logger for Vagrant. This logger is a _detailed_
+    # logger which should be used to log internals only. For outward
+    # facing information, use {#ui}.
+    #
+    # @return [Logger]
+    def logger
+      return @logger if @logger
 
-        # Figure out where the output should go to.
+      # Figure out where the output should go to.
+      output = nil
+      if ENV["MCCLOUD_LOG"] == "STDOUT"
+        output = STDOUT
+      elsif ENV["MCCLOUD_LOG"] == "NULL"
         output = nil
-        if ENV["MCCLOUD_LOG"] == "STDOUT"
-          output = STDOUT
-        elsif ENV["MCCLOUD_LOG"] == "NULL"
-          output = nil
-        elsif ENV["MCCLOUD_LOG"]
-          output = ENV["MCCLOUD_LOG"]
-        else
-          output = nil #log_path.join("#{Time.now.to_i}.log")
-        end
-
-        # Create the logger and custom formatter
-        @logger = ::Logger.new(output)
-        @logger.formatter = Proc.new do |severity, datetime, progname, msg|
-          "#{datetime} - #{progname} - [#{resource}] #{msg}\n"
-        end
-
-        @logger
+      elsif ENV["MCCLOUD_LOG"]
+        output = ENV["MCCLOUD_LOG"]
+      else
+        output = nil #log_path.join("#{Time.now.to_i}.log")
       end
 
-    end #Class
-  end #Module
+      # Create the logger and custom formatter
+      @logger = ::Logger.new(output)
+      @logger.formatter = Proc.new do |severity, datetime, progname, msg|
+        "#{datetime} - #{progname} - [#{resource}] #{msg}\n"
+      end
+
+      @logger
+    end
+
+  end #Class
+end #Module
