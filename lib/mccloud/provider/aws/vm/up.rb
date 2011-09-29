@@ -36,13 +36,17 @@ module Mccloud::Provider
           @provider.raw.create_tags(raw.id, { "Name" => "#{@provider.filter}#{@name}"})
 
           # Wait for ssh to become available ...
-          env.ui.info "[#{@name}] - Waiting for ssh to become available"
+          env.ui.info "[#{@name}] - Waiting for ssh port to become available"
           #env.ui.info instance.console_output.body["output"]
 
           Mccloud::Util.execute_when_tcp_available(self.ip_address, { :port => @port, :timeout => 6000 }) do
-            env.ui.info "[#{@name}] - Ssh is available , proceeding with bootstrap"
+            env.ui.info "[#{@name}] - Ssh Port is available"
           end
 
+          #TODO: check for ssh to really work
+          env.ui.info "Waiting for the ssh service to become available"
+          sleep 5
+          env.ui.info "[#{@name}] - Ssh Service is available , proceeding with bootstrap"
           # No bootstrap to provide
           self._bootstrap(nil,options)
 
