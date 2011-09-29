@@ -18,7 +18,7 @@ PATH
   specs:
     fog (0.11.0)
       builder
-      excon (~> 0.6.5)
+      excon (~> 0.6.2)
       formatador (~> 0.2.0)
       mime-types
       multi_json (~> 1.0.3)

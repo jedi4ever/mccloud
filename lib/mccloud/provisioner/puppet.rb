@@ -40,7 +40,7 @@ module Mccloud
         if server.user=="root"
           server.execute("puppet #{@pp_path}/manifest.pp")
         else
-          server.execute("sudo puppet #{@pp_path}/manifest.pp")
+          server.execute("sudo -i puppet #{@pp_path}/manifest.pp")
         end
       end
     end #Class

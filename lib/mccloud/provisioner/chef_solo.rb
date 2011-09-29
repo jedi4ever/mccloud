@@ -102,9 +102,9 @@ module Mccloud
           if server.user=="root"
             server.execute("chef-solo -c /tmp/solo.rb -j /tmp/dna.json -l #{@log_level}")
           else
-            #             server.execute("sudo -i chef-solo -c /tmp/solo.rb -j /tmp/dna.json -l #{@log_level}")
+            server.execute("sudo -i chef-solo -c /tmp/solo.rb -j /tmp/dna.json -l #{@log_level}")
 
-            server.execute("sudo chef-solo -c /tmp/solo.rb -j /tmp/dna.json -l #{@log_level}")
+            #server.execute("sudo chef-solo -c /tmp/solo.rb -j /tmp/dna.json -l #{@log_level}")
           end
         rescue Exception
         ensure
