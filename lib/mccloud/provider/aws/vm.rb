@@ -96,9 +96,14 @@ module Mccloud::Provider
             name=vm.tags["Name"].strip unless vm.tags["Name"].nil?
             if name==rawname
               @raw=vm
+
+              # Add it to make scp work the first time
+              @raw.private_key_path=@private_key_path
+              @raw.username = @user
             end
           end
         else
+            # Refresh this every time it is referenced
           @raw.private_key_path=@private_key_path
           @raw.username = @user
         end
