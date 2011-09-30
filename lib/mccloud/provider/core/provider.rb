@@ -15,7 +15,7 @@ module Mccloud
           real_component=nil
           begin
             # Now that we know the actual provider, we can check if the provider has this type of component
-            require_path='mccloud/provider/'+@type.to_s.downcase+"/"+type
+            require_path='mccloud/provider/'+@type.to_s.downcase+"/"+type.to_s.downcase
             require require_path
             # Now we can create the real component
 
