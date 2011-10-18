@@ -27,20 +27,19 @@ Mccloud::Config.run do |config|
     <%= serverName %>_config.vm.private_key="<%= privateKeyPath %>"
     <%= serverName %>_config.vm.public_key="<%= publicKeyPath %>"
 
-  end
+    ### Provisioners
+    <%= serverName %>_config.vm.provision :puppet do |puppet|
+      puppet.pp_path = "/tmp/vagrant-puppet"
+      #puppet.manifests_path = "puppet/manifests"
+      #puppet.module_path = "puppet/modules"
+      puppet.manifest_file = "newbox.pp"
+    end
 
-  ### Provisioners
-  config.vm.provision :puppet do |puppet|
-    puppet.pp_path = "/tmp/vagrant-puppet"
-    #puppet.manifests_path = "puppet/manifests"
-    #puppet.module_path = "puppet/modules"
-    puppet.manifest_file = "newbox.pp"
-  end
-
-  config.vm.provision :chef_solo do |chef|
-     chef.cookbooks_path = ["<your cookboopath>"]
-     chef.add_recipe("<some recipe>")
-     # You may also specify custom JSON attributes:
-     chef.json.merge!({})
+    <%= serverName %>_config.vm.provision :chef_solo do |chef|
+      chef.cookbooks_path = ["<your cookboopath>"]
+      chef.add_recipe("<some recipe>")
+      # You may also specify custom JSON attributes:
+      chef.json.merge!({})
+    end
   end
 end
