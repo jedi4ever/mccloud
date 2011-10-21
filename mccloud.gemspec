@@ -38,6 +38,7 @@ Gem::Specification.new do |s|
   s.add_development_dependency("vagrant","~>0.8.1")
   s.add_dependency("rake","~>0.8.1")
 
+  s.add_dependency "i18n"
 
   s.files        = `git ls-files`.split("\n")
   s.executables  = `git ls-files`.split("\n").map{|f| f =~ /^bin\/(.*)/ ? $1 : nil}.compact
