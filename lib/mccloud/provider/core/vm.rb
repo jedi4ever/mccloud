@@ -39,6 +39,7 @@ module Mccloud
       attr_accessor :port
       attr_accessor :private_key_path
       attr_accessor :public_key_path
+      attr_accessor :agent_forwarding
 
       attr_accessor :auto_selection
 
@@ -57,6 +58,7 @@ module Mccloud
         @declared=true
         @provisioners=Array.new
         @port=22
+        @agent_forwarding=false
         @create_options={}
       end
 
