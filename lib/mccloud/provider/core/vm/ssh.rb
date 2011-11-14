@@ -20,6 +20,9 @@ module Mccloud
             command_options << "-i #{@private_key_path}"
 
           end
+          if @agent_forwarding
+            command_options << "-A"
+          end
           commandline_options="#{command_options.join(" ")} ".strip
 
           user_option=@user.nil? ? "" : "-l #{@user}"
