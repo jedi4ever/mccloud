@@ -11,7 +11,7 @@ module Mccloud
 
       attr_accessor :path
       attr_accessor :inline
-      attr_accessor :nosudo
+      attr_accessor :sudo
 
       def initialize(env)
         @env=env
