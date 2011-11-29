@@ -80,6 +80,9 @@ module Mccloud
         env.ui.error $!
         env.ui.error e.message
         exit -1
+      rescue Errno::ENOENT => e
+        env.ui.error "You need a Mccloudfile to be able to run mccloud, run mccloud init to create one"
+        exit -1
       rescue Error => e
         env.ui.error "Error processing configfile - Sorry"
         env.ui.error e.message
