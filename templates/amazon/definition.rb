@@ -42,10 +42,10 @@ aws_templates=[
 ]
 
 aws_templates.each do |template|
-  config.template.define "#{template[:name]}" do |config|
-    config.template.name=template[:name]
-    config.template.params=template
-    config.template.file=File.join(basedir,"aws.erb")
-    config.template.bootstrap="#{template[:bootstrap]}"
+  config.template.define "#{template[:name]}" do |template_config|
+    template_config.template.name=template[:name]
+    template_config.template.params=template
+    template_config.template.file=File.join(".","aws.erb")
+    template_config.template.bootstrap="#{template[:bootstrap]}"
   end
 end
