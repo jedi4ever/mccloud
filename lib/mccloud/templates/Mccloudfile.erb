@@ -5,13 +5,13 @@ Mccloud::Config.run do |config|
 
   ### Providers ###
   config.provider.define "libvirt-juno" do |config|
-    config.provider.type=:libvirt
+    config.provider.flavor=:libvirt
     config.provider.options={ :libvirt_uri => "qemu+ssh://patrick.debois@juno/system" }
     config.provider.namespace="test"
   end 
 
   config.provider.define "aws-europe" do |config|
-    config.provider.type=:aws
+    config.provider.flavor=:aws
     config.provider.options={
       :region => "eu-west-1"
     }
@@ -21,15 +21,15 @@ Mccloud::Config.run do |config|
   end
 
   config.provider.define "hosts" do |config|
-    config.provider.type=:host
+    config.provider.flavor=:host
   end
 
   config.provider.define "vmfusion" do |config|
-    config.provider.type=:vmfusion
+    config.provider.flavor=:vmfusion
   end
 
   config.provider.define "virtualbox" do |config|
-    config.provider.type=:virtualbox
+    config.provider.flavor=:virtualbox
   end
 
   config.vm.define "lucid64" do |config|
@@ -65,7 +65,7 @@ Mccloud::Config.run do |config|
      :availability_zone => "eu-west-1a"
    }
      config.vm.create_options={
-          :network_interface_type => "bridge",
+          :network_interface_flavor => "bridge",
           :volume_template_name => "test-baseimage.img",
           :cpus => "3",
           :memory_size => 2*1024*1024, #2 GB
