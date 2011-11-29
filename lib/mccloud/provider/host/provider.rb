@@ -8,7 +8,7 @@ module Mccloud
       class Provider  < ::Mccloud::Provider::Core::Provider
 
         attr_accessor :name
-        attr_accessor :type
+        attr_accessor :flavor
 
         attr_accessor :options
 
@@ -24,7 +24,7 @@ module Mccloud
           @vms=Hash.new
 
           @options=options
-          @type=self.class.to_s.split("::")[-2]
+          @flavor=self.class.to_s.split("::")[-2]
           @name=name
         end
 

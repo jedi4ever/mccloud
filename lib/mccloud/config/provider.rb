@@ -29,7 +29,8 @@ module Mccloud
         env.logger.debug("config provider"){ "End stubbing provider"}
 
         # After processing we extract the provider type and options again
-        provider_type=provider_stub.provider.type
+        provider_type=provider_stub.provider.flavor
+        env.logger.debug("config provider"){ "Found provider of type #{provider_type}"}
         provider_options=provider_stub.provider.options
 
         begin

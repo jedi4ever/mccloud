@@ -101,9 +101,17 @@ module Mccloud
       end
     end
 
+    ## Does the actual read of the configuration file
+    ## @return [self]
     def load_config!
+
+      # Read the config
       @config=Config.new({:env => self}).load_mccloud_config()
+
+      # Read the templates in the template sub-dir
       @config.load_templates
+
+      # Read the vms specified inthe vm sub-dir
       @config.load_vms
       @ui.info "Loaded #{@config.providers.length} providers "+"#{@config.vms.length} vms"+" #{@config.ips.length} ips"+" #{@config.stacks.length} stacks"+" #{@config.templates.length} templates"
 

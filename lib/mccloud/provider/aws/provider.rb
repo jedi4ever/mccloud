@@ -16,7 +16,7 @@ module Mccloud
       class Provider  < ::Mccloud::Provider::Core::Provider
 
         attr_accessor :name
-        attr_accessor :type
+        attr_accessor :flavor
 
         attr_accessor :options
         attr_accessor :region
@@ -40,8 +40,11 @@ module Mccloud
           @check_security_groups=true
           @check_key_pairs=true
 
-          @options=options
-          @type=self.class.to_s.split("::")[-2]
+          @options={}
+          unless options.nil?
+            @options.merge!(options)
+          end
+          @flavor=self.class.to_s.split("::")[-2]
           @name=name
           @region="us-east-1"
 
@@ -65,8 +68,8 @@ module Mccloud
             begin
               @raw=Fog::Compute.new({:provider => "Aws", :region => @region}.merge(@options))
             rescue ArgumentError => e
-              env.ui.info "Error loading raw provider : #{e.to_s} #{$!}"
               @raw=nil
+              raise Mccloud::Error, "Error loading raw provider : #{e.to_s} #{$!}"
             end
           end
           return @raw

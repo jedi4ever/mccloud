@@ -27,7 +27,7 @@ module Mccloud
         @template_path=[:internal,"templates"]
         @vm_path=["vms"]
 
-        env.logger.debug("done")
+        env.logger.debug("done loading the mccloud setting")
 
       end
 

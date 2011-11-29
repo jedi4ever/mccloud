@@ -15,13 +15,13 @@ module Mccloud
           real_component=nil
           begin
             # Now that we know the actual provider, we can check if the provider has this type of component
-            require_path='mccloud/provider/'+@type.to_s.downcase+"/"+type.to_s.downcase
+            require_path='mccloud/provider/'+@flavor.to_s.downcase+"/"+type.to_s.downcase
             require require_path
             # Now we can create the real component
 
-            env.logger.debug("provide #{@type} about to create component of type #{type}")
+            env.logger.debug("provider #{@flavor} about to create component of type #{type}")
 
-            real_component=Object.const_get("Mccloud").const_get("Provider").const_get(@type.to_s.capitalize).const_get(type.to_s.capitalize).new(env)
+            real_component=Object.const_get("Mccloud").const_get("Provider").const_get(@flavor.to_s.capitalize).const_get(type.to_s.capitalize).new(env)
 
           rescue Error => e
             env.ui.error "Error getting component - #{e}"
