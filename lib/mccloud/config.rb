@@ -111,9 +111,9 @@ module Mccloud
       # Create a dummy config
       config_stub=OpenStruct.new
       config=OpenStruct.new
-      config_stub.config=config
       config.env=env
       config.template=::Mccloud::Config::Template.new(config)
+      config_stub.config=config
 
       # For all paths that exist
       valid_paths.each do |path|
