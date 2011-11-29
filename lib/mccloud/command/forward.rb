@@ -6,6 +6,7 @@ module Mccloud
       argument :selection, :type => :string, :optional => true, :default => nil
 
       def execute
+        env.load!
         threads=Array.new
         env.config.providers.each do |name,provider|
           env.logger.debug("Asking provider #{name} to forward ports from #{selection} to localhost")

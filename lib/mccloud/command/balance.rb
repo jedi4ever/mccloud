@@ -6,6 +6,7 @@ module Mccloud
       argument :selection, :type => :string, :optional => true, :default => nil
 
       def execute
+        env.load!
         env.config.providers.each do |name,provider|
           env.logger.debug("Asking provider #{name} to associate to #{selection}")
           provider.on_selected_components("lb",selection) do |id,lb|

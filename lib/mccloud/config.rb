@@ -19,7 +19,7 @@ module Mccloud
     attr_accessor :vms,:lbs,:stacks,:ips,:keystores
 
     attr_accessor :providers
-    
+
     attr_accessor :templates,:keypairs
 
     def initialize(options)

@@ -6,6 +6,7 @@ module Mccloud
 
       register "halt [NAME]", "Shutdown the machine"
       def execute
+        env.load!
         env.config.providers.each do |name,provider|
           env.logger.debug("Asking provider #{name} to halt box #{box_name}")
           provider.halt(box_name,options)

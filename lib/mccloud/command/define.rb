@@ -8,6 +8,7 @@ module Mccloud
       argument :template, :type => :string, :optional => false, :default => nil
 
       def execute
+        env.load!
         env.ui.info "Define #{name} with template #{template}"
 
         # Checking for name already defined

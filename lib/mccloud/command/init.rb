@@ -7,9 +7,10 @@ module Mccloud
       register "init NAME TEMPLATE-NAME", "Creates a new Mccloud project based on a template"
 
       def execute
-        env.config.templates.each do |name,template|
-           env.ui.info template.to_template if template.name==template_name
-        end
+        puts "balbalal"
+#        env.config.templates.each do |name,template|
+#           env.ui.info template.to_template if template.name==template_name
+#        end
       end
 
     end #Class

@@ -8,7 +8,7 @@ module Mccloud
       register "status [PROVIDER]", "Shows the status of the current Mccloud environment"
 
       def execute
-
+      	env.load!
         env.config.providers.each do |name,provider|
           provider.status(provider,options)
         end

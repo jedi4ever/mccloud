@@ -8,6 +8,7 @@ module Mccloud
       register "bootstrap [NAME] [FILENAME]", "Executes the bootstrap sequence"
 
       def execute
+        env.load!
         env.config.providers.each do |name,provider|
           env.logger.debug("Asking provider #{name} to reload box #{box_name}")
           provider.bootstrap(box_name,command,options)
