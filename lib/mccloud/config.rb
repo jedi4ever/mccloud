@@ -109,7 +109,9 @@ module Mccloud
       }
 
       # Create a dummy config
+      config_stub=OpenStruct.new
       config=OpenStruct.new
+      config_stub.config=config
       config.env=env
       config.template=::Mccloud::Config::Template.new(config)
 
@@ -125,7 +127,7 @@ module Mccloud
             env.logger.info(definition)
             config.basedir=File.dirname(definition_file)
             begin
-              config.instance_eval(definition)
+              config_stub.instance_eval(definition)
             rescue NameError => ex
               env.ui.error("NameError reading template from file #{definition_file} #{ex}")
             rescue Exception => ex
@@ -136,7 +138,10 @@ module Mccloud
           end
         end
       end
-      env.config.templates.merge!(config.template.components)
+
+      require 'pp'
+      pp config.template
+      env.config.templates.merge!(config_stub.config.template.components)
     end
 
     def load_vms()
