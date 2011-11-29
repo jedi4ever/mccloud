@@ -43,6 +43,7 @@ module Mccloud
           provider_stub.provider=real_provider
           yield provider_stub
 
+          env.logger.debug("config provider"){ "Instantiating provider #{name.to_s}"}
           components[name.to_s]=provider_stub.provider
         rescue Error => e
           env.ui.error "Error loading provider with #{name},#{$!}"

@@ -81,17 +81,10 @@ module Mccloud
           #list_keypairs
           #list_flavors
           #list_zones
+          #list_securitygroups
+          #check port 22 is open
         end
 
-        def list_keypairs
-          raw.key_pairs.each do |keypair|
-            env.logger.info "#{keypair.name} - #{keypair.fingerprint}"
-          end
-
-          raw.security_groups.each do |sg|
-            env.logger.info "#{sg.name} - #{sg.description}"
-          end
-        end
 
         # We should check to see if 22 is enabled for that zone
         #(AWS.security_groups.get("JMETER").ip_permissions[0]["fromPort"]..AWS.security_groups.get("JMETER").ip_permissions[0]["toPort"]) === 22
@@ -112,19 +105,6 @@ module Mccloud
           sg.description=comment
           sg.save
           sg.authorize_port_range(22..22)
-        end
-
-        def destroy_keypair(name)
-          old_pair=raw.key_pairs.get(name)
-          unless old_pair.nil?
-            old_pair.destroy()
-          end
-        end
-
-        def create_key_pair(name,key)
-          provider_keypair=raw.key_pairs.create(
-            :name => name,
-            :public_key => rsa_key.ssh_public_key )
         end
 
         def create_fog

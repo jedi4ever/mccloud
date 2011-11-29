@@ -30,7 +30,7 @@ module Mccloud
         end
 
         def on_selected_components(type,selection=nil)
-          unless self.instance_variables.include?("@#{type}s".to_sym)
+          unless self.instance_variables.include?("@#{type}s")
             env.logger.info "There are no #{type}s defined for provider #{@name}"
             # Nothing to do here
             return
