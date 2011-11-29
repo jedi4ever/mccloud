@@ -10,7 +10,7 @@ end
 # The built-in commands must always be loaded
 require 'mccloud/command/status'
 #require 'mccloud/command/init'
-require 'mccloud/command/sshkeys'
+require 'mccloud/command/keypair'
 require 'mccloud/command/up'
 require 'mccloud/command/bootstrap'
 require 'mccloud/command/ssh'
