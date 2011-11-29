@@ -5,9 +5,12 @@ module Mccloud
 
         def keystore_list(selection=nil,options=nil)
 
-          env.logger.info("#{selection} - #{options}")          
-          raw.key_pairs.each do |keypair|
-            env.logger.info "KeyPair #{keypair.name} - #{keypair.fingerprint}"
+          if raw.key_pairs.empty?
+            env.ui.info("No Keypairs found")
+          else
+            raw.key_pairs.each do |keypair|
+              env.ui.info "KeyPair #{keypair.name} - #{keypair.fingerprint}"
+            end
           end
 
         end
