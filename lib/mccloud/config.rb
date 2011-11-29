@@ -144,7 +144,7 @@ module Mccloud
 
     def load_vms()
       # Read templates from templatepath
-      env.ui.info "Loading vms from vm path"
+      env.logger.info "Loading vms from vm path"
       paths=env.config.mccloud.vm_path
 
       valid_paths=paths.collect { |path|

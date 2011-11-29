@@ -113,7 +113,7 @@ module Mccloud
 
       # Read the vms specified inthe vm sub-dir
       @config.load_vms
-      @ui.info "Loaded #{@config.providers.length} providers "+"#{@config.vms.length} vms"+" #{@config.ips.length} ips"+" #{@config.stacks.length} stacks"+" #{@config.templates.length} templates"
+      @ui.info "Loaded providers[#{@config.providers.length}]"+" vms[#{@config.vms.length}]"+" ips[#{@config.ips.length}]"+" stacks[#{@config.stacks.length}]"+" templates[#{@config.templates.length}]"
 
       return self
     end
