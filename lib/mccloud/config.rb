@@ -139,8 +139,6 @@ module Mccloud
         end
       end
 
-      require 'pp'
-      pp config.template
       env.config.templates.merge!(config_stub.config.template.components)
     end
 
