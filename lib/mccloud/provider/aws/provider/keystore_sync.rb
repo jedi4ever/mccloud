@@ -23,31 +23,28 @@ module Mccloud
                   name=keypair.name
                   begin
                     # Read key file
-                    key=File.read(keypair.private_key_path)
-                    fingerprint = ::Mccloud::Util::SSHKey.new(key).fingerprint
+                    key=File.read(keypair.public_key_path)
 
                     # Check if key already exists
                     existing_key=raw.key_pairs.get(remote_name)
                     if existing_key.nil?
                       # It does not exist, just create it
                       env.ui.info "Creating Remote Key #{remote_name}"
-                      env.ui.info "- fingerprint #{fingerprint}"
-                      raw.key_pairs.create(:name => remote_name, :fingerprint => fingerprint, :private_key => key)
+                      raw.key_pairs.create(:name => remote_name, :public_key => key)
                     else
                       if options.has_key?("overwrite")
                         # Exists but overwrite was specified
                         env.ui.info "Remote key '#{remote_name}' exists but --overwrite specified, removing key first"
                         existing_key.destroy
                         env.ui.info "Creating Remote Key #{remote_name}"
-                        env.ui.info "- fingerprint #{fingerprint}"
-                        raw.key_pairs.create(:name => defined_pair[:name], :fingerprint => fingerprint, :private_key => key)
+                        raw.key_pairs.create(:name => defined_pair[:name], :public_key => key)
                       else
                         # Exists but overwrite was NOT specified
                         env.ui.info "Remote Key '#{remote_name}' already exists. Use 'mccloud sync --overwrite'"
                       end
                     end
                   rescue Errno::ENOENT => ex
-                    env.ui.error "Error: private_key_path does not exist : #{keypair.private_key_path}"
+                    env.ui.error "Error: public_key_path does not exist : #{keypair.public_key_path}"
                   rescue Error => ex
                     env.ui.error "Error uploading key : #{ex}"
                   end
