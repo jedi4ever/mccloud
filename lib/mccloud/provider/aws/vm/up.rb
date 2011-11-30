@@ -2,12 +2,54 @@ module Mccloud::Provider
   module Aws
     module VmCommand
 
+     def security_group_has_ssh_open?(group)
+      return false
+     end
+
+     def security_group_exists?(group)
+      return !@provider.raw.security_groups.get(group).nil?
+     end
+
+    def security_group_is_managed_by_mccloud?(group)
+        return /^1mccloud/ =~ group
+    end
+
+     def check_security_groups(groups)
+        if @provider.check_security_groups
+          # Iterate over all groups
+          groups.each do |group|
+
+            if security_group_exists?(group)
+              env.logger.info "security group #{group} exists"
+            else
+              env.logger.info "security group #{group} doest not exist"
+              if security_group_is_managed_by_mccloud?(group)
+                # Managed by mccloud
+                env.logger.info "security group #{group} starts with mccloud"
+                env.ui.info "Creating security group #{group}"
+                @provider.create_sg(group)
+              else
+                # Not managed by mccloud
+                raise Mccloud::Error, "security group #{group} does not exits. And we only managed security groups with prefix mccloud"
+              end
+            end
+
+            unless security_group_has_ssh_open?(group)
+            end
+          end
+        end
+      end
+
+      def check_key(key_name)
+        if @provider.raw.key_pairs.get(key_name).nil?
+          raise Mccloud::Error, "keypair #{key_name} does not exist"
+        end
+      end
+
       def up(options)
 
-        env.ui.info "Upping of aws vm #{@name}"
 
         if raw.nil? || raw.state =="terminated"
-          env.ui.info "[#{@name}] - Spinning up a new machine"
 
           create_options= {
             :private_key_path => @private_key_path ,
@@ -19,7 +61,10 @@ module Mccloud::Provider
             :groups => @security_groups
           }.merge(@create_options)
 
-          env.logger.info "Creating new vm for provider AWS with options #{create_options}"
+          check_security_groups(create_options[:groups])
+          check_key(create_options[:key_name])
+
+          env.ui.info "Creating new vm #{@name} for provider #{@provider.name}"
           begin
             @raw=@provider.raw.servers.create(create_options)
           rescue Fog::Compute::AWS::NotFound => ex

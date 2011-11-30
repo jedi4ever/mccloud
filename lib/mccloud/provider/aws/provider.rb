@@ -28,8 +28,8 @@ module Mccloud
 
         attr_accessor :keystores
 
-        attr_accessor :check_key_pairs
-        attr_accessor :check_securitygroups
+        attr_accessor :check_keypairs
+        attr_accessor :check_security_groups
 
         include Mccloud::Provider::Aws::ProviderCommand
 
@@ -39,7 +39,7 @@ module Mccloud
           super(name,options,env)
 
           @check_security_groups=true
-          @check_key_pairs=true
+          @check_keypairs=true
 
           @options={}
           unless options.nil?
