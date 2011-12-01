@@ -1,22 +1,28 @@
 #!/usr/bin/env ruby
 require 'mccloud'
 
-env = Mccloud::Environment.new
 
 begin
-	# Begin logging
-	# env.logger.info("mccloud")
-	
-	# Disable color if the proper argument was passed
-	shell = ARGV.include?("--no-color") ? Thor::Shell::Basic.new : Thor::Base.shell.new
-	
-#	# Attach the UI
-	env.ui = ::Mccloud::UI::Shell.new(env, shell)
 
-	
-	# Start the CLI
-  ::Mccloud::CLI.start(ARGV,:env => env)
-	
-rescue Mccloud::Error => e
-  puts "#{e}"
+  # Disable color if the proper argument was passed
+  shell = ARGV.include?("--no-color") ? Thor::Shell::Basic.new : Thor::Base.shell.new
+
+
+  # Start the CLI
+  begin
+    env = Mccloud::Environment.new
+
+    # # Attach the UI
+    env.ui = ::Mccloud::UI::Shell.new(env, shell)
+
+    ::Mccloud::CLI.start(ARGV,:env => env)
+  rescue Mccloud::Error => ex
+    env.ui.error "#{ex}"
+  rescue Exception => ex
+    puts "Something blew up Mccloud. Time for McGuyver:"
+    puts ""
+    puts "#{ex}"
+    puts ex.backtrace
+  end
+
 end
