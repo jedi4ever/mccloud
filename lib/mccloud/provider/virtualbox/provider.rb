@@ -1,11 +1,11 @@
 require 'mccloud/provider/virtualbox/provider/status'
 require 'mccloud/provider/virtualbox/vm'
-require 'mccloud/provider/core/provider'
+require 'mccloud/provider/fog/provider'
 
 module Mccloud
   module Provider
     module Virtualbox
-      class Provider  < ::Mccloud::Provider::Core::Provider
+      class Provider  < ::Mccloud::Provider::Fog::Provider
 
         attr_accessor :name
         attr_accessor :flavor

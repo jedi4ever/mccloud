@@ -1,6 +1,7 @@
-require 'mccloud/provider/core/provider'
+require 'mccloud/provider/fog/provider'
 
 require 'mccloud/provider/aws/provider/status'
+#require 'mccloud/provider/aws/provider/fogconfig'
 require 'mccloud/provider/aws/provider/ip_list'
 require 'mccloud/provider/aws/provider/lb_list'
 require 'mccloud/provider/aws/provider/keystore_list'
@@ -14,7 +15,7 @@ require 'mccloud/provider/aws/ip'
 module Mccloud
   module Provider
     module Aws
-      class Provider  < ::Mccloud::Provider::Core::Provider
+      class Provider  < ::Mccloud::Provider::Fog::Provider
 
         attr_accessor :name
         attr_accessor :flavor
@@ -25,6 +26,7 @@ module Mccloud
         attr_accessor :vms
         attr_accessor :lbs
         attr_accessor :ips
+        attr_accessor :credential
 
         attr_accessor :keystores
 
@@ -37,6 +39,9 @@ module Mccloud
         def initialize(name,options,env)
 
           super(name,options,env)
+
+          # Default fog credential pair
+          @credential=:default
 
           @check_security_groups=true
           @check_keypairs=true
@@ -63,14 +68,14 @@ module Mccloud
 
         end
 
-
         def raw
+          check_fog_credentials([:aws_access_key_id,:aws_secret_access_key])
           if @raw.nil?
             begin
-              @raw=Fog::Compute.new({:provider => "Aws", :region => @region}.merge(@options))
+              @raw=::Fog::Compute.new({:provider => "Aws", :region => @region}.merge(@options))
             rescue ArgumentError => e
               @raw=nil
-              raise Mccloud::Error, "Error loading raw provider : #{e.to_s} #{$!}"
+              raise Mccloud::Error, "Error loading Aws provider : #{e.to_s} #{$!}"
             end
           end
           return @raw

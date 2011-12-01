@@ -1,11 +1,11 @@
 require 'mccloud/provider/libvirt/provider/status'
 require 'mccloud/provider/libvirt/vm'
-require 'mccloud/provider/core/provider'
+require 'mccloud/provider/fog/provider'
 
 module Mccloud
   module Provider
     module Libvirt
-      class Provider  < ::Mccloud::Provider::Core::Provider
+      class Provider  < ::Mccloud::Provider::Fog::Provider
 
         attr_accessor :name
         attr_accessor :flavor
@@ -37,7 +37,7 @@ module Mccloud
         def raw
           if @raw.nil?
             begin
-              @raw=Fog::Compute.new({:provider => "Libvirt"}.merge(@options))
+              @raw=::Fog::Compute.new({:provider => "Libvirt"}.merge(@options))
             rescue ArgumentError => e
               env.ui.error "Error loading raw provider : #{e.to_s} #{$!}"
               @raw=nil
