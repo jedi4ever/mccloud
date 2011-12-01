@@ -1,118 +1,222 @@
 Mccloud::Config.run do |config|
-  # All Mccloud configuration is done here. For a detailed explanation
-  # and listing of configuration options, please view the documentation
-  # online.
 
-  ### Providers ###
-  config.provider.define "libvirt-juno" do |config|
-    config.provider.flavor=:libvirt
-    config.provider.options={ :libvirt_uri => "qemu+ssh://patrick.debois@juno/system" }
-    config.provider.namespace="test"
-  end 
+  #############################################################
+  ## ** Provider Section ** - list alls keys to be used
+  #############################################################
 
-  config.provider.define "aws-europe" do |config|
-    config.provider.flavor=:aws
-    config.provider.options={
-      :region => "eu-west-1"
-    }
-    config.provider.check_keypairs=false
-    config.provider.check_securitygroups=false
-    config.provider.namespace="mccloud-development-patrick"
+  ######
+  ## Example Amazon provider
+  ## Defines a provider called aws-us-east
+  ## Note 1: specify a provider with a different name for each region you need
+  ## Note 2: you need to have a valid .fog file with the correct key and secret-key
+
+  config.provider.define "aws-us-east" do |provider_config|
+    provider_config.provider.flavor = :aws
+
+    #Note: this are option provided to fog for creation
+   provider_config.provider.options = { }
+
+    # Region in which to create the VM
+    provider_config.provider.region = "us-east-1"
+
+    ## Check if necessary keypairs exist
+    ## To speed things up, set it to false
+    provider_config.provider.check_keypairs = true
+
+    ## Disable check if required security groups exist
+    ## To speed things up, set it to false
+   provider_config.provider.check_security_groups = true
+
+    ## If you share an amazon account with multiple people
+    ## You can use namespaces to separate resources
+    ## All resources will take this prefix 
+    provider_config.provider.namespace = "mccloud-development"
   end
 
-  config.provider.define "hosts" do |config|
-    config.provider.flavor=:host
+  ######
+  ## Generic provider to manage host reachable by ssh
+  config.provider.define "hosts" do |provider_config|
+    provider_config.provider.flavor = :host
   end
 
-  config.provider.define "vmfusion" do |config|
-    config.provider.flavor=:vmfusion
+  #############################################################
+  ## ** Key Section ** - list alls keys to be used
+  #############################################################
+  ## Default is :
+  ## - keyname = mccloud
+  ## - location = in $HOME directory
+  ## - private key_path =  $HOME/mccloud_rsa
+  ## - public key_path =  $HOME/mccloud_rsa.pub
+  ##
+  ## Note 1: keys can be generated with '$ mccloud sshkeygen'
+  ## Note 2: Amazon only supports RSA keys
+  ## Note 3: You can have multiple keypair listed here
+  #############################################################
+
+  config.keypair.define "mccloud" do |key_config|
+    key_config.keypair.public_key_path = "#{File.join(ENV['HOME'],'.ssh','mccloud_rsa.pub')}"
+    key_config.keypair.private_key_path = "#{File.join(ENV['HOME'],'.ssh','mccloud_rsa')}"
   end
 
-  config.provider.define "virtualbox" do |config|
-    config.provider.flavor=:virtualbox
-  end
+  #############################################################
+  ## ** Key Store ** - defines a location to store keys in
+  #############################################################
+  ##
+  ## Defines a keystore provided by provider "aws-us-east"
+  ## And specifies the keypair(s) to be stored in that keystore
+  ## Note 1: this only handles creation, removal of keys needs to be done manual
+  ##
+  ## :name => "the name as visible on EC2"
+  ## :pairname=> "the name specified in the Key Section of this config file"
+  #############################################################
 
-  config.vm.define "lucid64" do |config|
-    config.vm.provider=:vmfusion
-    config.vm.user="veewee"
+<% uncomment([:aws]) do %>
+  config.keystore.define "aws-us-east-key-store" do |keystore_config|
+    keystore_config.keystore.provider = "aws-us-east"
+    keystore_config.keystore.keypairs = [
+      # :name is the name as it will be displayed on amazon
+      # :keypair is the named as defined above
+      { :name => "mccloud-key", :keypair => "mccloud"},
+      { :name => "mccloud-key-test", :keypair => "mccloud"},
+      { :name => "mccloud-key-bla", :keypair => "mccloud"},
+      { :name => "mccloud-key-boe", :keypair => "mccloud"}
+    ]
   end
+<% end %>
 
-  config.vm.define "cooke" do |config|
-    config.vm.provider=:hosts
-    config.vm.ip_address="cooke.sos.be"
-    config.vm.user="deboispa"
-    config.vm.provision :shell do |command|
-      command.inline="who am i"
-      command.path="a.sh"
+  #############################################################
+  ## ** Server section ** Specifies server options
+  ##
+  ## Note: Loosely modelled after Vagrantfile syntax, but not compatible
+  #############################################################
+
+  config.vm.define "aws-demo1" do |vm_config|
+
+    # Provider to use for creating this vm
+    vm_config.vm.provider = "aws-us-east"
+
+    # AMI to use for creating the vm
+    vm_config.vm.ami = "ami-cef405a7"
+
+    # Flavor of the vm
+    vm_config.vm.flavor = "t1.micro"
+
+    # Availability zone to create the VM
+    vm_config.vm.zone = "us-east-1a"
+
+    # Security groups
+    # Note: if it starts with mccloud, it will be autocreated and port 22 will be opened
+    # Note: you can supply your own but you have to create these manual and open port 22
+    vm_config.vm.security_groups = [ "mccloud"]
+
+    # Options required 
+    # There are directly passed to fog create
+    vm_config.vm.create_options = { }
+
+    # User to log into the new VM created
+    vm_config.vm.user = "ubuntu"
+
+    # Path to script to execute before provisioners are run
+    # Only run on vm creation
+    vm_config.vm.bootstrap = "samples/bootstrap-ubuntu-system.sh"
+
+    # Name of the key pair to use to login
+    vm_config.vm.key_name = "mccloud-key"
+
+    # Files to ssh into the create vm
+    vm_config.vm.private_key_path = "#{File.join(ENV['HOME'],'.ssh','mccloud_rsa')}"
+
+    # If no server is specified in mccloud subcommands,
+    # It will go over all server
+    # Setting auto_selection to false, will not include this server
+    vm_config.vm.auto_selection = false
+
+#    ###
+#    ### Server Provisioners
+#    ### Mccloud supports 3 provisioners : :chef_solo, :puppet , and :shell
+#    ### Note: if multiple are provided, they are run in the sequence as described in the vm_config file
+#    ###
+#
+#    ##
+#    ## Sample chef solo provider
+#    ##
+#    vm_config.vm.provision :chef_solo do |chef|
+#      # Path to load cookbooks of
+#      chef.cookbooks_path = ["chefrepo/cookbooks","chefrepo/site-cookbooks"]
+#
+#      # Level to pass on the chef server
+#      chef.log_level = "info"
+#
+#      ## Add recipes to the runlist
+#      ## Can be specified multiple times
+#      chef.add_recipe "apache2"
+#
+#      ## Note you can use ERB inside the json block
+#      ## :private_demo1_ip => "<%%= private_ips['awsdemo1'] %>"
+#      ## :public_demo2_ip=> "<%%= public_ips['awsdemo1'] %>"
+#      chef.json.merge!( {
+#      })
+#    end
+#
+#    ##
+#    ## Sample puppet provider
+#    ##
+    vm_config.vm.provision :puppet do |puppet|
+        puppet.manifest_file = "aws-demo1.pp"
+        # puppet.manifest_path = "manifests"
+        # puppet.modules_path = ["modules"]
     end
+#
+#    ##
+#    ## Sample script provider
+#    ##
+#    vm_config.vm.provision :shell do |command|
+#      # Either provide the command to run inline
+#      command.inline  = ""
+#      # Or provide the path to a local script to be executed remotely
+#      command.path = "myscript.sh"
+#    end
+
   end
 
-  config.vm.define "vagrant-demo" do |config|
-    config.vm.provider=:virtualbox
-  end
 
- config.vm.define "aws-demo" do |config|
-   config.vm.provider="aws-europe"
-   config.vm.provider="juno-libvirt"
+  ##
+  #  ## Example on how to use the host provider for a server
+  #  ##
+  #  vm_config.vm.define "myserver" do |vm_config|
+  #    vm_config.vm.provider=:hosts
+  #    # Ip address or hostname that resolves
+  #    vm_config.vm.ip_address="www.myserver.com"
+  #    # Login in with user ubuntu on the remote server
+  #    vm_config.vm.user="ubuntu"
+  #    # Forward some ports between remote and local
+  #    # example remote port = 80, local port 8080
+  #    # Used by 'mccloud server' command
+  #    vm_config.vm.forward_port("webport",8080,80)
+  #
+  #    # Example provisioner via shell commands
+  #    vm_config.vm.provision :shell do |command|
+  #      command.inline="who am i"
+  #    end
+  #  end
 
-   #admin_config.vm.provisioner=:chef_solo
-   config.vm.create_options={
-     # ID = "ami-e59ca991" = Ubuntu 10.10 - Maverick 64-bit (Canonical/EBS) - Euwest1
-     :image_id => "ami-e59ca991" ,
-     :flavor_id => "c1.xlarge",
-     :groups => %w(villa-prod),
-     :key_name => "mccloud-key-patrick",
-     :availability_zone => "eu-west-1a"
-   }
-     config.vm.create_options={
-          :network_interface_flavor => "bridge",
-          :volume_template_name => "test-baseimage.img",
-          :cpus => "3",
-          :memory_size => 2*1024*1024, #2 GB
-     }
-   #config.vm.auto_selection=false
-   config.vm.forward_port("redis", 6379, 6379)
-   config.vm.forward_port("postgres", 5432, 5432)
-   config.vm.forward_port("sphinx", 9312, 9312)
-   config.vm.user="ubuntu"
-   config.vm.bootstrap="definitions/villa-ubuntu/bootstrap-ubuntu-system.sh"
-   config.vm.key_name="mccloud-key-patrick"
-   config.vm.private_key_path="keys/mccloud_rsa"
-   config.vm.public_key_path="keys/mccloud_rsa.pub"
+  #############################################################
+  ## ** Non-server section
+  ## Currently only had loadbalancer and ip-address for EC2
+  #############################################################
 
-   config.vm.provision :chef_solo do |chef|
-       chef.cookbooks_path = ["villa-chefrepo/cookbooks","villa-chefrepo/site-cookbooks"]
-       chef.log_level = "info"
-       default_node(chef)
-       chef.add_recipe("mediasquare_rails::backend")
-       #chef.add_recipe("mediasquare_daemons::default")
-       #chef.add_recipe("mediasquare_rails::test_data")
-       chef.json.merge!({
-          :rvm => {
-            :version => "1.6.8",
-          :ruby => {
-          :version => "1.9.2",
-        :patch_level => "p180"
-      }
-    }, :mediasquare_daemons => {
-             :sphinx_host_ip => "<%%= private_ips['backend'] %>"
-       }})
-   end
+  #    config.lb.define "mccloud-development-lb" do |config|
+  #      config.lb.provider="aws-eu-east"
+  #      config.lb.members=["aws-demo1","aws-demo1"]
+  #      config.lb.sorry_members=["aws-demo2"]
+  #    end
+  #
+  #    config.ip.define "mccloud-demo1" do |config|
+  #      config.ip.provider="aws-eu-west"
+  #      config.ip.address="46.137.72.170"
+  #      config.ip.vmname = "aws-demo1"
+  #    end
 
 
- end
 
-  config.lb.define "lb-frontend" do |lb_config|
-   lb_config.lb.provider="aws-europe"
-    ##lb_config.lb.members = [ "frontend1"]
-    lb_config.lb.members = [ "frontend1","frontend2"]
-    lb_config.lb.sorry_members = [ "sorry"]
-  end
-
-  config.ip.define "ip-monitoring" do |config2|
-    config2.ip.provider="aws-europe"
-    config2.ip.address="79.125.105.12"
-    config2.ip.vmname = "monitoring"
-  end
-
-end #End Mcloud
+end # End Mccloud
