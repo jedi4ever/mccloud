@@ -11,7 +11,7 @@ module Mccloud::Provider
      end
 
     def security_group_is_managed_by_mccloud?(group)
-        return /^1mccloud/ =~ group
+        return /^mccloud/ =~ group
     end
 
      def check_security_groups(groups)
@@ -67,7 +67,7 @@ module Mccloud::Provider
           env.ui.info "Creating new vm #{@name} for provider #{@provider.name}"
           begin
             @raw=@provider.raw.servers.create(create_options)
-          rescue Fog::Compute::AWS::NotFound => ex
+          rescue ::Fog::Compute::AWS::NotFound => ex
             #Oh we got an error
             #Let's see if we need to create keypair mccloud
 
