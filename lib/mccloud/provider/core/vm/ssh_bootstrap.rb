@@ -15,7 +15,11 @@ module Mccloud
                 env.ui.info "[#{@name}] - Uploading bootstrap code to machine #{@name}"
 
                 unless !File.exists?(scriptname)
-                  raw.scp(scriptname,"/tmp/bootstrap.sh")
+                  begin
+                    raw.scp(scriptname,"/tmp/bootstrap.sh")
+                  rescue Exception => ex
+                    raise ::Mccloud::Error, "[#{@name}] - Error uploading file #{scriptname}\n"+ex
+                  end
                   env.ui.info "[#{@name}] - Enabling the bootstrap code to run"
                   result=raw.ssh("chmod +x /tmp/bootstrap.sh")
 
@@ -29,13 +33,13 @@ module Mccloud
                 end
 
               else
-                env.ui.info "[#{@name}] - You didn't specify a bootstrap, hope you know what you're doing."
+                env.ui.warn "[#{@name}] - You didn't specify a bootstrap, hope you know what you're doing."
               end
             else
-              env.ui.info "[#{@name}] - Server is not running, so bootstrapping will do no good"
+              env.ui.warn "[#{@name}] - Server is not running, so bootstrapping will do no good"
             end
           rescue Net::SSH::AuthenticationFailed => ex
-            env.ui.info "[#{@name}] - Authentication failure #{ex.to_s}"
+              raise ::Mccloud::Error, "[#{@name}] - Authentication failure #{ex.to_s}"
           end
         end
 
