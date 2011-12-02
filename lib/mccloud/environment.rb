@@ -31,7 +31,7 @@ module Mccloud
     def initialize(options=nil)
       options = {
         :cwd => nil,
-        :mccloudfile_name => nil}.merge(options || {})
+        :mccloudfile_name => "Mccloudfile"}.merge(options || {})
 
        # We need to set this variable before the first call to the logger object
        if options.has_key?("debug")
@@ -39,18 +39,44 @@ module Mccloud
          ui.info "Debugging enabled"
        end
 
-
-        # Set the default working directory to look for the Mccloudfile
-        options[:mccloudfile_name] ||=["Mccloudfile",""]
-
-        logger.info("environment") { "Environment initialized (#{self})" }
-        logger.info("environment") { " - cwd : #{cwd}" }
-
         options.each do |key, value|
           instance_variable_set("@#{key}".to_sym, options[key])
         end
 
+        if options[:cwd].nil?
+          @cwd=computed_rootpath(".")
+        end
+
+        # Set the default working directory to look for the Mccloudfile
+        logger.info("environment") { "Environment initialized (#{self})" }
+        logger.info("environment") { " - cwd : #{cwd}" }
+
         return self
+    end
+
+    def root_path
+      File.expand_path(@cwd)
+    end
+
+    def computed_rootpath(start)
+        # Let's start at the start path provided
+        logger.info("Calculating computed rootpath")
+        logger.info("Start provided: #{start}")
+        startdir=start
+        prevdir="/someunknownpath"
+
+        until File.exists?(File.join(startdir,@mccloudfile_name))
+          prevdir=startdir
+          startdir=Fle.expand_path(File.join(startdir,".."))
+          logger.info("No #{@mccloudfile_name} found, going up one directory #{startdir}")
+
+          # Check if aren't at the root dir
+          if File.expand_path(prevdir)==File.expand_path(startdir)
+            return start
+          end
+        end
+
+        return startdir
     end
 
     #---------------------------------------------------------------
