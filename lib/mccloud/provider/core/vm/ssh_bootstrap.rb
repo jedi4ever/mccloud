@@ -25,8 +25,7 @@ module Mccloud
                   self.ssh("#{sudo_cmd} /tmp/bootstrap.sh",options)
 
                 else
-                  env.ui.info "[#{@name}] - Error: bootstrap file #{scriptname} does not exist"
-                  exit -1
+                  raise ::Mccloud::Error, "[#{@name}] - Error: bootstrap file #{scriptname} does not exist"
                 end
 
               else
