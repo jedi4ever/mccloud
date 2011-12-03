@@ -33,7 +33,7 @@ module Mccloud
         def sudo(command=nil,options={})
           prefix="sudo -i "
           prefix="" if self.user == "root"
-          self.execute("#{prefix}command",options)
+          self.execute("#{prefix}#{command}",options)
         end
 
         def execute(command=nil,options={})
