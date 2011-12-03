@@ -90,8 +90,9 @@ module Mccloud
       end
 
       def share_manifest
-        env.ui.info "Synching manifest #{@manifest_file}"
-        server.transfer(File.join(manifests_path,@manifest_file),"#{File.basename(@manifest_file)}")
+        full_path=Pathname.new(File.join(manifests_path,@manifest_file)).expand_path(env.root_path).to_s
+        env.ui.info "Synching manifest #{full_path}"
+        server.transfer(full_path,"#{File.basename(@manifest_file)}")
       end
 
       def prepare

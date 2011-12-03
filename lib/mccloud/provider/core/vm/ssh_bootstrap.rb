@@ -8,17 +8,18 @@ module Mccloud
         def ssh_bootstrap(command,options=nil)
           begin
             scriptname=command.nil? ? @bootstrap : command
+            full_scriptname=Pathname.new(scriptname).expand_path(env.root_path).to_s
             env.logger.info "[#{@name}] - Using #{scriptname} as bootstrap script"
 
             if raw.ready?
               unless scriptname.nil?
                 env.ui.info "[#{@name}] - Uploading bootstrap code to machine #{@name}"
 
-                unless !File.exists?(scriptname)
+                unless !File.exists?(full_scriptname)
                   begin
-                    raw.scp(scriptname,"/tmp/bootstrap.sh")
+                    raw.scp(full_scriptname,"/tmp/bootstrap.sh")
                   rescue Exception => ex
-                    raise ::Mccloud::Error, "[#{@name}] - Error uploading file #{scriptname}\n"+ex
+                    raise ::Mccloud::Error, "[#{@name}] - Error uploading file #{full_scriptname}\n"+ex
                   end
                   env.ui.info "[#{@name}] - Enabling the bootstrap code to run"
                   result=raw.ssh("chmod +x /tmp/bootstrap.sh")
