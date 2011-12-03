@@ -5,7 +5,8 @@ module Mccloud::Provider
 
       def share_folder(name,src,dest="tmp",options={})
         new_options={:mute => false}.merge(options)
-        rsync(src,dest,new_options)
+        clean_src_path=File.join(Pathname.new(src).cleanpath.to_s,'/')
+        rsync(clean_src_path,dest,new_options)
       end
 
       # http://blade.nagaokaut.ac.jp/cgi-bin/scat.rb/ruby/ruby-talk/185404
@@ -17,7 +18,7 @@ module Mccloud::Provider
           mute="-v" 
           mute="-q -t" if  options[:mute]
 
-          command="rsync --exclude '.DS_Store' #{mute} --delete  -az -e 'ssh #{ssh_commandline_options(options)}' '#{src}/' '#{@user}@#{self.ip_address}:/#{File.join(dest,File.basename(src))}/'"
+          command="rsync --exclude '.DS_Store' #{mute} --delete  -az -e 'ssh #{ssh_commandline_options(options)}' '#{src}' '#{@user}@#{self.ip_address}:/#{dest}'"
         else
           env.ui.info "[#{@name}] - rsync error: #{src} does no exist"
           exit

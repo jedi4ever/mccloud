@@ -37,6 +37,10 @@ module Mccloud
 
     def self.transfer_file(host,filename,destination = '.' , options = {})
 
+      unless File.exists?(filename)
+        raise Mccloud::Error,"Can't transfer #{filename}: does not exist"
+      end
+
       Net::SSH.start( host,options[:user],options ) do |ssh|
         puts "Transferring #{filename} to #{destination} "
         ssh.scp.upload!( filename, destination ) do |ch, name, sent, total|
