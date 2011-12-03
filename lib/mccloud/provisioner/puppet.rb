@@ -65,7 +65,7 @@ module Mccloud
         expanded_module_paths.each do |path|
           remote_path=File.join(pp_path,"modules-#{i}")
           env.ui.info "Sharing module dir #{path}"
-          server.execute("test ! -d '#{remote_path}' && mkdir -p '#{remote_path}'")
+          server.execute("test -d '#{remote_path}' || mkdir -p '#{remote_path}'")
           server.share_folder("modules-#{i}",path,remote_path,{:mute => false})
           i=i+1
         end
@@ -76,7 +76,7 @@ module Mccloud
         expanded_manifests_paths.each do |path|
           remote_path=File.join(pp_path,"manifests-#{i}")
           env.ui.info "Sharing manifest dir #{path}"
-          server.execute("test ! -d '#{remote_path}' && mkdir -p '#{remote_path}'")
+          server.execute("test -d '#{remote_path}' || mkdir -p '#{remote_path}'")
           server.share_folder("manifests-#{i}",path,remote_path,{:mute => false})
           i=i+1
         end
