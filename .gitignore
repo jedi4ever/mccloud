@@ -2,6 +2,8 @@
 /.mccloud
 /*.pp
 /puppet/*
+/manifests/
+/modules/
 /chef/*
 /.fog
 /bootstrap*

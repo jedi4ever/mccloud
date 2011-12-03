@@ -34,8 +34,8 @@ module Mccloud
         env.ui.warn "Make sure you make a backup!!"
         rsa_key=::Mccloud::Util::SSHKey.generate({ :comment => "Generate #{@name}"})
         begin
-          File.open(@public_key_path,'w'}{|f| f.write(rsa_key.ssh_public_key)}
-          File.open(@private_key_path,'w'}{|f| f.write(rsa_key.rsa_private_key)}
+          File.open(@public_key_path,'w'){|f| f.write(rsa_key.ssh_public_key)}
+          File.open(@private_key_path,'w'){|f| f.write(rsa_key.rsa_private_key)}
         rescue Exception => ex
           env.ui.error "Error generating keypair : #{ex}"
         end

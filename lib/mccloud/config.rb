@@ -67,10 +67,11 @@ module Mccloud
     def load_mccloud_config()
       mccloud_configurator=self
       begin
-        mccloudfile=File.read(File.join(Dir.pwd,"Mccloudfile"))
-        mccloudfile.gsub!("Mccloud::Config.run","mccloud_configurator.define")
+        mccloud_file=File.read(File.join(env.root_path,env.mccloud_file))
+        env.ui.info("Reading #{mccloud_file}")
+        mccloud_file.gsub!("Mccloud::Config.run","mccloud_configurator.define")
         #        http://www.dan-manges.com/blog/ruby-dsls-instance-eval-with-delegation
-        instance_eval(mccloudfile)
+        instance_eval(mccloud_file)
       rescue LoadError => e
         env.ui.error "Error loading configfile - Sorry"
         env.ui.error e.message
@@ -81,15 +82,7 @@ module Mccloud
         env.ui.error e.message
         exit -1
       rescue Errno::ENOENT => e
-        currentdir=FileUtils.pwd
-        FileUtils.chdir("..")
-        if currentdir==FileUtils.pwd
-          env.ui.error "You need a Mccloudfile to be able to run mccloud, run mccloud init to create one"
-          exit -1
-        else
-          env.logger.info "No Mccloudfile found. checking parent directory #{FileUtils.pwd}"
-          retry
-        end
+        raise ::Mccloud::Error, "You need a Mccloudfile to be able to run mccloud, run mccloud init to create one"
       rescue Error => e
         env.ui.error "Error processing configfile - Sorry"
         env.ui.error e.message

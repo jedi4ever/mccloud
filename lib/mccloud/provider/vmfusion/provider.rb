@@ -72,11 +72,6 @@ module Mccloud
 
         end
 
-        def rsync(selection,path,options)
-
-          on_selected_components("vm",selection) do |id,vm|
-            vm.rsync(path,options)
-          end
 
         end
 

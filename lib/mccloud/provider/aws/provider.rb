@@ -105,6 +105,7 @@ module Mccloud
         #      security_group.authorize_port_range(22..22)
         #    end
         def create_sg(name,comment="Securitygroup created by Mccloud")
+          env.logger.info "Creating security group #{name}"
           sg=raw.security_groups.new
           sg.name=name
           sg.description=comment
@@ -187,14 +188,6 @@ module Mccloud
 
           on_selected_components("vm",selection) do |id,vm|
             vm.ssh(command,options)
-          end
-
-        end
-
-        def rsync(selection,path,options)
-
-          on_selected_components("vm",selection) do |id,vm|
-            vm.rsync(path,options)
           end
 
         end

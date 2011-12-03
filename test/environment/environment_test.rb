@@ -8,9 +8,8 @@ class TestEnvironment < Test::Unit::TestCase
   # The default would be currentdir "."
   def test_environment_default_without_mccloudfile_currentdir
     tempdir = Dir.mktmpdir
-    Dir.chdir(tempdir)
     begin
-      env=Mccloud::Environment.new()
+      env=Mccloud::Environment.new(:cwd => tempdir)
       assert_equal(Pathname(env.root_path).dirname.realpath,Pathname(tempdir).dirname.realpath)
     ensure 
       FileUtils.remove_entry_secure tempdir
@@ -21,10 +20,9 @@ class TestEnvironment < Test::Unit::TestCase
   # The default would be currentdir "."
   def test_environment_default_with_mccloudfile_currentdir
     tempdir = Dir.mktmpdir
-    Dir.chdir(tempdir)
-    FileUtils.touch("Mccloudfile")
+    FileUtils.touch(File.join(tempdir,"Mccloudfile"))
     begin
-      env=Mccloud::Environment.new()
+      env=Mccloud::Environment.new(:cwd => tempdir)
       assert_equal(Pathname(env.root_path).dirname.realpath,Pathname(tempdir).dirname.realpath)
     ensure 
       FileUtils.remove_entry_secure tempdir

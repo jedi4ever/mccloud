@@ -1,6 +1,7 @@
 module Mccloud
   module Util
 
+    class Ssh
     def self.when_ssh_login_works(ip="localhost", options = {  } , &block)
 
       defaults={ :port => '22', :timeout => 20000 , :user => 'vagrant', :password => 'vagrant'}
@@ -161,7 +162,8 @@ module Mccloud
 
     end
 
-
-
   end #Class
+
+   end #Module
+
 end #Module

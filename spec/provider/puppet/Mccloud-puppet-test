@@ -1,0 +1,32 @@
+Mccloud::Config.run do |config|
+  config.provider.define "aws-us-east" do |provider_config|
+   provider_config.provider.flavor = :aws
+   provider_config.provider.check_keypairs = false
+   provider_config.provider.check_security_groups = true
+  end
+
+   config.keypair.define "mccloud" do |key_config|
+     key_config.keypair.public_key_path = "#{File.join(ENV['HOME'],'.ssh','mccloud_rsa.pub')}"
+     key_config.keypair.private_key_path = "#{File.join(ENV['HOME'],'.ssh','mccloud_rsa')}"
+   end
+
+    config.keystore.define "aws-us-east-key-store" do |keystore_config|
+      keystore_config.keystore.provider = "aws-us-east"
+      keystore_config.keystore.keypairs = [
+        { :name => "mccloud-key", :keypair => "mccloud"} ]
+    end
+
+  config.vm.define "puppet" do |vm_config|
+    vm_config.vm.provider = "aws-us-east"
+    vm_config.vm.key_name = "mccloud-key"
+
+    vm_config.vm.security_groups = [ "mccloud"]
+
+    vm_config.vm.provision :puppet do |puppet|
+      puppet.manifest_file = "aws-demo1.pp"
+      # puppet.manifest_path = "manifests"
+      puppet.module_path = ["modules"]
+    end
+
+  end
+end

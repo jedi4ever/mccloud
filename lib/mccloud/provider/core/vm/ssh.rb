@@ -30,6 +30,12 @@ module Mccloud
           return "#{commandline_options} #{user_option}"
         end
 
+        def sudo(command=nil,options={})
+          prefix="sudo -i "
+          prefix="" if self.user == "root"
+          self.execute("#{prefix}command",options)
+        end
+
         def execute(command=nil,options={})
           ssh(command,options)
         end

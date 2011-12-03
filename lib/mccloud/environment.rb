@@ -17,7 +17,7 @@ module Mccloud
     attr_reader :cwd
 
     # The valid name for a Mccloudfile for this environment
-    attr_reader :mccloudfile_name
+    attr_reader :mccloud_file
 
     # The {UI} Object to communicate with the outside world
     attr_writer :ui
@@ -28,10 +28,10 @@ module Mccloud
     #    attr_accessor :providers
 
 
-    def initialize(options=nil)
+    def initialize(newoptions=nil)
       options = {
         :cwd => nil,
-        :mccloudfile_name => "Mccloudfile"}.merge(options || {})
+        :mccloud_file => "Mccloudfile"}.merge(newoptions || {})
 
        # We need to set this variable before the first call to the logger object
        if options.has_key?("debug")
@@ -40,7 +40,8 @@ module Mccloud
        end
 
         options.each do |key, value|
-          instance_variable_set("@#{key}".to_sym, options[key])
+          logger.info("environment") { "Setting @#{key} to #{options[key]}" }
+          self.instance_variable_set("@#{key}".to_sym, options[key])
         end
 
         if options[:cwd].nil?
@@ -55,7 +56,7 @@ module Mccloud
     end
 
     def root_path
-      File.expand_path(@cwd)
+      return File.expand_path(@cwd)
     end
 
     def computed_rootpath(start)
@@ -65,10 +66,10 @@ module Mccloud
         startdir=start
         prevdir="/someunknownpath"
 
-        until File.exists?(File.join(startdir,@mccloudfile_name))
+        until File.exists?(File.join(startdir,@mccloud_file))
           prevdir=startdir
-          startdir=Fle.expand_path(File.join(startdir,".."))
-          logger.info("No #{@mccloudfile_name} found, going up one directory #{startdir}")
+          startdir=File.expand_path(File.join(startdir,".."))
+          logger.info("No #{@mccloud_file} found, going up one directory #{startdir}")
 
           # Check if aren't at the root dir
           if File.expand_path(prevdir)==File.expand_path(startdir)

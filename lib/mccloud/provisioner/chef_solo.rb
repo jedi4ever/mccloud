@@ -92,8 +92,10 @@ module Mccloud
         server.transfer(StringIO.new(configfile.join("\n")),"/tmp/solo.rb")
 
         # Share the cookbooks
+        i=0
         cookbooks_path.each do |path|
-          server.share(path,{:mute => true})
+          server.share_folder("cookbook-path-#{i}",path,"/tmp",{:mute => true})
+          i=i+1
         end
 
         env.ui.info "[#{server.name}] - [#{@name}] - running chef-solo"

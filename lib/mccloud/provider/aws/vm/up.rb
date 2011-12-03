@@ -22,7 +22,7 @@ module Mccloud::Provider
             if security_group_exists?(group)
               env.logger.info "security group #{group} exists"
             else
-              env.logger.info "security group #{group} doest not exist"
+              env.logger.info "security group #{group} does not yet exist"
               if security_group_is_managed_by_mccloud?(group)
                 # Managed by mccloud
                 env.logger.info "security group #{group} starts with mccloud"
@@ -41,12 +41,14 @@ module Mccloud::Provider
       end
 
       def check_key(key_name)
-        if @provider.raw.key_pairs.get(key_name).nil?
-          raise Mccloud::Error, "keypair #{key_name} does not exist"
-        end
+        if @provider.check_keypairs
+          if @provider.raw.key_pairs.get(key_name).nil?
+            raise Mccloud::Error, "keypair #{key_name} does not exist"
+          end
+        end 
       end
 
-      def up(options)
+      def up(options={})
 
 
         if raw.nil? || raw.state =="terminated"
@@ -84,13 +86,14 @@ module Mccloud::Provider
           env.ui.info "[#{@name}] - Waiting for ssh port to become available"
           #env.ui.info instance.console_output.body["output"]
 
-          Mccloud::Util.execute_when_tcp_available(self.ip_address, { :port => @port, :timeout => 6000 }) do
+          Mccloud::Util::Ssh.execute_when_tcp_available(self.ip_address, { :port => @port, :timeout => 6000 }) do
             env.ui.info "[#{@name}] - Ssh Port is available"
           end
 
           #TODO: check for ssh to really work
           env.ui.info "Waiting for the ssh service to become available"
-          sleep 5
+          #sleep 5
+
           env.ui.info "[#{@name}] - Ssh Service is available , proceeding with bootstrap"
           # No bootstrap to provide
           self._bootstrap(nil,options)
@@ -114,7 +117,7 @@ module Mccloud::Provider
 
         unless options["noprovision"]
           env.ui.info "[#{@name}] - Waiting for ssh to become available"
-          Mccloud::Util.execute_when_tcp_available(self.ip_address, { :port => @port, :timeout => 6000 }) do
+          Mccloud::Util::Ssh.execute_when_tcp_available(self.ip_address, { :port => @port, :timeout => 6000 }) do
             env.ui.info "[#{@name}] - Ssh is available , proceeding with provisioning"
           end
 

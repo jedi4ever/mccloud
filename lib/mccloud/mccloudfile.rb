@@ -4,7 +4,7 @@ module Mccloud
 
     attr_accessor :path
     attr_accessor :sections
-    attr_accessor :name
+    attr_accessor :vm_name
 
     def initialize(path)
       # Path to the file
@@ -14,7 +14,7 @@ module Mccloud
       @sections=[:aws]
 
       # Name to use as the base machine
-      @name="mccloud"
+      @vm_name="mccloud"
     end
 
     def exists?
@@ -56,6 +56,11 @@ module Mccloud
     end
 
     def save
+       begin
+        File.open(@path,'w'){ |f| f.write(self.to_s)}
+       rescue Exception => ex
+          raise Mccloud::Error, "Error saving Mccloudfile: #{ex}"
+       end
     end
 
     def to_s

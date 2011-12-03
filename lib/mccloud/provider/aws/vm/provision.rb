@@ -2,19 +2,19 @@ module Mccloud::Provider
   module Aws
     module VmCommand
 
-      def _provision(options)
+      def _provision(options=nil)
         unless raw.nil?
 
           if raw.ready?
             @provisioners.each do |provisioner|
-              puts "[#{@name}] - starting provisioning with #{provisioner.name} as provisioner"
+              env.ui.info "[#{@name}] - starting provisioning with #{provisioner.name} as provisioner"
               provisioner.run(self)
             end
           else
-            puts "[#{@name}] - machine is not running, skipping provisioning"
+            raise Mccloud::Error, "[#{@name}] - machine is not running, skipping provisioning"
           end
         else
-          puts "[#{@name}] - machine doesn't exit yet"
+          raise Mccloud::Error, "[#{@name}] - machine doesn't exit yet"
         end
       end
 

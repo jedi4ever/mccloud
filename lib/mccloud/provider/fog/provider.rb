@@ -23,8 +23,8 @@ module Mccloud
             missing_credentials.each do |key|
                errormsg+="-key #{key}\n"
             end
+            raise Mccloud::Error, "#{errormsg}"
           end
-          raise Mccloud::Error, "#{errormsg}"
         end
 
 
