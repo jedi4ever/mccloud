@@ -30,8 +30,9 @@ module Mccloud
         end
 
         def on_selected_components(type,selection=nil)
-          unless self.instance_variables.include?("@#{type}s")
-            env.logger.info "There are no #{type}s defined for provider #{@name}"
+          require 'pp'
+          unless self.instance_variables.collect{|v| v.to_s}.include?("@vms")
+            env.ui.info "There are no #{type}s defined for provider #{@name}"
             # Nothing to do here
             return
           end
