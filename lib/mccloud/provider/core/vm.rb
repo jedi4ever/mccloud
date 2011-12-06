@@ -74,6 +74,14 @@ module Mccloud
         return auto_selection
       end
 
+      def provisioner
+        if provisioners.nil?
+          return nil
+        else
+          provisioners.first
+        end
+      end
+
       # This function is swapped with the component provision function
       # while reading the configuration
       def provision(type)

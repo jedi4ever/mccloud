@@ -17,7 +17,7 @@ module Mccloud
 
       def initialize(env)
         @env=env
-        @manifest_file = "manifest.pp"
+        @manifest_file = nil
         @manifests_path = "manifests"
         @module_paths = []
         @pp_path = "/tmp/mccloud-puppet"
@@ -91,8 +91,9 @@ module Mccloud
 
       def share_manifest
         full_path=Pathname.new(File.join(manifests_path,@manifest_file)).expand_path(env.root_path).to_s
-        env.ui.info "Synching manifest #{full_path}"
-        server.transfer(full_path,"#{File.basename(@manifest_file)}")
+        dest=File.join(@pp_path,File.basename(@manifest_file))
+        env.ui.info "Synching manifest #{full_path} -> #{dest}"
+        server.transfer(full_path,dest)
       end
 
       def prepare
@@ -106,6 +107,9 @@ module Mccloud
 
       def run(server)
         @server=server
+        if @manifest_file.nil?
+          raise ::Mccloud::Error, "You did not specify a manifest file, makes no sense to run"
+        end
 
         options=[]
         options << "--modulepath '#{@module_paths}'"
@@ -115,7 +119,7 @@ module Mccloud
 
         env.ui.info "Running puppet"
 
-        server.sudo("puppet apply #{@pp_path}/manifest.pp")
+        server.sudo("puppet apply --debug --verbose --modulepath='/tmp/mccloud-puppet/modules-0' #{File.join(@pp_path,File.basename(@manifest_file))}")
 
       end
     end #Class
