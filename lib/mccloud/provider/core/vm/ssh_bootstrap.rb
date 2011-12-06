@@ -1,4 +1,5 @@
 require 'mccloud/util/platform'
+require 'net/ssh'
 
 module Mccloud
   module Provider
@@ -7,12 +8,13 @@ module Mccloud
 
         def ssh_bootstrap(command,options=nil)
           begin
-            scriptname=command.nil? ? @bootstrap : command
-            full_scriptname=Pathname.new(scriptname).expand_path(env.root_path).to_s
-            env.logger.info "[#{@name}] - Using #{scriptname} as bootstrap script"
 
             if raw.ready?
+              scriptname=command.nil? ? @bootstrap : command
               unless scriptname.nil?
+                env.logger.info "[#{@name}] - Using #{scriptname} as bootstrap script"
+                full_scriptname=Pathname.new(scriptname).expand_path(env.root_path).to_s
+                env.logger.info "[#{@name}] - Full #{full_scriptname} "
                 env.ui.info "[#{@name}] - Uploading bootstrap code to machine #{@name}"
 
                 unless !File.exists?(full_scriptname)
@@ -39,8 +41,8 @@ module Mccloud
             else
               env.ui.warn "[#{@name}] - Server is not running, so bootstrapping will do no good"
             end
-          rescue Net::SSH::AuthenticationFailed => ex
-              raise ::Mccloud::Error, "[#{@name}] - Authentication failure #{ex.to_s}"
+          rescue ::Net::SSH::AuthenticationFailed => ex
+            raise ::Mccloud::Error, "[#{@name}] - Authentication failure #{ex.to_s}"
           end
         end
 
