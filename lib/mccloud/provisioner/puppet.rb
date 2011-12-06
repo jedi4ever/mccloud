@@ -111,16 +111,21 @@ module Mccloud
           raise ::Mccloud::Error, "You did not specify a manifest file, makes no sense to run"
         end
 
-        options=[]
-        options << "--modulepath '#{@module_paths}'"
         env.logger.info "Starting puppet run"
         server.execute("mkdir -p #{@pp_path}")
         prepare
 
         env.ui.info "Running puppet"
 
-        server.sudo("puppet apply --debug --verbose --modulepath='/tmp/mccloud-puppet/modules-0' #{File.join(@pp_path,File.basename(@manifest_file))}")
+        options=[
+          "apply",
+          "--debug",
+          "--verbose"]
+        options << "--modulepath='/tmp/mccloud-puppet/modules-0'"
 
+        options << File.join(@pp_path,File.basename(@manifest_file))
+
+        server.sudo("puppet #{options.join(' ')}")
       end
     end #Class
   end #Module Provisioners
