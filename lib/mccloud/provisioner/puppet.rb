@@ -100,6 +100,7 @@ module Mccloud
         share_manifests
         share_modules
         share_manifest
+        set_module_paths
       end
 
       def cleanup
@@ -121,11 +122,16 @@ module Mccloud
           "apply",
           "--debug",
           "--verbose"]
-        options << "--modulepath='/tmp/mccloud-puppet/modules-0'"
 
-        options << File.join(@pp_path,File.basename(@manifest_file))
+          unless @module_paths.empty?
+            options << "--modulepath=#{@module_paths.values.join(':')}"
+          end
 
-        server.sudo("puppet #{options.join(' ')}")
+          options << "--manifestdir=#{File.join(@pp_path,'manifests-0')}"
+
+          options << File.join(@pp_path,File.basename(@manifest_file))
+
+          server.sudo("puppet #{options.join(' ')}")
       end
     end #Class
   end #Module Provisioners
