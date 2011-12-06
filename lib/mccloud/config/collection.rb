@@ -61,12 +61,20 @@ module Mccloud
           # if it is a vm, we add to the hash vms
           # if it is an ip, we add it to the hash ips
           provider_collection=provider.instance_variable_get("@#{@type}s")
-          provider_collection[name]=component
+          if provider_collection[name].nil?
+            provider_collection[name]=component
+          else
+            provider_collection[name]<<component
+          end
 
           # And we also add it to the global config element
           # So we can have all components of a similar type in one place
           config_collection=@config.instance_variable_get("@#{@type}s")
-          config_collection[name]=component
+          if config_collection[name].nil?
+            config_collection[name]=component
+          else
+            config_collection[name]<<component
+          end
 
           # Now we can ask the component to validate itself
           #component_stub.validate

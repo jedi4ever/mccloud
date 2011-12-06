@@ -25,19 +25,21 @@ module Mccloud
     # The configuration as loaded by the Mccloudfile
     attr_accessor :config
 
+    attr_accessor :autoload
     #    attr_accessor :providers
 
 
     def initialize(newoptions=nil)
       options = {
         :cwd => nil,
-        :mccloud_file => "Mccloudfile"}.merge(newoptions || {})
+        :mccloud_file => "Mccloudfile",
+        :autoload => true}.merge(newoptions || {})
 
-       # We need to set this variable before the first call to the logger object
-       if options.has_key?("debug")
-         ENV['MCCLOUD_LOG']="STDOUT"
-         ui.info "Debugging enabled"
-       end
+        # We need to set this variable before the first call to the logger object
+        if options.has_key?("debug")
+          ENV['MCCLOUD_LOG']="STDOUT"
+          ui.info "Debugging enabled"
+        end
 
         options.each do |key, value|
           logger.info("environment") { "Setting @#{key} to #{options[key]}" }
@@ -48,9 +50,14 @@ module Mccloud
           @cwd=computed_rootpath(".")
         end
 
+        logger.info("environment") { "Autoload activated? #{options[:autoload]}"}
+        @autoload=options[:autoload]
+
         # Set the default working directory to look for the Mccloudfile
         logger.info("environment") { "Environment initialized (#{self})" }
         logger.info("environment") { " - cwd : #{cwd}" }
+
+        @config=Config.new({:env => self})
 
         return self
     end
@@ -60,24 +67,24 @@ module Mccloud
     end
 
     def computed_rootpath(start)
-        # Let's start at the start path provided
-        logger.info("Calculating computed rootpath")
-        logger.info("Start provided: #{start}")
-        startdir=start
-        prevdir="/someunknownpath"
+      # Let's start at the start path provided
+      logger.info("Calculating computed rootpath")
+      logger.info("Start provided: #{start}")
+      startdir=start
+      prevdir="/someunknownpath"
 
-        until File.exists?(File.join(startdir,@mccloud_file))
-          prevdir=startdir
-          startdir=File.expand_path(File.join(startdir,".."))
-          logger.info("No #{@mccloud_file} found, going up one directory #{startdir}")
+      until File.exists?(File.join(startdir,@mccloud_file))
+        prevdir=startdir
+        startdir=File.expand_path(File.join(startdir,".."))
+        logger.info("No #{@mccloud_file} found, going up one directory #{startdir}")
 
-          # Check if aren't at the root dir
-          if File.expand_path(prevdir)==File.expand_path(startdir)
-            return start
-          end
+        # Check if aren't at the root dir
+        if File.expand_path(prevdir)==File.expand_path(startdir)
+          return start
         end
+      end
 
-        return startdir
+      return startdir
     end
 
     #---------------------------------------------------------------
@@ -90,7 +97,9 @@ module Mccloud
     #
     # @return [Config::Top]
     def config
-      load! if !loaded?
+      if  @autoload
+        load! if !loaded?
+      end
       @config
     end
 
@@ -133,7 +142,7 @@ module Mccloud
     def load_config!
 
       # Read the config
-      @config=Config.new({:env => self}).load_mccloud_config()
+      @config.load_mccloud_config()
 
       # Read the templates in the template sub-dir
       @config.load_templates
@@ -165,7 +174,7 @@ module Mccloud
       "mccloud"
     end
 
-    # Accesses the logger for Vagrant. This logger is a _detailed_
+    # Accesses the logger for Mccloud. This logger is a _detailed_
     # logger which should be used to log internals only. For outward
     # facing information, use {#ui}.
     #

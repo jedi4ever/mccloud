@@ -36,20 +36,23 @@ module Mccloud
 
       # These don't depend on a provider
       config.mccloud=::Mccloud::Config::Mccloud.new(self)
+      @mccloud=config.mccloud
 
       # Assign templates
       config.template=::Mccloud::Config::Template.new(self)
-      @templates=config.template.components
+      config.template.components=@templates
 
       # Assign keypairs
       config.keypair=::Mccloud::Config::Keypair.new(self)
-      @keypairs=config.keypair.components
+      config.keypair.components=@keypairs
 
       # Assign providers
       config.provider=::Mccloud::Config::Provider.new(self)
-      @providers=config.provider.components
+      config.provider.components=@providers
 
       # These components depend on a provider, so we try to guess it frst
+      # This will access self's variables like :
+      #         vms,lbs, ips, etc by simply putting an 's' after the type
       config.vm=::Mccloud::Config::Collection.new("vm",self)
       config.lb=::Mccloud::Config::Collection.new("lb",self)
       config.ip=::Mccloud::Config::Collection.new("ip",self)
@@ -58,8 +61,6 @@ module Mccloud
 
       # Process config file
       yield config
-
-      @mccloud=config.mccloud
 
     end
 
