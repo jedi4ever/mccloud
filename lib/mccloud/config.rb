@@ -69,7 +69,7 @@ module Mccloud
       mccloud_configurator=self
       begin
         mccloud_file=File.read(File.join(env.root_path,env.mccloud_file))
-        env.ui.info("Reading #{mccloud_file}")
+        env.logger.info("Reading #{mccloud_file}")
         mccloud_file.gsub!("Mccloud::Config.run","mccloud_configurator.define")
         #        http://www.dan-manges.com/blog/ruby-dsls-instance-eval-with-delegation
         instance_eval(mccloud_file)
