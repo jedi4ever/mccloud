@@ -1,0 +1,9 @@
+Mccloud::Config.run do |config|
+  config.vm.define "<%= @name %>" do |vm_config|
+
+    # You can customize vm setting here if you want
+    # to override the settings of a definition
+    vm_config.vm.definition = "<%= @definition.name %>"
+
+  end
+end

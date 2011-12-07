@@ -3,6 +3,7 @@ module Mccloud
     class Component
 
       attr_accessor :provider
+      attr_accessor :definition
 
       attr_reader   :env
 

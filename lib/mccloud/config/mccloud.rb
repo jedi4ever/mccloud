@@ -12,6 +12,7 @@ module Mccloud
       attr_accessor :loglevel
 
       attr_accessor :template_path
+      attr_accessor :definition_path
       attr_accessor :vm_path
 
       def initialize(config)
@@ -24,8 +25,9 @@ module Mccloud
         @delimiter="-"
         @loglevel=:info
 
-        @template_path=[:internal,"templates"]
-        @vm_path=["vms"]
+        @template_path=File.expand_path(File.join(File.dirname(__FILE__),'..','..','..','templates'))
+        @definition_path=File.join(@env.root_path,"definitions")
+        @vm_path=File.join(@env.root_path,"vms")
 
         env.logger.debug("done loading the mccloud setting")
 

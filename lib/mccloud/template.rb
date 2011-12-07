@@ -20,6 +20,14 @@ module Mccloud
       @bootstrap=nil
     end
 
+    def path
+      File.join(@env.config.templates.path,@name)
+    end
+
+    def exists?
+      File.directory?(self.path)
+    end
+
     # Bindings in ERB http://www.stuartellis.eu/articles/erb/
     # Links:
     # * Trimming whitespace in ERB

@@ -10,7 +10,7 @@ begin
 
   # Start the CLI
   begin
-    env = Mccloud::Environment.new
+    env = Mccloud::Environment.new(:cwd => ".")
 
     # # Attach the UI
     env.ui = ::Mccloud::UI::Shell.new(env, shell)

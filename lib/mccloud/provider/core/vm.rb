@@ -32,6 +32,7 @@ module Mccloud
       attr_reader   :env
 
       attr_accessor :provider
+      attr_accessor :definition
 
       attr_accessor :create_options
       attr_accessor :name
@@ -60,6 +61,7 @@ module Mccloud
         @port=22
         @agent_forwarding=false
         @create_options={}
+        @definition=nil
       end
 
       def declared?

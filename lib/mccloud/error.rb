@@ -3,8 +3,8 @@ module Mccloud
       attr_reader :orginal
       def initialize(msg, original=$!)
         super(msg)
-        @original = original; end 
-    end 
+        @original = original; end
+    end
 end
 
 #Usage (from the exceptional ruby book)

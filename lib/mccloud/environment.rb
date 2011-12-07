@@ -145,11 +145,13 @@ module Mccloud
       @config.load_mccloud_config()
 
       # Read the templates in the template sub-dir
-      @config.load_templates
+      @config.templates.load!
+      @config.definitions.load!
 
       # Read the vms specified inthe vm sub-dir
-      @config.load_vms
-      @ui.info "Loaded providers[#{@config.providers.length}]"+" vms[#{@config.vms.length}]"+" ips[#{@config.ips.length}]"+" stacks[#{@config.stacks.length}]"+" templates[#{@config.templates.length}] keypairs[#{@config.keypairs.length}] keystores[#{@config.keystores.length}]"
+      @config.vms.load!
+
+      ui.info "Loaded providers[#{@config.providers.length}]"+" vms[#{@config.vms.length}]"+" ips[#{@config.ips.length}]"+" stacks[#{@config.stacks.length}]"+" templates[#{@config.templates.length}] keypairs[#{@config.keypairs.length}] keystores[#{@config.keystores.length}]"
 
       return self
     end

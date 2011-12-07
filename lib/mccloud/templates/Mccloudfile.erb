@@ -14,7 +14,7 @@ Mccloud::Config.run do |config|
     provider_config.provider.flavor = :aws
 
     #Note: this are option provided to fog for creation
-   provider_config.provider.options = { }
+    provider_config.provider.options = { }
 
     # Region in which to create the VM
     provider_config.provider.region = "us-east-1"
@@ -25,7 +25,7 @@ Mccloud::Config.run do |config|
 
     ## Disable check if required security groups exist
     ## To speed things up, set it to false
-   provider_config.provider.check_security_groups = true
+    provider_config.provider.check_security_groups = true
 
     ## If you share an amazon account with multiple people
     ## You can use namespaces to separate resources
@@ -70,7 +70,7 @@ Mccloud::Config.run do |config|
   ## :pairname=> "the name specified in the Key Section of this config file"
   #############################################################
 
-<% uncomment([:aws]) do %>
+  <% uncomment([:aws]) do %>
   config.keystore.define "aws-us-east-key-store" do |keystore_config|
     keystore_config.keystore.provider = "aws-us-east"
     keystore_config.keystore.keypairs = [
@@ -82,7 +82,7 @@ Mccloud::Config.run do |config|
       { :name => "mccloud-key-boe", :keypair => "mccloud"}
     ]
   end
-<% end %>
+  <% end %>
 
   #############################################################
   ## ** Server section ** Specifies server options
@@ -90,7 +90,7 @@ Mccloud::Config.run do |config|
   ## Note: Loosely modelled after Vagrantfile syntax, but not compatible
   #############################################################
 
-  config.vm.define "aws-demo1" do |vm_config|
+  config.vm.define "<%= @vm_name %>" do |vm_config|
 
     # Provider to use for creating this vm
     vm_config.vm.provider = "aws-us-east"
@@ -131,51 +131,51 @@ Mccloud::Config.run do |config|
     # Setting auto_selection to false, will not include this server
     vm_config.vm.auto_selection = false
 
-#    ###
-#    ### Server Provisioners
-#    ### Mccloud supports 3 provisioners : :chef_solo, :puppet , and :shell
-#    ### Note: if multiple are provided, they are run in the sequence as described in the vm_config file
-#    ###
-#
-#    ##
-#    ## Sample chef solo provider
-#    ##
-#    vm_config.vm.provision :chef_solo do |chef|
-#      # Path to load cookbooks of
-#      chef.cookbooks_path = ["chefrepo/cookbooks","chefrepo/site-cookbooks"]
-#
-#      # Level to pass on the chef server
-#      chef.log_level = "info"
-#
-#      ## Add recipes to the runlist
-#      ## Can be specified multiple times
-#      chef.add_recipe "apache2"
-#
-#      ## Note you can use ERB inside the json block
-#      ## :private_demo1_ip => "<%%= private_ips['awsdemo1'] %>"
-#      ## :public_demo2_ip=> "<%%= public_ips['awsdemo1'] %>"
-#      chef.json.merge!( {
-#      })
-#    end
-#
-#    ##
-#    ## Sample puppet provider
-#    ##
+    #    ###
+    #    ### Server Provisioners
+    #    ### Mccloud supports 3 provisioners : :chef_solo, :puppet , and :shell
+    #    ### Note: if multiple are provided, they are run in the sequence as described in the vm_config file
+    #    ###
+    #
+    #    ##
+    #    ## Sample chef solo provider
+    #    ##
+    #    vm_config.vm.provision :chef_solo do |chef|
+    #      # Path to load cookbooks of
+    #      chef.cookbooks_path = ["chefrepo/cookbooks","chefrepo/site-cookbooks"]
+    #
+    #      # Level to pass on the chef server
+    #      chef.log_level = "info"
+    #
+    #      ## Add recipes to the runlist
+    #      ## Can be specified multiple times
+    #      chef.add_recipe "apache2"
+    #
+    #      ## Note you can use ERB inside the json block
+    #      ## :private_demo1_ip => "<%%= private_ips['awsdemo1'] %>"
+    #      ## :public_demo2_ip=> "<%%= public_ips['awsdemo1'] %>"
+    #      chef.json.merge!( {
+    #      })
+    #    end
+    #
+    #    ##
+    #    ## Sample puppet provider
+    #    ##
     vm_config.vm.provision :puppet do |puppet|
-        puppet.manifest_file = "aws-demo1.pp"
-        # puppet.manifest_path = "manifests"
-        # puppet.modules_path = ["modules"]
+      puppet.manifest_file = "aws-demo1.pp"
+      # puppet.manifest_path = "manifests"
+      # puppet.modules_path = ["modules"]
     end
-#
-#    ##
-#    ## Sample script provider
-#    ##
-#    vm_config.vm.provision :shell do |command|
-#      # Either provide the command to run inline
-#      command.inline  = ""
-#      # Or provide the path to a local script to be executed remotely
-#      command.path = "myscript.sh"
-#    end
+    #
+    #    ##
+    #    ## Sample script provider
+    #    ##
+    #    vm_config.vm.provision :shell do |command|
+    #      # Either provide the command to run inline
+    #      command.inline  = ""
+    #      # Or provide the path to a local script to be executed remotely
+    #      command.path = "myscript.sh"
+    #    end
 
   end
 

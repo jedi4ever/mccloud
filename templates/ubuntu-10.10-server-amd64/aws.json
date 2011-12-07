@@ -1,0 +1,3 @@
+{
+  "amis" => { "aws_us-east_us-east-1a_t1.micro": { :ami => "ami-cef405a7" , :user => "ubuntu", :bootstrap => [ "bootstrap.sh"]} }
+}

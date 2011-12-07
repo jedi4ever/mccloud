@@ -35,12 +35,31 @@ module Mccloud
 
         # After processing we extract the component again
         component=component_stub.send("#{@type}")
-        provider=@providers[component.provider.to_s]
+
+
+        # Checking if this component has a base definition
+        provider_name=nil
+        if component.provider.nil?
+          env.logger.debug("config collection"){ "We got an empty provider here"}
+          env.logger.debug("config collection"){ "Trying if there is a definition provider"}
+          unless component.definition.nil?
+            provider_name=env.config.definitions[component.definition].provider
+          end
+        else
+          provider_name=component.provider.to_s
+        end
+
+        provider=@providers[provider_name]
 
         env.logger.debug("config collection"){ "We get here"}
 
         abort "Provider #{component.provider.to_s} does not (yet) exist" if provider.nil?
-        real_component=provider.get_component(@type.capitalize,env)
+        unless component.definition.nil?
+          real_component=env.config.definitions[component.definition].to_vm("blub")
+        else
+          real_component=provider.get_component(@type.capitalize,env)
+        end
+
         begin
 
           # And repeat the same process with a real component
@@ -61,20 +80,13 @@ module Mccloud
           # if it is a vm, we add to the hash vms
           # if it is an ip, we add it to the hash ips
           provider_collection=provider.instance_variable_get("@#{@type}s")
-          if provider_collection[name].nil?
-            provider_collection[name]=component
-          else
-            provider_collection[name]<<component
-          end
+          env.logger.debug("registering #{name} with provider #{provider.name}")
+          provider_collection[name]=component
 
           # And we also add it to the global config element
           # So we can have all components of a similar type in one place
           config_collection=@config.instance_variable_get("@#{@type}s")
-          if config_collection[name].nil?
-            config_collection[name]=component
-          else
-            config_collection[name]<<component
-          end
+          config_collection[name]=component
 
           # Now we can ask the component to validate itself
           #component_stub.validate

@@ -1,0 +1,6 @@
+Mccloud::Config.run do |config|
+  config.definition.define "ubuntu" do |d_config|
+    d_config.definition.provider = "aws-us-east"
+    d_config.definition.user = "ubuntu"
+  end
+end
