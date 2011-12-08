@@ -10,3 +10,4 @@ definitions/*
 /^bootstrap*/
 pkg/*
 *.swp
+Gemfile.lock
