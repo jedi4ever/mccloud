@@ -1,4 +1,4 @@
-#require 'mccloud/template'
+require 'mccloud/template'
 require 'mccloud/templates'
 require 'mccloud/vms'
 require 'mccloud/definition'
