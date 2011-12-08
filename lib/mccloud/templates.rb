@@ -1,4 +1,5 @@
-require 'lib/mccloud/template.rb'
+#require 'lib/mccloud/template'
+
 module Mccloud
    class Templates < Hash
     attr_reader :env

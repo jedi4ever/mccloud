@@ -1,3 +1,9 @@
+#require 'mccloud/template'
+require 'mccloud/templates'
+require 'mccloud/vms'
+require 'mccloud/definition'
+require 'mccloud/definitions'
+require 'mccloud/keypair'
 require 'mccloud/config/mccloud'
 require 'mccloud/config/provider'
 require 'mccloud/config/template'
@@ -5,12 +11,6 @@ require 'mccloud/config/keypair'
 require 'mccloud/config/definition'
 require 'mccloud/config/collection'
 
-require 'mccloud/templates'
-require 'mccloud/vms'
-require 'mccloud/template'
-require 'mccloud/definition'
-require 'mccloud/definitions'
-require 'mccloud/keypair'
 
 module Mccloud
   class Config

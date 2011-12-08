@@ -59,8 +59,8 @@ module Mccloud
     end
 
     def copy_template(templatename)
-      raise ::Mccloud::Error, "Definition #{@name} already exists" if self.exists?
-      raise ::Mccloud::Error, "Template #{templatename} does not exist" unless @env.config.templates[templatename].exists?
+      raise ::Mccloud::Error, "Definition #{@name} already exists" if self.exists?
+      raise ::Mccloud::Error, "Template #{templatename} does not exist" unless @env.config.templates[templatename].exists?
 
       begin
         t=@env.config.templates[templatename]
