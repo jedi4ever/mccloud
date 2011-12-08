@@ -1,4 +1,4 @@
-require 'lib/mccloud/vm'
+require 'mccloud/vm'
 module Mccloud
   class Vms < Hash
 

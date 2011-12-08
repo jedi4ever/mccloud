@@ -1,4 +1,4 @@
-#require 'lib/mccloud/template'
+require 'mccloud/template'
 
 module Mccloud
    class Templates < Hash
