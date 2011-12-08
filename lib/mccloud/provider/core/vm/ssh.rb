@@ -8,13 +8,15 @@ module Mccloud
         def ssh_commandline_options(options)
 
           command_options = [
-            #"-q", #Suppress warning messages
+            "-q", #Suppress warning messages
             #            "-T", #Pseudo-terminal will not be allocated because stdin is not a terminal.
             "-p #{@port}",
             "-o UserKnownHostsFile=/dev/null",
             "-t -o StrictHostKeyChecking=no",
             "-o IdentitiesOnly=yes",
-            "-o VerifyHostKeyDNS=no"
+            "-o VerifyHostKeyDNS=no",
+            "-o ControlMaster=auto",
+            "-o \"ControlPath=~/.ssh/master-%r@%h:%p\""
           ]
           unless @private_key_path.nil?
             command_options << "-i #{@private_key_path}"

@@ -25,7 +25,7 @@ module Mccloud::Provider
         end
 
         result=ShellResult.new("","",-1)
-        env.ui.info "#{command}" unless options[:mute]
+        env.logger.info "#{command}" unless options[:mute]
         IO.popen("#{command}") { |p|
           p.each_line{ |l|
             result.stdout+=l
