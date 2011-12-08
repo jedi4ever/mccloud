@@ -12,6 +12,7 @@ module Mccloud
       attr_accessor :module_path
       attr_accessor :pp_path
       attr_accessor :options
+      attr_accessor :remote_environment
 
       attr_reader   :server
 
@@ -23,6 +24,7 @@ module Mccloud
         @pp_path = "/tmp/mccloud-puppet"
         @name="puppet"
         @options = []
+        @remote_environment={}
       end
 
       # Returns the manifests path expanded relative to the root path of the
@@ -118,6 +120,13 @@ module Mccloud
 
         env.ui.info "Running puppet"
 
+        pre_options=[]
+        unless @remote_environment.empty?
+            @remote_environment.each do |key,value|
+              pre_options << "#{key.to_s}=\"#{value}\""
+            end
+        end
+
         options=[
           "apply",
           "--debug",
@@ -127,11 +136,12 @@ module Mccloud
             options << "--modulepath=#{@module_paths.values.join(':')}"
           end
 
+
           options << "--manifestdir=#{File.join(@pp_path,'manifests-0')}"
 
           options << File.join(@pp_path,File.basename(@manifest_file))
 
-          server.sudo("puppet #{options.join(' ')}")
+          server.sudo("#{pre_options.join(" ")} puppet #{options.join(' ')}")
       end
     end #Class
   end #Module Provisioners
