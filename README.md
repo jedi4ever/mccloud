@@ -1,3 +1,6 @@
+# This needs to be completely rewritten for the new version!!!
+
+
 ## Note:
 - This is a quick copy and paste job(weekend hacking), you should not consider it anything but experimental right now
 - But I wanted to share the idea already with others
