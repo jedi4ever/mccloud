@@ -1,4 +1,4 @@
-require 'lib/mccloud/definition.rb'
+require 'mccloud/definition.rb'
 
 module Mccloud
   class Definitions < Hash
