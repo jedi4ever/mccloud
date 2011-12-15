@@ -48,6 +48,8 @@ module Mccloud
 
         if options[:cwd].nil?
           @cwd=computed_rootpath(".")
+        else
+          @cwd=computed_rootpath(options[:cwd])
         end
 
         logger.info("environment") { "Autoload activated? #{options[:autoload]}"}
