@@ -7,12 +7,11 @@ source "http://rubygems.org"
 group :development do
   gem 'rspec', '>= 2.0'
   gem "rake"
-  gem 'autotest'
-  if RUBY_PLATFORM.downcase.include?("darwin")
-    gem 'autotest-fsevent'
-    # also install growlnotify from the Extras/growlnotify/growlnotify.pkg in Growl disk image
-    gem 'autotest-growl'
-  end
+  gem 'guard'
+  gem 'guard-rspec'
+  gem 'guard-cucumber'
+  gem 'growl'
+  gem 'rb-fsevent'
 end
 
 gem "mccloud", :path => "."
