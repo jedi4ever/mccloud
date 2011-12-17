@@ -12,6 +12,7 @@ group :development do
   gem 'guard-cucumber'
   gem 'growl'
   gem 'rb-fsevent'
+  gem 'parallel_tests'
 end
 
 gem "mccloud", :path => "."
