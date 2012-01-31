@@ -45,8 +45,8 @@ module Mccloud
 
           env.logger.debug("config provider"){ "Instantiating provider #{name.to_s}"}
           components[name.to_s]=provider_stub.provider
-        rescue Error => e
-          env.ui.error "Error loading provider with #{name},#{$!}"
+        rescue ::Mccloud::Error => ex
+          raise ::Mccloud::Error, "Error loading provider with #{name}\n#{ex}"
         end
       end
 

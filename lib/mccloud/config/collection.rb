@@ -53,7 +53,12 @@ module Mccloud
 
         env.logger.debug("config collection"){ "We get here"}
 
-        abort "Provider #{component.provider.to_s} does not (yet) exist" if provider.nil?
+        if provider.nil?
+          env.ui.warn "Provider #{component.provider.to_s} does not (yet) exist"
+          env.ui.warn "Skipping definition of #{name}"
+          return
+        end
+
         unless component.definition.nil?
           real_component=env.config.definitions[component.definition].to_vm("blub")
         else

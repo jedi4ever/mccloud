@@ -1,5 +1,6 @@
 require 'mccloud'
 require 'mccloud/provisioner/puppet'
+require 'tempfile'
 
 # Without a cwd passed, and no mccloudfile in any parentdir
 # The default would be currentdir "."
@@ -12,6 +13,7 @@ describe "Provisioner puppet" do
       config.provider.define "aws-us-east" do |provider_config|
         provider_config.provider.flavor = :aws
         provider_config.provider.region = "us-east-1"
+        provider_config.provider.credentials_path=File.join(@tempdir,".fog")
       end
 
       config.keypair.define "mccloud" do |key_config|
@@ -22,11 +24,17 @@ describe "Provisioner puppet" do
       config.keystore.define "aws-us-east-key-store" do |keystore_config|
         keystore_config.keystore.provider = "aws-us-east"
         keystore_config.keystore.keypairs = [
-          { :name => "default", :keypair => "mccloud"},
+          { :name => "mccloud", :keypair => "mccloud"},
         ]
       end
 
     end
+  end
+
+  def fake_credentials(env)
+    credentials={:default => {:aws_access_key_id => "1234567",
+                              :aws_secret_access_key => "1234567"}}
+    File.open(File.join(@tempdir,".fog"),'w') { |f| f.write(credentials.to_yaml)}
   end
 
   def default_puppet(env)
@@ -34,8 +42,6 @@ describe "Provisioner puppet" do
       config.vm.define "puppet" do |vm_config|
         vm_config.vm.provider = "aws-us-east"
         vm_config.vm.provision :puppet do |puppet|
-          #          puppet.manifest_file = "aws-demo1.pp"
-          # puppet.manifest_path = "manifests"
           puppet.module_path = ["modules"]
         end
       end
@@ -43,22 +49,22 @@ describe "Provisioner puppet" do
   end
 
   before(:each) do
+    @tempdir=Dir.mktmpdir
     @env=Mccloud::Environment.new(
       :cwd => File.dirname(__FILE__),
       :autoload => false
-      #:mccloud_file => "Mccloud-puppet-test"
     )
 
+    fake_credentials(@env)
     default_config(@env)
     default_puppet(@env)
 
     # Fog will get loaded because of aws
     Fog.mock!
-    @env.config.providers["aws-us-east"].keystore_sync
+    #@env.config.providers["aws-us-east"].keystore_sync
 
     @vm=@env.config.vms["puppet"]
     ::Mccloud::Util::Ssh.stub(:execute_when_tcp_available).and_return(true)
-    #@vm.raw.stub!(:wait_for).and_return(true)
     @vm.stub!(:share_folder).and_return(nil)
     @vm.stub!(:transfer).and_return(nil)
     @vm.stub!(:execute).and_return(nil)
@@ -67,6 +73,7 @@ describe "Provisioner puppet" do
 
   after(:each) do
     Fog::Mock.reset
+    FileUtils.remove_entry_secure @tempdir
     @env=nil
     @vm=nil
   end

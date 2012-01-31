@@ -85,20 +85,18 @@ module Mccloud
         #        http://www.dan-manges.com/blog/ruby-dsls-instance-eval-with-delegation
         instance_eval(mccloud_file)
       rescue LoadError => e
+        raise ::Mccloud::Error, "Error processing configfile - Sorry"
         env.ui.error "Error loading configfile - Sorry"
         env.ui.error e.message
         exit -1
       rescue NoMethodError => e
-        env.ui.error "Some method got an error in the configfile - Sorry"
-        env.ui.error $!
-        env.ui.error e.message
-        exit -1
+        raise ::Mccloud::Error, "Some method got an error in the configfile - Sorry\n#{$!}\n#{e.message}"
       rescue Errno::ENOENT => e
-        raise ::Mccloud::Error, "You need a Mccloudfile to be able to run mccloud, run mccloud init to create one"
+        raise ::Mccloud::Error, "You need a Mccloudfile to be able to run mccloud, run mccloud init to create one, #{e}"
+      rescue ::Mccloud::Error => e
+        raise ::Mccloud::Error, "#{e}"
       rescue Error => e
-        env.ui.error "Error processing configfile - Sorry"
-        env.ui.error e.message
-        exit -1
+        raise ::Mccloud::Error, "Error processing configfile - Sorry"
       end
       return self
     end

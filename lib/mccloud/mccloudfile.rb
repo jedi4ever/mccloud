@@ -4,17 +4,11 @@ module Mccloud
 
     attr_accessor :path
     attr_accessor :sections
-    attr_accessor :vm_name
 
     def initialize(path)
       # Path to the file
       @path=path
 
-      # Tags to be enable for the comment
-      @sections=[:aws]
-
-      # Name to use as the base machine
-      @vm_name="mccloud"
     end
 
     def exists?
@@ -55,12 +49,23 @@ module Mccloud
       return true
     end
 
-    def save
+    def generate(options={:force => false})
+      force=options[:force]
+      provider=options[:provider]
+      raise Mccloud::Error, "You need to specify a provider to generate a Mccloudfile" if provider.nil?
+
+      @sections=[provider.to_sym]
+      # We need at least one provider
+
+      if exists? && force==false
+          raise Mccloud::Error, "Error Mccloudfile already exists."
+      else
        begin
         File.open(@path,'w'){ |f| f.write(self.to_s)}
        rescue Exception => ex
           raise Mccloud::Error, "Error saving Mccloudfile: #{ex}"
        end
+      end
     end
 
     def to_s

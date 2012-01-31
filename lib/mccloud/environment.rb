@@ -1,4 +1,5 @@
 require 'mccloud/config'
+require 'mccloud/generator'
 
 require 'mccloud/command/init'
 require 'mccloud/command/provider'
@@ -24,6 +25,12 @@ module Mccloud
 
     # The configuration as loaded by the Mccloudfile
     attr_accessor :config
+
+    # A generator helper to create a Mccloud project
+    attr_accessor :generator
+
+    # Default ssh keypath
+    attr_accessor :ssh_key_path
 
     attr_accessor :autoload
     #    attr_accessor :providers
@@ -60,6 +67,10 @@ module Mccloud
         logger.info("environment") { " - cwd : #{cwd}" }
 
         @config=Config.new({:env => self})
+        @generator=Generator.new(self)
+
+        # Setting the default to path of the sshkey
+        @ssh_key_path=File.join(ENV['HOME'],".ssh")
 
         return self
     end
