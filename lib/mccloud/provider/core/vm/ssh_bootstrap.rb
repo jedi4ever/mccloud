@@ -26,10 +26,10 @@ module Mccloud
                   env.ui.info "[#{@name}] - Enabling the bootstrap code to run"
                   result=raw.ssh("chmod +x /tmp/bootstrap.sh")
 
-                  sudo_cmd="sudo"
-                  sudo_cmd=options["sudo"] unless options["sudo"].nil?
+                  #sudo_cmd="sudo"
+                  #sudo_cmd=options["sudo"] unless options["sudo"].nil?
 
-                  self.ssh("#{sudo_cmd} /tmp/bootstrap.sh",options)
+                  self.sudo("/tmp/bootstrap.sh",options)
 
                 else
                   raise ::Mccloud::Error, "[#{@name}] - Error: bootstrap file #{scriptname} does not exist"
