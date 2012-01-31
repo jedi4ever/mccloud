@@ -1,5 +1,8 @@
 require 'mccloud/util/rsync'
 require 'mccloud/util/ssh'
+require 'erb'
+require 'tempfile'
+
 module Mccloud
   module Provisioner
     class Puppet
@@ -93,9 +96,58 @@ module Mccloud
 
       def share_manifest
         full_path=Pathname.new(File.join(manifests_path,@manifest_file)).expand_path(env.root_path).to_s
+
+        # These are the default
         dest=File.join(@pp_path,File.basename(@manifest_file))
-        env.ui.info "Synching manifest #{full_path} -> #{dest}"
-        server.transfer(full_path,dest)
+        src=full_path
+
+        # ERB file
+        if is_erb?(full_path)
+          env.ui.info "Interpreting ERB puppet manifest"
+
+          # Correct the src path
+          temp_file = Tempfile.new("puppet_erb")
+          src=temp_file.path
+          result=erbify(full_path)
+          File.open(temp_file,'w') { |f| f.write(result)}
+
+          # Correct the dest path
+          dest=File.join(@pp_path,File.basename(@manifest_file,".erb"))
+
+          # Immediately unlink it
+          #temp_file.close(true)
+        end
+
+        env.ui.info "Synching manifest #{src} -> #{dest}"
+        server.transfer(src,dest)
+      end
+
+      def is_erb?(filename)
+        result=File.extname(filename) == ".erb"
+        puts result
+        return result
+      end
+
+      def erbify(filename)
+
+        # Fill the array to pass to the ERB
+        public_ips=Hash.new
+        private_ips=Hash.new
+        server.provider.vms.each do |name,vm|
+          public_ips[name] = vm.public_ip_address
+          private_ips[name] = vm.private_ip_address
+        end
+
+        data = { :public_ips => public_ips, :private_ips => private_ips}
+        vars = ErbBinding.new(data)
+
+        template = File.read(filename)
+        erb = ERB.new(template)
+
+        vars_binding = vars.send(:get_binding)
+        result=erb.result(vars_binding)
+        return result
+
       end
 
       def prepare
@@ -122,9 +174,9 @@ module Mccloud
 
         pre_options=[]
         unless @remote_environment.empty?
-            @remote_environment.each do |key,value|
-              pre_options << "#{key.to_s}=\"#{value}\""
-            end
+          @remote_environment.each do |key,value|
+            pre_options << "#{key.to_s}=\"#{value}\""
+          end
         end
 
         options=[
@@ -139,7 +191,11 @@ module Mccloud
 
           options << "--manifestdir=#{File.join(@pp_path,'manifests-0')}"
 
-          options << File.join(@pp_path,File.basename(@manifest_file))
+          if is_erb?(@manifest_file)
+            options << File.join(@pp_path,File.basename(@manifest_file,".erb"))
+          else
+            options << File.join(@pp_path,File.basename(@manifest_file))
+          end
 
           server.sudo("#{pre_options.join(" ")} puppet #{options.join(' ')}")
       end
