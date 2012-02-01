@@ -40,16 +40,21 @@ module Mccloud::Provider
         end
       end
 
+    def key_is_managed_by_mccloud?(keyname)
+        return /^mccloud/ =~ keyname
+    end
+
       def check_key(key_name)
         if @provider.check_keypairs
-          if @provider.raw.key_pairs.get(key_name).nil?
+          raw_keypair=@provider.raw.key_pairs.get(key_name)
+          if raw_keypair.nil?
+                raise Mccloud::Error, "keypair #{key_name} does not exits. And we only managed keys with prefix mccloud"
             raise Mccloud::Error, "keypair #{key_name} does not exist"
           end
-        end 
+        end
       end
 
       def up(options={})
-
 
         if raw.nil? || raw.state =="terminated"
 
@@ -60,7 +65,8 @@ module Mccloud::Provider
             :image_id => @ami,
             :flavor_id => @flavor,
             :key_name => @key_name,
-            :groups => @security_groups
+            :groups => @security_groups,
+            :tags             => {"Name" => "#{@provider.filter}#{@name}"}
           }.merge(@create_options)
 
           check_security_groups(create_options[:groups])
@@ -70,21 +76,16 @@ module Mccloud::Provider
           begin
             @raw=@provider.raw.servers.create(create_options)
           rescue ::Fog::Compute::AWS::NotFound => ex
-            #Oh we got an error
-            #Let's see if we need to create keypair mccloud
-
-            env.ui.error "Error creating the new server: #{ex}"
+            raise ::Mccloud::Error, "Error creating the new server: #{ex}"
             return
           end
 
           env.ui.info "[#{@name}] - Waiting for the machine to become accessible"
           raw.wait_for { printf "."; STDOUT.flush;  ready?}
           env.ui.info ""
-          @provider.raw.create_tags(raw.id, { "Name" => "#{@provider.filter}#{@name}"})
 
           # Wait for ssh to become available ...
           env.ui.info "[#{@name}] - Waiting for ssh port to become available"
-          #env.ui.info instance.console_output.body["output"]
 
           Mccloud::Util::Ssh.execute_when_tcp_available(self.ip_address, { :port => @port, :timeout => 6000 }) do
             env.ui.info "[#{@name}] - Ssh Port is available"
@@ -92,7 +93,7 @@ module Mccloud::Provider
 
           #TODO: check for ssh to really work
           env.ui.info "Waiting for the ssh service to become available"
-          #sleep 5
+          sleep 3
 
           env.ui.info "[#{@name}] - Ssh Service is available , proceeding with bootstrap"
           # No bootstrap to provide
@@ -131,6 +132,3 @@ module Mccloud::Provider
     end #module
   end #module
 end #module
-
-
-
