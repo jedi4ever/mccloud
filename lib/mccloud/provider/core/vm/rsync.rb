@@ -18,7 +18,7 @@ module Mccloud::Provider
           mute="-v" 
           mute="-q -t" if  options[:mute]
 
-          command="rsync --exclude '.DS_Store' #{mute} --delete  -az -e 'ssh #{ssh_commandline_options(options)}' '#{src}' '#{@user}@#{self.ip_address}:/#{dest}'"
+          command="rsync --exclude '.DS_Store' --exclude '.hg' --exclude '.git' #{mute} --delete-excluded --delete  -az -e 'ssh #{ssh_commandline_options(options)}' '#{src}' '#{@user}@#{self.ip_address}:/#{dest}'"
         else
           env.ui.info "[#{@name}] - rsync error: #{src} does no exist"
           exit
