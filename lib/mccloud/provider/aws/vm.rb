@@ -36,11 +36,11 @@ module Mccloud::Provider
         # Todo calculate the best default based
         # On provider region
         super(env)
-        @key_name = [ "default"]
+        @key_name = [ "mccloud"]
         # Todo calculate the best default based
         # On provider region
         @zone="eu-west-1a"
-        @security_groups=[ "default"]
+        @security_groups=[ "mccloud"]
         @flavor="t1.micro"
         # Todo calculate the ubuntu one based
         # on provider region and flavor
