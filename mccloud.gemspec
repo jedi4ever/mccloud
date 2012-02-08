@@ -17,7 +17,7 @@ Gem::Specification.new do |s|
   s.add_dependency "net-ssh", "~> 2.1.0"
   #s.add_dependency "sshkey"
   s.add_dependency "net-scp"
-  s.add_dependency "fog", "~> 1.0.0"
+   s.add_dependency "fog", "~> 1.1.0"
 
   s.add_dependency "json"
   s.add_dependency "ansi"
