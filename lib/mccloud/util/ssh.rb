@@ -9,7 +9,7 @@ module Mccloud
       options=defaults.merge(options)
 
       puts
-      puts "Waiting for ssh login on #{ip} with user #{options[:user]} to sshd on port => #{options[:port]} to work"
+      puts "Waiting for ssh login on #{ip} with user #{options[:user]} to sshd on port => #{options[:port]} to work (Timeout in #{options[:timeout]} seconds)"
 
       begin
         Timeout::timeout(options[:timeout]) do
