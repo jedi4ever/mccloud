@@ -18,6 +18,7 @@ module Mccloud::Provider
       include Mccloud::Provider::Script::VmCommand
 
       attr_accessor :ip_address
+      attr_accessor :variables
 
     end
   end

@@ -36,7 +36,7 @@ module Mccloud
         begin
           # Now that we know the actual provider, we can check if the provider has this type of component
           require_path='mccloud/provider/'+provider_type.to_s.downcase+"/provider"
-          require require_path
+            require require_path
 
           # Now we can create the real provider
           real_provider=Object.const_get("Mccloud").const_get("Provider").const_get(provider_type.to_s.capitalize).const_get("Provider").new(name,provider_options,env)

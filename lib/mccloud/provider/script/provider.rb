@@ -32,17 +32,17 @@ module Mccloud
 
         def up(selection,options)
           on_selected_components("vm",selection) do |id,vm|
-            script_exec("up.sh",options)
+            script_exec("up.sh",vm,options)
           end
         end
 
         def status(selection,options)
-          script_exec("status.sh",options)
+          script_exec("status.sh",vm,options)
         end
 
         def bootstrap(selection,script,options)
           on_selected_components("vm",selection) do |id,vm|
-            script_exec("bootstrap.sh",options)
+            script_exec("bootstrap.sh",vm,options)
           end
 
         end
@@ -50,7 +50,7 @@ module Mccloud
         def destroy(selection,options)
 
           on_selected_components("vm",selection) do |id,vm|
-            script_exec("destroy.sh",options)
+            script_exec("destroy.sh",vm,options)
           end
 
         end
@@ -58,7 +58,7 @@ module Mccloud
         def ssh(selection,command,options)
 
           on_selected_components("vm",selection) do |id,vm|
-            script_exec("ssh.sh",options)
+            script_exec("ssh.sh",vm,options)
           end
 
         end
@@ -66,20 +66,24 @@ module Mccloud
         def provision(selection,options)
 
           on_selected_components("vm",selection) do |id,vm|
-            script_exec("provision.sh",options)
+            script_exec("provision.sh",vm,options)
           end
 
         end
 
         def halt(selection,options)
           on_selected_components("vm",selection) do |id,vm|
-            script_exec("provision.sh",options)
+            script_exec("provision.sh",vm,options)
           end
 
         end
 
         private
-        def script_exec(filename,options)
+        def script_exec(filename,vm,options)
+          vm.variables.each do |name,value|
+            env.logger.info "setting environment: #{name}=#{value}"
+            ENV["MC_"+name.to_s]=value
+          end
           # Some hackery going on here. On Mac OS X Leopard (1.5), exec fails
           # (GH-51). As a workaround, we fork and wait. On all other platforms,
           # we simply exec.
