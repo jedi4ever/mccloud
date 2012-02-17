@@ -40,9 +40,9 @@ module Mccloud
 
         def status(selection,options)
           unless selection.nil?
-          on_selected_components("vm",selection) do |id,vm|
-            script_exec("status.sh",vm,options)
-          end
+            on_selected_components("vm",selection) do |id,vm|
+              script_exec("status.sh",vm,options)
+            end
           else
             script_exec("status.sh",nil,options)
           end
@@ -95,14 +95,15 @@ module Mccloud
               env.logger.info "setting environment: #{name}=#{value}"
               ENV["MC_"+name.to_s]=value
             end
+            ENV["MC_BOXNAME"]=vm.name
           end
 
           # Set vm variables
-          unless vm.nil?
-            @variables.each do |name,value|
-              env.logger.info "setting environment: #{name}=#{value}"
-              ENV["MC_"+name.to_s]=value
-            end
+          env.logger.info "script_dir : #{File.absolute_path(@script_dir)}"
+          ENV["MC_SCRIPT_DIR"]=File.absolute_path(@script_dir)
+          @variables.each do |name,value|
+            env.logger.info "setting environment: #{name}=#{value}"
+            ENV["MC_"+name.to_s]=value
           end
 
           # Some hackery going on here. On Mac OS X Leopard (1.5), exec fails
