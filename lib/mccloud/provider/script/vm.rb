@@ -1,14 +1,6 @@
 require 'mccloud/provider/core/vm'
 
-require 'mccloud/provider/script/vm/up'
-require 'mccloud/provider/script/vm/bootstrap'
-require 'mccloud/provider/script/vm/ssh'
-require 'mccloud/provider/script/vm/scp'
-require 'mccloud/provider/script/vm/forward'
-require 'mccloud/provider/script/vm/rsync'
-require 'mccloud/provider/script/vm/halt'
-require 'mccloud/provider/script/vm/provision'
-require 'mccloud/provider/script/vm/destroy'
+require 'mccloud/provider/script/vm/status'
 
 module Mccloud::Provider
   module Script
