@@ -81,7 +81,7 @@ module Mccloud
 
         def halt(selection,options)
           on_selected_components("vm",selection) do |id,vm|
-            script_exec("provision.sh",vm,options)
+            script_exec("halt.sh",vm,options)
           end
 
         end
