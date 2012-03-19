@@ -99,7 +99,7 @@ module Mccloud
           end
 
           # Set vm variables
-          env.logger.info "script_dir : #{File.absolute_path(@script_dir)}"
+          env.logger.info "script_dir : #{File.expand_path(@script_dir)}"
           ENV["MC_SCRIPT_DIR"]=File.absolute_path(@script_dir)
           @variables.each do |name,value|
             env.logger.info "setting environment: #{name}=#{value}"
