@@ -179,25 +179,26 @@ module Mccloud
           end
         end
 
-        options=[
-          "apply",
-          "--debug",
-          "--verbose"]
-
-          unless @module_paths.empty?
-            options << "--modulepath=#{@module_paths.values.join(':')}"
-          end
+        puppet_options=[ "apply"]
+        @options.each do |o|
+          puppet_options << o
+        end
 
 
-          options << "--manifestdir=#{File.join(@pp_path,'manifests-0')}"
+        unless @module_paths.empty?
+          puppet_options << "--modulepath=#{@module_paths.values.join(':')}"
+        end
 
-          if is_erb?(@manifest_file)
-            options << File.join(@pp_path,File.basename(@manifest_file,".erb"))
-          else
-            options << File.join(@pp_path,File.basename(@manifest_file))
-          end
 
-          server.sudo("#{pre_options.join(" ")} puppet #{options.join(' ')}")
+        puppet_options << "--manifestdir=#{File.join(@pp_path,'manifests-0')}"
+
+        if is_erb?(@manifest_file)
+          puppet_options << File.join(@pp_path,File.basename(@manifest_file,".erb"))
+        else
+          puppet_options << File.join(@pp_path,File.basename(@manifest_file))
+        end
+
+        server.sudo("#{pre_options.join(" ")} puppet #{puppet_options.join(' ')}")
       end
     end #Class
   end #Module Provisioners
