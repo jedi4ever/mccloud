@@ -95,6 +95,11 @@ module Mccloud
       end
 
       def share_manifest
+        if @manifest_file.nil?
+          # Nothing to do here
+          return
+        end
+
         full_path=Pathname.new(File.join(manifests_path,@manifest_file)).expand_path(env.root_path).to_s
 
         # These are the default
