@@ -198,7 +198,7 @@ module Mccloud
         puppet_options << "--manifestdir=#{manifestdir}"
 
         if @manifest_file.nil?
-          puppet_options << File.join(@manifestdir,"site.pp")
+          puppet_options << File.join(manifestdir,"site.pp")
         else
           if is_erb?(@manifest_file)
             puppet_options << File.join(@pp_path,File.basename(@manifest_file,".erb"))
