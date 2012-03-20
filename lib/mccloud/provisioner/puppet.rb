@@ -190,7 +190,7 @@ module Mccloud
         end
 
 
-        manifestdir="#{File.join(@pp_path,'manifests-0')"
+        manifestdir="#{File.join(@pp_path,'manifests-0')}"
         puppet_options << "--manifestdir=#{manifestdir}"
 
         if is_erb?(@manifest_file)
