@@ -163,7 +163,7 @@ module Mccloud
       def run(server)
         @server=server
         if @manifest_file.nil?
-          raise ::Mccloud::Error, "You did not specify a manifest file, makes no sense to run"
+          env.ui.info "No specific manifestfile specified defaulting to site.pp in the manifest dir"
         end
 
         env.logger.info "Starting puppet run"
