@@ -207,7 +207,7 @@ module Mccloud
           end
         end
 
-        server.sudo("cd '#{manifestdir}' ; #{pre_options.join(" ")} puppet #{puppet_options.join(' ')}")
+        server.sudo("#{pre_options.join(" ")} puppet #{puppet_options.join(' ')}")
       end
     end #Class
   end #Module Provisioners
