@@ -190,7 +190,8 @@ module Mccloud
         end
 
 
-        puppet_options << "--manifestdir=#{File.join(@pp_path,'manifests-0')}"
+        manifestdir="#{File.join(@pp_path,'manifests-0')"
+        puppet_options << "--manifestdir=#{manifestdir}"
 
         if is_erb?(@manifest_file)
           puppet_options << File.join(@pp_path,File.basename(@manifest_file,".erb"))
@@ -198,7 +199,7 @@ module Mccloud
           puppet_options << File.join(@pp_path,File.basename(@manifest_file))
         end
 
-        server.sudo("#{pre_options.join(" ")} puppet #{puppet_options.join(' ')}")
+        server.sudo("cd '#{manifestdir}' ; #{pre_options.join(" ")} puppet #{puppet_options.join(' ')}")
       end
     end #Class
   end #Module Provisioners
