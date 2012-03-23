@@ -65,6 +65,7 @@ module Mccloud::Provider
             :image_id => @ami,
             :flavor_id => @flavor,
             :key_name => @key_name,
+            :user_data => @user_data,
             :groups => @security_groups,
             :tags             => {"Name" => "#{@provider.filter}#{@name}"}
           }.merge(@create_options)

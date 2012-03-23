@@ -33,7 +33,7 @@ module Mccloud
         end
 
         def sudo(command=nil,options={})
-          prefix="sudo -i "
+          prefix="sudo -E "
           prefix="" if self.user == "root"
           self.execute("#{prefix}#{command}",options)
         end
@@ -86,7 +86,7 @@ module Mccloud
             ssh_command="ssh #{ssh_commandline_options(options)} #{host_ip} \"#{extended_command}\""
 
             unless options.nil? || options[:mute]
-              env.ui.info "[#{@name}] - ssh -p #{@port} #{@user}@#{@name}(#{host_ip}) \"#{command}\""
+              env.ui.info "[#{@name}] - ssh -p #{@port} #{@user}@#{host_ip} \"#{command}\""
             end
 
             if command.nil? || command==""
