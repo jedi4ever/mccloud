@@ -71,7 +71,7 @@ module Mccloud
               s.close
               block.call(ip);
               return true
-            rescue Errno::ECONNREFUSED, Errno::EHOSTUNREACH
+            rescue Errno::ECONNREFUSED, Errno::EHOSTUNREACH,Errno::ETIMEDOUT
               sleep options[:pollrate]
             end
           end
