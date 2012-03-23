@@ -92,11 +92,9 @@ module Mccloud::Provider
             env.ui.info "[#{@name}] - Ssh Port is available"
           end
 
-          #TODO: check for ssh to really work
-          env.ui.info "Waiting for the ssh service to become available"
-          sleep 3
-
-          env.ui.info "[#{@name}] - Ssh Service is available , proceeding with bootstrap"
+          Mccloud::Util::Ssh.when_ssh_login_works(self.ip_address, { :user => @user, :port => @port, :timeout => 6000 ,:keys => [@private_key_path]}) do
+            env.ui.info "[#{@name}] - Ssh login works , proceeding with bootstrap"
+          end
           # No bootstrap to provide
           self._bootstrap(nil,options)
 

@@ -17,12 +17,12 @@ module Mccloud
           while !connected do
             begin
               print "."
-              Net::SSH.start(ip, options[:user], { :port => options[:port] , :password => options[:password], :paranoid => false, :timeout => options[:timeout]  }) do |ssh|
+              Net::SSH.start(ip, options[:user], { :port => options[:port] , :password => options[:password], :paranoid => false, :timeout => options[:timeout] ,:keys => options[:keys] }) do |ssh|
                 block.call(ip);
                 puts ""
                 return true
               end
-            rescue Net::SSH::Disconnect,Errno::ECONNREFUSED, Errno::EHOSTUNREACH, Errno::ECONNABORTED, Errno::ECONNRESET, Errno::ENETUNREACH
+            rescue Net::SSH::AuthenticationFailed,Net::SSH::Disconnect,Errno::ECONNREFUSED, Errno::EHOSTUNREACH, Errno::ECONNABORTED, Errno::ECONNRESET, Errno::ENETUNREACH
               sleep 5
             end
           end
