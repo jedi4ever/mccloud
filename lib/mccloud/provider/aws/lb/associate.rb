@@ -24,7 +24,7 @@ module Mccloud::Provider
                 # First add new members
                 if current_members.include?(vm.id)
                   cleanup_members=cleanup_members - [ vm.id ]
-                  env.ui.info "[#{@name}] Skipping #{vm.name} - #{vm.id}"
+                  env.ui.info "[#{@name}] Skipping associate #{vm.name} - #{vm.id} as it already is a member"
                 else
                   env.ui.info "[#{@name}] Associating #{vm.name} - #{vm.id}"
                   raw.register_instances(vm.id)

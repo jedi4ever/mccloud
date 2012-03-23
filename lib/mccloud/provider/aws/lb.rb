@@ -24,7 +24,8 @@ module Mccloud::Provider
         if @raw.nil?
           rawname="#{@name}"
           #rawname="#{@provider.filter}#{@name}"
-          @raw=Fog::AWS::ELB.new({:region => provider.region}.merge(provider.options)).load_balancers.get(@name)
+          ::Fog.credential=@provider.credential
+          @raw=::Fog::AWS::ELB.new({:region => provider.region}.merge(provider.options)).load_balancers.get(@name)
           env.logger.info("LB found #{@raw}")
         end
         return @raw

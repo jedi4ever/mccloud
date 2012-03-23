@@ -38,6 +38,8 @@ module Mccloud
 
           components=self.instance_variable_get("@#{type}s")
 
+          unless components.nil?
+
           if selection.nil? || selection == "all"
             components.each do |name,component|
               if component.auto_selected?
@@ -50,6 +52,10 @@ module Mccloud
             if components.has_key?(selection)
               yield name,components[selection]
             end
+          end
+
+          else
+                env.ui.info "[#{name}] Has no components of type #{type}"
           end
         end
 

@@ -6,7 +6,7 @@ module Mccloud
       desc "associate [IP-NAME]", "Associate IP addresses"
       def associate(selection=nil)
         env.load!
-      	
+
         env.config.providers.each do |name,provider|
           env.logger.debug("Asking provider #{name} to associate to #{selection}")
           provider.on_selected_components("ip",selection) do |id,ip|
@@ -19,7 +19,7 @@ module Mccloud
       #method_options :test => :boolean
       def list(selection=nil)
         env.load!
-      	
+
           env.config.providers.each do |name,provider|
             env.logger.debug("Asking provider #{name} to list ip #{selection}")
             provider.ip_list(selection,options)
