@@ -10,8 +10,13 @@ module Mccloud
 
       desc "list", "list all known vms"
       def list
+        vms = env.config.vms.sort
         printf("%-30s|%-20s|%-10s\n","alias","provider","ip-address")
-        env.config.vms.sort.each do |name,vm|
+        80.times do 
+          print '-'
+        end
+        puts
+        vms.each do |name,vm|
           printf("%-30s|%-20s|%-10s\n",name,vm.provider.name,vm.ip_address)
         end
       end
