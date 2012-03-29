@@ -6,7 +6,7 @@ class Forwarding
   attr_accessor :namespace
 
 
-  def initialize(name,local,remote)
+  def initialize(name,remote,local)
     @name=name
     @local=local
     @remote=remote

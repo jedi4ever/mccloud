@@ -102,8 +102,8 @@ module Mccloud
         end
       end
 
-      def forward_port(name,local,remote)
-        forwarding=Forwarding.new(name,local,remote)
+      def forward_port(name,remote,local)
+        forwarding=Forwarding.new(name,remote,local)
         forwardings << forwarding
       end
 

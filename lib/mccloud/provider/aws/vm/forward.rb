@@ -4,7 +4,12 @@ module Mccloud::Provider
 
         def forward(command,options={})
           @forward_threads=Array.new
-          return self.ssh_forward(options)
+          unless raw.nil?
+            return self.ssh_forward(options)
+          else
+            env.ui.info "[#{self.name}] not yet created"
+            return [] 
+          end
         end
 
     end #module

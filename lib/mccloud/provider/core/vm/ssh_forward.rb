@@ -10,16 +10,16 @@ module Mccloud
 
         def ssh_tunnel_start(forwardings)
           unless forwardings.empty?
-            ssh_options={ :paranoid => false, :keys_only => true}
-            ssh_options[:keys]= [ @private_key_path ] unless @private_key_path.nil?
             @forward_threads<< Thread.new(self) { |vm|
               env=vm.env
               begin
+                ssh_options={ :paranoid => false, :keys_only => true}
+                ssh_options[:keys]= [ vm.private_key_path ] unless vm.private_key_path.nil?
                 Net::SSH.start(vm.ip_address, vm.user, ssh_options) do |ssh_session|
                   vm.forwardings.each do |f|
                     begin
                       env.ui.info "Forwarding remote port #{f.remote} from #{@name} to localhost port #{f.local}"
-                      ssh_session.forward.local(f.local, "127.0.0.1",f.remote)
+                      ssh_session.forward.local(f.local.to_i, vm.ip_address,f.remote.to_i)
                     rescue Errno::EACCES
                       env.ui.error "Error - Access denied to forward remote port #{f.remote} from #{@name} to localhost port #{f.local}"
                     end

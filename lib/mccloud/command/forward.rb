@@ -13,15 +13,17 @@ module Mccloud
           trap("INT") { puts "You've hit CTRL-C . Stopping server now"; exit }
           provider.on_selected_components("vm",selection) do |id,vm|
             fwds=vm.forward(options)
-            fwds.each do |f|
-              threads << f
+            unless fwds.nil?
+              fwds.each do |f|
+                threads << f
+              end
             end
+            threads.each { |thr| thr.join}
           end
+
         end
-        threads.each { |thr| thr.join}
+
       end
-
     end
-
   end
 end
