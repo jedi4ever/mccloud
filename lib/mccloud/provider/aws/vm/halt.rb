@@ -10,7 +10,11 @@ module Mccloud::Provider
           raw.wait_for { printf "."; STDOUT.flush; state=="stopped"}
           env.ui.info ""
         else
-          env.ui.info "#{@name}(#{raw.id}) is already halted."
+          unless @raw.nil?
+            env.ui.info "#{@name}(#{@raw.id}) is already halted."
+          else
+            env.ui.info "#{@name} is not yet created or was terminated"
+          end
         end
 
       end
