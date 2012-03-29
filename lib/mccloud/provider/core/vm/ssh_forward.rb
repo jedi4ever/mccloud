@@ -18,8 +18,9 @@ module Mccloud
                 Net::SSH.start(vm.ip_address, vm.user, ssh_options) do |ssh_session|
                   vm.forwardings.each do |f|
                     begin
-                      env.ui.info "Forwarding remote port #{f.remote} from #{@name} to localhost port #{f.local}"
-                      ssh_session.forward.local(f.local.to_i, vm.ip_address,f.remote.to_i)
+                      env.ui.info "Forwarding remote port #{f.remote} on #{vm.ip_address} from #{@name} to localhost port #{f.local}"
+                      ssh_session.forward.local(f.local.to_i, "127.0.0.1",f.remote.to_i)
+                      #ssh_session.forward.local(f.local.to_i, vm.ip_address,f.remote.to_i)
                     rescue Errno::EACCES
                       env.ui.error "Error - Access denied to forward remote port #{f.remote} from #{@name} to localhost port #{f.local}"
                     end
