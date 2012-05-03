@@ -36,7 +36,7 @@ Gem::Specification.new do |s|
   s.add_development_dependency "bundler", ">= 1.0.0"
   s.add_development_dependency("ruby-libvirt","~>0.4.0")
   s.add_development_dependency("vagrant","~>0.8.1")
-  s.add_dependency("rake","~>0.8.1")
+  s.add_dependency("rake","~>0.9")
 
   s.add_dependency "i18n"
 
