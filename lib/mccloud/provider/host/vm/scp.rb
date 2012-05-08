@@ -2,15 +2,15 @@ require 'net/scp'
 module Mccloud::Provider
   module Host
     module VmCommand
-         
+
       def transfer(src,dest)
         scp(src,dest)
       end
-             
-       def scp(src,dest) 
+
+       def scp(src,dest)
          Net::SCP.upload!(ip_address,@user,src,dest)
-      end 
-      
+      end
+
        end #module
       end #module
     end #module

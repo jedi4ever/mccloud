@@ -1,7 +1,7 @@
 require 'mccloud/provider/core/vm'
 
 #require 'mccloud/provider/host/vm/up'
-#require 'mccloud/provider/host/vm/bootstrap'
+require 'mccloud/provider/host/vm/bootstrap'
 require 'mccloud/provider/host/vm/ssh'
 require 'mccloud/provider/host/vm/scp'
 require 'mccloud/provider/host/vm/forward'
@@ -18,6 +18,10 @@ module Mccloud::Provider
       include Mccloud::Provider::Host::VmCommand
 
       attr_accessor :ip_address
+
+      def runnning?
+          true
+      end
 
     end
   end

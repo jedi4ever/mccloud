@@ -40,7 +40,7 @@ module Mccloud
 
         def bootstrap(selection,script,options)
           on_selected_components("vm",selection) do |id,vm|
-            vm.bootstrap(script,options)
+            vm._bootstrap(script,options)
           end
 
         end
