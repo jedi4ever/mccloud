@@ -68,7 +68,12 @@ module Mccloud::Provider
         end
       end
       def ip_address
-        return self.public_ip_address
+        # For VPC
+        ip = self.public_ip_address
+        return ip unless ip.nil?
+        ip = self.private_ip_address
+        return ip unless ip.nil?
+        return nil
       end
 
       def public_ip_address
