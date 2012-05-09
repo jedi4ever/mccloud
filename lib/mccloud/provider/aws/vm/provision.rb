@@ -6,6 +6,8 @@ module Mccloud::Provider
         unless raw.nil?
 
           if raw.ready?
+            self.share
+
             @provisioners.each do |provisioner|
               env.ui.info "[#{@name}] - starting provisioning with #{provisioner.name} as provisioner"
               provisioner.run(self)

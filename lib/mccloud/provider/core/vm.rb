@@ -48,12 +48,14 @@ module Mccloud
       attr_accessor :provisioners
 
       attr_accessor :forwardings
+      attr_accessor :shared_folders
       attr_accessor :stacked
       attr_accessor :declared
 
       def initialize(env)
         @env=env
         @forwardings=Array.new
+        @shared_folders = Array.new
         @stacked=false
         @auto_selection=true
         @declared=true
