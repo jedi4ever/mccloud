@@ -13,7 +13,7 @@ module Mccloud::Provider
          #@raw.scp(src,dest)
          scp_options[:key_data] = [@raw.private_key] if @raw.private_key
 
-         Fog::SCP.new(self.ip_address, @raw.username, scp_options).upload(local_path, remote_path, {})
+         ::Fog::SCP.new(self.ip_address, @raw.username, scp_options).upload(local_path, remote_path, {})
       end
 
        end #module
