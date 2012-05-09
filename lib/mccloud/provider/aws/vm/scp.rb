@@ -6,11 +6,14 @@ module Mccloud::Provider
         scp(src,dest)
       end
 
-       def scp(src,dest)
-         unless File.exists?(src)
-          raise Mccloud::Error,"scp failed: #{src} does not exist"
+       def scp(local_path, remote_path, upload_options = {})
+         unless File.exists?(local_path)
+          raise Mccloud::Error,"scp failed: #{local_path} does not exist"
          end
-         @raw.scp(src,dest)
+         #@raw.scp(src,dest)
+         scp_options[:key_data] = [@raw.private_key] if @raw.private_key
+
+         Fog::SCP.new(self.ip_address, @raw.username, scp_options).upload(local_path, remote_path, upload_options)
       end
 
        end #module
