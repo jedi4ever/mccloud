@@ -127,6 +127,7 @@ module Mccloud
         end
 
         def up(selection,options)
+          raise ::Mccloud::Error,"#{selection} did not match any defined vms" unless vm_defined?(selection)
           self.verify
           on_selected_components("vm",selection) do |id,vm|
             vm.up(options)
@@ -134,6 +135,7 @@ module Mccloud
         end
 
         def bootstrap(selection,script,options)
+          raise ::Mccloud::Error,"#{selection} did not match any defined vms" unless vm_defined?(selection)
           self.verify
           on_selected_components("vm",selection) do |id,vm|
             vm._bootstrap(script,options)
@@ -141,6 +143,7 @@ module Mccloud
         end
 
         def shutdown(selection,options)
+          raise ::Mccloud::Error,"#{selection} did not match any defined vms" unless vm_defined?(selection)
           self.verify
           on_selected_components("vm",selection) do |id,vm|
             vm.shutdown(options)
@@ -148,6 +151,7 @@ module Mccloud
         end
 
         def resume(selection,options)
+          raise ::Mccloud::Error,"#{selection} did not match any defined vms" unless vm_defined?(selection)
           self.verify
           on_selected_components("vm",selection) do |id,vm|
             vm.resume(options)
@@ -155,6 +159,7 @@ module Mccloud
         end
 
         def reload(selection,options)
+          raise ::Mccloud::Error,"#{selection} did not match any defined vms" unless vm_defined?(selection)
           self.verify
           on_selected_components("vm",selection) do |id,vm|
             vm.reload(options)
@@ -162,6 +167,7 @@ module Mccloud
         end
 
         def destroy(selection,options)
+          raise ::Mccloud::Error,"#{selection} did not match any defined vms" unless vm_defined?(selection)
           self.verify
           on_selected_components("vm",selection) do |id,vm|
             vm.destroy(options)
@@ -170,13 +176,19 @@ module Mccloud
         end
 
         def ssh(selection,command,options)
+          raise ::Mccloud::Error,"#{selection} did not match any defined vms" unless vm_defined?(selection)
           self.verify
           on_selected_components("vm",selection) do |id,vm|
             vm.ssh(command,options)
           end
         end
 
+        def vm_defined?(selection)
+          env.config.vms.keys.include?(selection)
+        end
+
         def package(selection,options)
+          raise ::Mccloud::Error,"#{selection} did not match any defined vms" unless vm_defined?(selection)
           self.verify
           on_selected_components("vm",selection) do |id,vm|
             vm.package(options)
@@ -184,6 +196,7 @@ module Mccloud
         end
 
         def provision(selection,options)
+          raise ::Mccloud::Error,"#{selection} did not match any defined vms" unless vm_defined?(selection)
           self.verify
           on_selected_components("vm",selection) do |id,vm|
             vm._provision(options)
@@ -191,6 +204,7 @@ module Mccloud
         end
 
         def halt(selection,options)
+          raise ::Mccloud::Error,"#{selection} did not match any defined vms" unless vm_defined?(selection)
           self.verify
           on_selected_components("vm",selection) do |id,vm|
             env.ui.info "Matched #{vm.name}"
