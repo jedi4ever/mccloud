@@ -13,7 +13,7 @@ module Mccloud
             "-p #{@port}",
             "-o UserKnownHostsFile=/dev/null",
             "-t -o StrictHostKeyChecking=no",
-            "-o IdentitiesOnly=yes",
+            #"-o IdentitiesOnly=yes",
             "-o VerifyHostKeyDNS=no",
             "-o ControlMaster=auto",
             "-o \"ControlPath=~/.ssh/master-%r@%h:%p\""
