@@ -1,6 +1,6 @@
 require 'erb'
 require 'ostruct'
-
+require 'tempfile'
 
 
 module Mccloud
@@ -88,16 +88,23 @@ module Mccloud
         cookpath="cookbook_path [\""+cooks.join("\",\"")+"\"]"
         loglevel="loglevel :debug"
         configfile=['file_cache_path "/var/chef-solo"',cookpath,loglevel]
-        server.transfer(StringIO.new(json),"/tmp/dna.json")
-        server.transfer(StringIO.new(configfile.join("\n")),"/tmp/solo.rb")
+        #convert string to Tempfile (instead of StringIO), as server.transfer expects a file with a filename
+        temp_file_json = Tempfile.new("dna_json")
+        File.open(temp_file_json,'w') { |f| f.write(json)}
+        temp_file_solo = Tempfile.new("solo_rb")
+        File.open(temp_file_solo,'w') { |f| f.write(configfile.join("\n"))}
+
+        server.transfer(temp_file_json.path,"/tmp/dna.json")
+        server.transfer(temp_file_solo.path,"/tmp/solo.rb")
 
         # Share the cookbooks
         i=0
         cookbooks_path.each do |path|
-          server.share_folder("cookbook-path-#{i}",path,"/tmp",{:mute => true})
+          server.share_folder("cookbook-path-#{i}","/tmp/" + File.basename(path),path,{:mute => true})
           i=i+1
         end
-
+		server.share
+		
         env.ui.info "[#{server.name}] - [#{@name}] - running chef-solo"
         env.ui.info "[#{server.name}] - [#{@name}] - login as #{server.user}"
         begin
