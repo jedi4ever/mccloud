@@ -2,6 +2,7 @@ require 'json'
 
 require 'i18n'
 require 'openssl'
+require 'pathname'
 
 module Mccloud
   # The source root is the path to the root directory of
