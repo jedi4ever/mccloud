@@ -8,7 +8,21 @@ module Mccloud::Provider
       end
 
        def scp(src,dest,options = {})
-         Net::SCP.upload!(ip_address,@user,src,dest,options)
+         if options[:user]
+
+           if options[:password]
+             Net::SCP.start(ip_address,options[:user],:password => options[:password]) do |auth_scp|
+               auth_scp.upload!(src,dest)
+             end
+           else
+             Net::SCP.start(ip_address,options[:user]) do |auth_scp|
+               auth_scp.upload!(src,dest)
+             end
+           end
+
+         else
+           Net::SCP.upload!(ip_address,@user,src,dest,options)
+         end
       end
 
        end #module

@@ -37,6 +37,11 @@ module Mccloud
         end
 
         def sudo(command=nil,options={})
+
+          self.execute("#{sudo_string(command,options)}",options)
+        end
+
+        def sudo_string(command=nil,options={})
           prefix="sudo -E "
 
           # Check if we override the user in the options
@@ -45,8 +50,7 @@ module Mccloud
           else
             prefix="" if options[:user] == "root"
           end
-
-          self.execute("#{prefix}#{command}",options)
+          return "#{prefix}#{command}"
         end
 
         def execute(command=nil,options={})
@@ -104,7 +108,21 @@ module Mccloud
             if command.nil? || command==""
               fg_exec(ssh_command,options)
             else
-              bg_exec(ssh_command,options)
+              unless options[:password]
+                bg_exec(ssh_command,options)
+              else
+                env.ui.info "[#{@name}] - attempting password login"
+                real_user = @user
+                real_user = options[:user] if options[:user]
+
+                if options[:user]
+                    Net::SSH.start(host_ip, real_user, :password => options[:password] ) do |ssh2|
+                        result = ssh2.exec!(command)
+                        puts result
+                    end
+                else
+                end
+              end
             end
 
           else

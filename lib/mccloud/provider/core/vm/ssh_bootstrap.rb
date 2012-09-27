@@ -14,6 +14,10 @@ module Mccloud
               options[:user] = @bootstrap_user
             end
 
+            unless @bootstrap_password.nil?
+              options[:password] = @bootstrap_password
+            end
+
             if self.running?
               scriptname=command.nil? ? @bootstrap : command
               unless scriptname.nil?
@@ -25,13 +29,14 @@ module Mccloud
                 unless !File.exists?(full_scriptname)
                   begin
                     self.transfer(full_scriptname,"/tmp/bootstrap.sh",options)
+                  rescue Net::SSH::AuthenticationFailed
+                    raise ::Mccloud::Error, "[#{@name}] - Authentication problem \n"
                   rescue Exception => ex
-                    raise ::Mccloud::Error, "[#{@name}] - Error uploading file #{full_scriptname}\n"+ex
+                    raise ::Mccloud::Error, "[#{@name}] - Error uploading file #{full_scriptname} #{ex.to_s}\n"
                   end
                   env.ui.info "[#{@name}] - Enabling the bootstrap code to run"
-                  result=self.execute("chmod +x /tmp/bootstrap.sh",options)
+                  result=self.execute("chmod +x /tmp/bootstrap.sh && #{self.sudo_string("/tmp/bootstrap.sh",options)}",options)
 
-                  self.sudo("/tmp/bootstrap.sh",options)
 
                 else
                   raise ::Mccloud::Error, "[#{@name}] - Error: bootstrap file #{scriptname} does not exist"
