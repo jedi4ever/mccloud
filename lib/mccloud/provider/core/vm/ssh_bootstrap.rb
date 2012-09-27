@@ -6,8 +6,13 @@ module Mccloud
     module Core
       module VmCommand
 
-        def ssh_bootstrap(command,options=nil)
+        def ssh_bootstrap(command,bootstrap_options=nil)
           begin
+            options = bootstrap_options.dup
+
+            unless @bootstrap_user.nil?
+              options[:user] = @bootstrap_user
+            end
 
             if self.running?
               scriptname=command.nil? ? @bootstrap : command
@@ -19,15 +24,12 @@ module Mccloud
 
                 unless !File.exists?(full_scriptname)
                   begin
-                    self.scp(full_scriptname,"/tmp/bootstrap.sh")
+                    self.transfer(full_scriptname,"/tmp/bootstrap.sh",options)
                   rescue Exception => ex
                     raise ::Mccloud::Error, "[#{@name}] - Error uploading file #{full_scriptname}\n"+ex
                   end
                   env.ui.info "[#{@name}] - Enabling the bootstrap code to run"
-                  result=self.ssh("chmod +x /tmp/bootstrap.sh")
-
-                  #sudo_cmd="sudo"
-                  #sudo_cmd=options["sudo"] unless options["sudo"].nil?
+                  result=self.execute("chmod +x /tmp/bootstrap.sh",options)
 
                   self.sudo("/tmp/bootstrap.sh",options)
 

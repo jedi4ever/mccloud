@@ -27,14 +27,25 @@ module Mccloud
           end
           commandline_options="#{command_options.join(" ")} ".strip
 
-          user_option=@user.nil? ? "" : "-l #{@user}"
+          unless options[:user]
+            user_option=@user.nil? ? "" : "-l #{@user}"
+          else
+            user_option=@user.nil? ? "" : "-l #{options[:user]}"
+          end
 
           return "#{commandline_options} #{user_option}"
         end
 
         def sudo(command=nil,options={})
           prefix="sudo -E "
-          prefix="" if self.user == "root"
+
+          # Check if we override the user in the options
+          unless options[:user]
+            prefix="" if self.user == "root"
+          else
+            prefix="" if options[:user] == "root"
+          end
+
           self.execute("#{prefix}#{command}",options)
         end
 

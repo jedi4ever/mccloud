@@ -3,12 +3,12 @@ module Mccloud::Provider
   module Host
     module VmCommand
 
-      def transfer(src,dest)
-        scp(src,dest)
+      def transfer(src,dest,options = {})
+        scp(src,dest,options)
       end
 
-       def scp(src,dest)
-         Net::SCP.upload!(ip_address,@user,src,dest)
+       def scp(src,dest,options = {})
+         Net::SCP.upload!(ip_address,@user,src,dest,options)
       end
 
        end #module

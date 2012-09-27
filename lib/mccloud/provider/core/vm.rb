@@ -45,6 +45,8 @@ module Mccloud
       attr_accessor :auto_selection
 
       attr_accessor :bootstrap
+      attr_accessor :bootstrap_user
+      attr_accessor :bootstrap_password
       attr_accessor :provisioners
 
       attr_accessor :forwardings
