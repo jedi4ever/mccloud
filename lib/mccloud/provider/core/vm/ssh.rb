@@ -8,11 +8,11 @@ module Mccloud
         def ssh_commandline_options(options)
 
           command_options = [
-            #"-q", #Suppress warning messages
-            #            "-T", #Pseudo-terminal will not be allocated because stdin is not a terminal.
+            "-q", #Suppress warning messages
+             #           "-T", #Pseudo-terminal will not be allocated because stdin is not a terminal.
             "-p #{@port}",
             "-o UserKnownHostsFile=/dev/null",
-            "-t -o StrictHostKeyChecking=no",
+            "-o StrictHostKeyChecking=no",
             #"-o IdentitiesOnly=yes",
             "-o VerifyHostKeyDNS=no",
             "-o ControlMaster=auto",
@@ -61,7 +61,8 @@ module Mccloud
           pid = fork if Mccloud::Util::Platform.leopard? || Mccloud::Util::Platform.tiger?
 
           env.logger.info "Executing internal ssh command"
-          env.logger.info ssh_command
+          # Add terminal
+          env.logger.info ssh_command+" -t"
           Kernel.exec ssh_command if pid.nil?
           Process.wait(pid) if pid
         end
