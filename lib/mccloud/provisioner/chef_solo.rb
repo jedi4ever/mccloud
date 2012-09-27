@@ -17,10 +17,12 @@ module Mccloud
       attr_reader   :env
 
       attr_accessor :cookbooks_path
-      attr_accessor :role_path
+      attr_accessor :roles_path
       attr_accessor :provisioning_path
+      attr_accessor :data_bags_path
       attr_accessor :json
       attr_accessor :json_erb
+      attr_accessor :clean_after_run
       attr_reader   :roles
 
       attr_accessor :node_name
@@ -41,6 +43,7 @@ module Mccloud
         @name ="chef_solo"
         @log_level="info"
         @cookbooks_path =  []
+        @clean_after_run = true
       end
 
       def mccloudconfig_to_json
@@ -86,15 +89,22 @@ module Mccloud
         @cookbooks_path.each do |cook|
           cooks << File.join("/tmp/"+File.basename(cook))
         end
-        cookpath="cookbook_path [\""+cooks.join("\",\"")+"\"]"
-        loglevel="loglevel :debug"
-        configfile=['file_cache_path "/var/chef-solo"',cookpath,loglevel]
+
+        # Prepare solo.rb
+        configfile=['file_cache_path "/var/chef-solo"']
+        configfile << "cookbook_path [\""+cooks.join("\",\"")+"\"]"
+        configfile << "loglevel :debug"
+        configfile << "role_path \"/tmp/#{File.basename(roles_path)}\"" unless roles_path.nil?
+        configfile << "data_bag_path \"/tmp/#{File.basename(data_bags_path)}\"" unless data_bags_path.nil?
 
         #convert string to Tempfile (instead of StringIO), as server.transfer expects a file with a filename
         temp_file_json = Tempfile.new("dna_json")
         temp_file_json.write(json)
+        temp_file_json.close
+
         temp_file_solo = Tempfile.new("solo_rb")
         temp_file_solo.write(configfile.join("\n"))
+        temp_file_solo.close
 
         server.transfer(temp_file_json.path,"/tmp/dna.json")
         server.transfer(temp_file_solo.path,"/tmp/solo.rb")
@@ -102,9 +112,18 @@ module Mccloud
         # Share the cookbooks
         i=0
         cookbooks_path.each do |path|
-          server.share_folder("cookbook-path-#{i}","/tmp/" + File.basename(path),path,{:mute => true})
+          server.share_folder("cookbook_path-#{i}","/tmp/" + File.basename(path),path,{:mute => true})
           i=i+1
         end
+
+        unless roles_path.nil?
+          server.share_folder("roles_path","/tmp/" + File.basename(roles_path),roles_path,{:mute => true})
+        end
+
+        unless data_bags_path.nil?
+          server.share_folder("databags_path","/tmp/" + File.basename(data_bags_path),data_bags_path,{:mute => true})
+        end
+
         server.share
 
         env.ui.info "[#{server.name}] - [#{@name}] - running chef-solo"
@@ -119,15 +138,26 @@ module Mccloud
           end
         rescue Exception
         ensure
-          env.ui.info "[#{server.name}] - [#{@name}] - Cleaning up dna.json"
-          server.execute("rm /tmp/dna.json",{:mute => true})
-          env.ui.info "[#{server.name}] - [#{@name}] - Cleaning up solo.json"
-          server.execute("rm /tmp/solo.rb", {:mute => true})
-          cookbooks_path.each do |path|
-            env.ui.info "[#{server.name}] - [#{@name}] - Cleaning cookbook_path #{path}"
-            server.execute("rm -rf /tmp/#{File.basename(path)}",{:mute => true})
-          end
+          if @clean_after_run == true
+            env.ui.info "[#{server.name}] - [#{@name}] - Cleaning up dna.json"
+            server.execute("rm /tmp/dna.json",{:mute => true})
+            env.ui.info "[#{server.name}] - [#{@name}] - Cleaning up solo.json"
+            server.execute("rm /tmp/solo.rb", {:mute => true})
+            cookbooks_path.each do |path|
+              env.ui.info "[#{server.name}] - [#{@name}] - Cleaning cookbook_path #{path}"
+              server.execute("rm -rf /tmp/#{File.basename(path)}",{:mute => true})
+            end
 
+            unless roles_path.nil?
+                env.ui.info "[#{server.name}] - [#{@name}] - Cleaning roles_path #{roles_path}"
+                server.execute("rm -rf /tmp/#{File.basename(roles_path)}",{:mute => true})
+            end
+
+            unless data_bags_path.nil?
+                env.ui.info "[#{server.name}] - [#{@name}] - Cleaning data_bags_path #{data_bags_path}"
+                server.execute("rm -rf /tmp/#{File.basename(data_bags_path)}",{:mute => true})
+            end
+          end
         end
 
         #Cleaning up
@@ -159,11 +189,12 @@ module Mccloud
           :https_proxy => config.https_proxy,
           :https_proxy_user => config.https_proxy_user,
           :https_proxy_pass => config.https_proxy_pass,
+          :data_bag_path => config.data_bag_path,
+          :roles_path => config.roles_path,
           :no_proxy => config.no_proxy
         }.merge(template_vars))
 
         # file_cache_path "/var/chef-solo"
-        # cookbook_path "/var/chef-solo/cookbooks"
 
         #server.execute.upload!(StringIO.new(config_file), File.join(config.provisioning_path, filename))
       end
@@ -177,7 +208,7 @@ module Mccloud
 
       def prepare
         share_cookbook_folders
-        share_role_folders
+        share_role_folder
       end
 
       def provision!
@@ -194,9 +225,9 @@ module Mccloud
         end
       end
 
-      def share_role_folders
-        host_role_paths.each_with_index do |role, i|
-          env.config.vm.share_folder("v-csr-#{i}", role_path(i), role)
+      def share_role_folder
+        host_roles_path.each_with_index do |role, i|
+          env.config.vm.share_folder("v-csr-#{i}", roles_path(i), role)
         end
       end
 
@@ -208,12 +239,12 @@ module Mccloud
           :log_level        => :debug,
           :recipe_url => config.recipe_url,
           :roles_path => roles_path,
+          :data_bags_path => data_bags_path,
         })
       end
       def run_chef_solo
         commands = ["cd #{config.provisioning_path}", "chef-solo -c solo.rb -j dna.json"]
 
-        env.ui.info I18n.t("vagrant.provisioners.chef.running_solo")
         server.execute.execute do |execute|
           execute.sudo!(commands) do |channel, type, data|
             if type == :exit_status
