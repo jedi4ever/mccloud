@@ -93,7 +93,7 @@ module Mccloud
         # Prepare solo.rb
         configfile=['file_cache_path "/var/chef-solo"']
         configfile << "cookbook_path [\""+cooks.join("\",\"")+"\"]"
-        configfile << "loglevel :debug"
+        configfile << "log_level #{log_level}"
         configfile << "role_path \"/tmp/#{File.basename(roles_path)}\"" unless roles_path.nil?
         configfile << "data_bag_path \"/tmp/#{File.basename(data_bags_path)}\"" unless data_bags_path.nil?
 
