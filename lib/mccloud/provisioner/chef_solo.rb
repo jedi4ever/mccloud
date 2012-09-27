@@ -40,6 +40,7 @@ module Mccloud
         @json_erb=true
         @name ="chef_solo"
         @log_level="info"
+        @cookbooks_path =  []
       end
 
       def mccloudconfig_to_json
@@ -88,11 +89,12 @@ module Mccloud
         cookpath="cookbook_path [\""+cooks.join("\",\"")+"\"]"
         loglevel="loglevel :debug"
         configfile=['file_cache_path "/var/chef-solo"',cookpath,loglevel]
+
         #convert string to Tempfile (instead of StringIO), as server.transfer expects a file with a filename
         temp_file_json = Tempfile.new("dna_json")
-        File.open(temp_file_json,'w') { |f| f.write(json)}
+        temp_file_json.write(json)
         temp_file_solo = Tempfile.new("solo_rb")
-        File.open(temp_file_solo,'w') { |f| f.write(configfile.join("\n"))}
+        temp_file_solo.write(configfile.join("\n"))
 
         server.transfer(temp_file_json.path,"/tmp/dna.json")
         server.transfer(temp_file_solo.path,"/tmp/solo.rb")
@@ -103,8 +105,8 @@ module Mccloud
           server.share_folder("cookbook-path-#{i}","/tmp/" + File.basename(path),path,{:mute => true})
           i=i+1
         end
-		server.share
-		
+        server.share
+
         env.ui.info "[#{server.name}] - [#{@name}] - running chef-solo"
         env.ui.info "[#{server.name}] - [#{@name}] - login as #{server.user}"
         begin
@@ -141,11 +143,11 @@ module Mccloud
       end
       def add_role(name)
         name = "role[#{name}]" unless name =~ /^role\[(.+?)\]$/
-          run_list << name
+        run_list << name
       end
       def add_recipe(name)
         name = "recipe[#{name}]" unless name =~ /^recipe\[(.+?)\]$/
-          run_list << name
+        run_list << name
       end
 
       def setup_config(template, filename, template_vars)
