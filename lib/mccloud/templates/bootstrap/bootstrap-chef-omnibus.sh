@@ -2,7 +2,7 @@
 
 # download omnibus install.sh
 if which curl 2>/dev/null; then
-    curl -L http://opscode.com/chef/install.sh | sudo bash
+    curl -L https://www.opscode.com/chef/install.sh | sudo bash
 else
-    wget -q -O - http://opscode.com/chef/install.sh | sudo bash
+    wget -q -O - https://www.opscode.com/chef/install.sh | sudo bash
 fi
