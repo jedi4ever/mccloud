@@ -10,6 +10,7 @@ module Mccloud
           command_options = [
             "-q", #Suppress warning messages
              #           "-T", #Pseudo-terminal will not be allocated because stdin is not a terminal.
+            "-t",
             "-p #{@port}",
             "-o UserKnownHostsFile=/dev/null",
             "-o StrictHostKeyChecking=no",
