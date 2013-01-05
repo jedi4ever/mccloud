@@ -1,11 +1,11 @@
 module Mccloud::Provider
-  module Virtualbox
+  module Vagrant
     module VmCommand
 
         def reload(command,options={})
-            Vagrant::CLI.start(["reload"],:env => @provider.raw)
+            self.provider.raw.cli(['reload',name])
         end
- 
+
     end #module
   end #module
 end #module

@@ -1,11 +1,11 @@
-require 'mccloud/provider/virtualbox/provider/status'
-require 'mccloud/provider/virtualbox/vm'
-require 'mccloud/provider/fog/provider'
+require 'mccloud/provider/vagrant/provider/status'
+require 'mccloud/provider/vagrant/vm'
+require 'vagrant'
 
 module Mccloud
   module Provider
-    module Virtualbox
-      class Provider  < ::Mccloud::Provider::Fog::Provider
+    module Vagrant
+      class Provider  < ::Mccloud::Provider::Core::Provider
 
         attr_accessor :name
         attr_accessor :flavor
@@ -14,7 +14,7 @@ module Mccloud
 
         attr_accessor :vms
 
-        include Mccloud::Provider::Virtualbox::ProviderCommand
+        include Mccloud::Provider::Vagrant::ProviderCommand
 
 
         def initialize(name,options,env)
@@ -30,6 +30,7 @@ module Mccloud
           require 'vagrant'
           require 'vagrant/cli'
 
+
         end
 
         #We use this to get access to the logger attribute
@@ -42,7 +43,7 @@ module Mccloud
         def raw
           if @raw.nil?
             begin
-              @raw=LogEnvironment.new(:cwd => ".")
+              @raw=LogEnvironment.new(:cwd => ".",:ui_class => ::Vagrant::UI::Colored)
               require 'logger'
               vlogger=::Logger.new(STDOUT)
               vlogger.formatter=Proc.new do |severity, datetime, progname, msg|
@@ -83,6 +84,14 @@ module Mccloud
 
         end
 
+        def reload(selection,options)
+
+          on_selected_components("vm",selection) do |id,vm|
+            vm.reload(options)
+          end
+
+        end
+
         def ssh(selection,command,options)
 
           on_selected_components("vm",selection) do |id,vm|
@@ -90,10 +99,6 @@ module Mccloud
           end
 
         end
-
-
-        end
-
 
         def provision(selection,options)
 
@@ -111,7 +116,11 @@ module Mccloud
 
         end
 
+
       end
+
+
+
     end
   end
 end
