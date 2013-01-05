@@ -184,6 +184,10 @@ Currently only used by aws provider. Allows you to define multiple keystores for
 ### Core vm
 
     vm_config.vm.share_folder("somename", "/source/inthemachinepath", "localmachinepath")
+    vm_config.vm.bootstrap = "somescript"
+    vm_config.vm.bootstrap_user = "root"
+    vm_config.vm.bootstrap_password = "blabla"
+    vm_config.vm.user = "ubuntu"
 
 ### AWS vm
 
@@ -238,6 +242,10 @@ Currently only used by aws provider. Allows you to define multiple keystores for
 ### Vmfusion
 
 ## Provisioners
+
+You can use multiple provisioners per vm
+
+
 ### Puppet apply provisioner
 
     vm_config.vm.provision :puppet do |puppet|
@@ -250,6 +258,45 @@ Currently only used by aws provider. Allows you to define multiple keystores for
     end
 
 ### Chef-solo provisioner
+
+     # Read chef solo nodes files
+     require 'chef'
+     nodes = []
+     Dir["data_bags/node/*.json"].each do |n|
+           nodes << JSON.parse(IO.read(n))
+     end
+
+     nodes.each do |n|
+       config.vm.define n.name do |vm_config|
+         vm_config.vm.provider   = "host"
+         vm_config.vm.ip_address = n.automatic_attrs[:ipaddress]
+         vm_config.vm.user       = n.automatic_attrs[:sudo_user]
+
+         vm_config.vm.bootstrap  = File.join("bootstrap","bootstrap-#{n.automatic_attrs[:platform]}.sh")
+         vm_config.vm.bootstrap_user  = n.automatic_attrs[:bootstrap_user]
+         vm_config.vm.bootstrap_password  = n.automatic_attrs[:bootstrap_password]
+
+         vm_config.vm.provision :chef_solo do |chef|
+          chef.cookbooks_path = [ "cookbooks", "site-cookbooks" ]
+          chef.roles_path = "roles"
+          chef.data_bags_path = "data_bags"
+          chef.clean_after_run = false
+
+          chef.json.merge!(n.default_attrs)
+          chef.json.merge!(n.automatic_attrs)
+          chef.json.merge!(n.override_attrs)
+
+          chef.add_role n.chef_environment
+          chef.add_role n.automatic_attrs[:platform]
+
+          n.run_list.run_list_items.each do |r|
+            chef.add_role r.name if r.type == :role
+            chef.add_recipe r.name if r.type == :recipe
+          end
+        end #end provisioner
+
+      end #end vm define
+    end # nodes.each
 
 ### Shell provisioner
 
