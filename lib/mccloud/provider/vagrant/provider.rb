@@ -92,6 +92,14 @@ module Mccloud
 
         end
 
+        def suspend(selection,options)
+
+          on_selected_components("vm",selection) do |id,vm|
+            vm.suspend(options)
+          end
+
+        end
+
         def ssh(selection,command,options)
 
           on_selected_components("vm",selection) do |id,vm|
@@ -110,12 +118,13 @@ module Mccloud
 
         def halt(selection,options)
           on_selected_components("vm",selection) do |id,vm|
-            env.ui.info  "Matched #{vm.name}"
             vm.halt(options)
           end
 
         end
 
+
+        end
 
       end
 
