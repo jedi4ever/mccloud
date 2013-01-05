@@ -181,9 +181,13 @@ Currently only used by aws provider. Allows you to define multiple keystores for
     end
 
 ## VM definitons
+### Core vm
+
+    vm_config.vm.share_folder("somename", "/source/inthemachinepath", "localmachinepath")
+
 ### AWS vm
 
-   config.vm.define "demo" do |config|
+    config.vm.define "demo" do |config|
      config.vm.provider="aws-eu-west"
      config.vm.ami="ami-e59ca991"
      config.vm.flavor="t1.micro"
@@ -194,7 +198,7 @@ Currently only used by aws provider. Allows you to define multiple keystores for
      config.vm.bootstrap="definitions/ubuntu/bootstrap-ubuntu-system.sh"
      config.vm.private_key_path="keys/mccloud_rsa"
      config.vm.public_key_path="keys/mccloud_rsa.pub"
-   end
+    end
 
 ### Vagrant vm
 
@@ -215,8 +219,6 @@ Currently only used by aws provider. Allows you to define multiple keystores for
 
 ### KVM vm
 
-
-
     config.vm.define "backend" do |config|
      config.vm.provider="juno-libvirt"
 
@@ -235,9 +237,17 @@ Currently only used by aws provider. Allows you to define multiple keystores for
 
 ### Vmfusion
 
-
 ## Provisioners
 ### Puppet apply provisioner
+
+    vm_config.vm.provision :puppet do |puppet|
+      puppet_flags = "--verbose --show_diff"
+      puppet.manifest_file = "site.pp"
+      puppet.pp_path = "/var/tmp/puppet"
+      puppet.manifests_path = "puppet/manifests"
+      puppet.module_path = [ "puppet/modules" ,"puppet/my-modules"]
+      puppet.options = puppet_flags
+    end
 
 ### Chef-solo provisioner
 
