@@ -22,6 +22,10 @@ module Mccloud
       @raw.send(m,*args)
     end
 
+    def valid?
+      File.exists?(self.definition_path)
+    end
+
     def exists?
       File.directory?(self.path)
     end
@@ -57,6 +61,7 @@ module Mccloud
     def validate
       raise ::Mccloud::Error, "Definition #{@name} does not yet exist" unless self.exists?
     end
+
 
     def copy_template(templatename)
       raise ::Mccloud::Error, "Definition #{@name} already exists" if self.exists?
