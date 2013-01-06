@@ -25,8 +25,10 @@ Kudos to the authors!
 
 ## Why not in vagrant?
 
+NOTE: mccloud is meant to be complementary to vagrant - we truely love @mitchellh
+
 - Main reason - this code has been around way before there was discussion on vagrant new providers
-- Companies are using it now as it support EC2, KVM, scripts, NOW
+- Companies are using it now as it supports EC2, KVM, scripts, NOW
 - Vagrant is (currently) focused on desktop vm types only - this extends it to server based cloud solution
 - Once providers are available in vagrant, you can easily switch: the effort is not in the Mccloudfile or Vagrantfile syntax but in the provisioning
 - Vagrant moves away from the 'gem ' support and targets fat installers - I need this code available as a library
@@ -164,6 +166,10 @@ Usefull if your cloud doesn't have an ip, but you can create start,stop, etc... 
     end
 
 ### Provider kvm
+
+this works together with veewee that support creating kvm template machines.
+Like on vagrant, mccloud clones a veewee created vm 
+
     config.provider.define "kvm-libvirt" do |config|
       config.provider.type=:libvirt
       config.provider.options={ :libvirt_uri => "qemu+ssh://ubuntu@kvmbox/system" }
@@ -215,15 +221,18 @@ TODO
 ## VM definitions
 ### Core vm
 
+Sharing of files is done over rsync because cloud based architectures don't have the ability to mount local folders
+
     vm_config.vm.share_folder("somename", "/source/inthemachinepath", "localmachinepath")
+
     vm_config.vm.bootstrap = "somescript"
     vm_config.vm.bootstrap_user = "root"
     vm_config.vm.bootstrap_password = "blabla"
     vm_config.vm.user = "ubuntu"
 
     vm_config.vm.name
-    vm_config.vm.user
     vm_config.vm.port
+
     vm_config.vm.private_key_path
     vm_config.vm.public_key_path
     vm_config.vm.agent_forwarding
