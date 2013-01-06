@@ -201,19 +201,19 @@ Currently only used by aws provider. Allows you to define multiple keystores for
 
 ## IP definitions
 
-   config.ip.define "ip-demo1" do |config|
-  config.ip.provider="aws-eu-west"
-  config.ip.address="46.137.72.170"
-  config.ip.vmname = "aws-demo1"
-end
+    config.ip.define "ip-demo1" do |config|
+      config.ip.provider="aws-eu-west"
+      config.ip.address="46.137.72.170"
+      config.ip.vmname = "aws-demo1"
+    end
 
 ## LB definitions
 
- config.lb.define "mccloud-development-patrick-lb" do |config|
-   config.lb.provider="aws-eu-west"
-   config.lb.members=["aws-demo2","aws-demo1"]
-   config.lb.sorry_members=["aws-demo2"]
- end
+    config.lb.define "mccloud-development-patrick-lb" do |config|
+     config.lb.provider="aws-eu-west"
+     config.lb.members=["aws-demo2","aws-demo1"]
+     config.lb.sorry_members=["aws-demo2"]
+    end
 
 ## Template/definitions
 TODO
@@ -449,37 +449,38 @@ Some functions are there in the CLI, but they are left overs from previous codin
 ### Mostly working
 Tasks:
 
- mccloud version                      # Prints the Mccloud version information
+    mccloud version                      # Prints the Mccloud version information
 
- mccloud bootstrap [NAME] [FILENAME]  # Executes the bootstrap sequence
- mccloud destroy [NAME]               # Destroys the machine
- mccloud forward [NAME]               # Forwards ports from a machine to localhost
- mccloud halt [NAME]                  # Shutdown the machine
- mccloud help [TASK]                  # Describe available tasks or one specific task
- mccloud image                        # Subcommand to manage images
- mccloud up [NAME]                    # Starts the machine and provisions it
- mccloud provision [NAME]             # Provisions the machine
- mccloud reload [NAME]                # Reboots the machine
- mccloud ssh [NAME] [COMMAND]         # Ssh-shes into the box
- mccloud status [name]                # Shows the status of the current Mccloud environment
+    mccloud bootstrap [NAME] [FILENAME]  # Executes the bootstrap sequence
+    mccloud destroy [NAME]               # Destroys the machine
+    mccloud forward [NAME]               # Forwards ports from a machine to localhost
+    mccloud halt [NAME]                  # Shutdown the machine
+    mccloud help [TASK]                  # Describe available tasks or one specific task
+    mccloud image                        # Subcommand to manage images
+    mccloud up [NAME]                    # Starts the machine and provisions it
+    mccloud provision [NAME]             # Provisions the machine
+    mccloud reload [NAME]                # Reboots the machine
+    mccloud ssh [NAME] [COMMAND]         # Ssh-shes into the box
+    mccloud status [name]                # Shows the status of the current Mccloud environment
 
- mccloud lb                           # Subcommand to manage Loadbalancers
- mccloud balance [LB-NAME]            # Balances loadbalancers
- mccloud sorry [LB-NAME]              # Puts loadbalancers in a sorry state
+    mccloud lb                           # Subcommand to manage Loadbalancers
+    mccloud balance [LB-NAME]            # Balances loadbalancers
+    mccloud sorry [LB-NAME]              # Puts loadbalancers in a sorry state
 
- mccloud ip                           # Subcommand to manage IP's
- mccloud ips [NAME]                   # Associate IP addresses
+    mccloud ip                           # Subcommand to manage IP's
+    mccloud ips [NAME]                   # Associate IP addresses
 
 ### Experimental/Not checked
- mccloud define NAME TEMPLATE-NAME    # Creates a new definition based on a tempate
- mccloud init                         # Initializes a new Mccloud project
 
- mccloud keypair                      # Subcommand to manage keypairs
- mccloud keystore                     # Subcommand to manage keystores
+    mccloud define NAME TEMPLATE-NAME    # Creates a new definition based on a tempate
+    mccloud init                         # Initializes a new Mccloud project
 
- mccloud package [NAME]               # Packages the machine
- mccloud template                     # Subcommand to manage templates
- mccloud vm                           # Subcommand to manage vms
+    mccloud keypair                      # Subcommand to manage keypairs
+    mccloud keystore                     # Subcommand to manage keystores
+
+    mccloud package [NAME]               # Packages the machine
+    mccloud template                     # Subcommand to manage templates
+    mccloud vm                           # Subcommand to manage vms
 
 
 # DISCLAIMER:
