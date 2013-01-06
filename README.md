@@ -23,6 +23,19 @@ Without the following opensource software this would not be that awesome!
 
 Kudos to the authors!
 
+## Why not in vagrant?
+
+- Main reason - this code has been around way before there was discussion on vagrant new providers
+- Companies are using it now as it support EC2, KVM, scripts, NOW
+- Vagrant is (currently) focused on desktop vm types only - this extends it to server based cloud solution
+- Once providers are available in vagrant, you can easily switch: the effort is not in the Mccloudfile or Vagrantfile syntax but in the provisioning
+- Vagrant moves away from the 'gem ' support and targets fat installers - I need this code available as a library
+- Vagrant new setup requires root to be installed - not what I want
+- Vagrant builder (might) replace veewee with new setup - I want to continue working with it now
+
+Bottom line - if vagrant has the new plugin architecture going and documented I'm happy to review again
+
+
 # Installation
 ## Requirements
 
@@ -180,7 +193,26 @@ Currently only used by aws provider. Allows you to define multiple keystores for
       ]
     end
 
-## VM definitons
+## IP definitions
+
+   config.ip.define "ip-demo1" do |config|
+  config.ip.provider="aws-eu-west"
+  config.ip.address="46.137.72.170"
+  config.ip.vmname = "aws-demo1"
+end
+
+## LB definitions
+
+ config.lb.define "mccloud-development-patrick-lb" do |config|
+   config.lb.provider="aws-eu-west"
+   config.lb.members=["aws-demo2","aws-demo1"]
+   config.lb.sorry_members=["aws-demo2"]
+ end
+
+## Template/definitions
+TODO
+
+## VM definitions
 ### Core vm
 
     vm_config.vm.share_folder("somename", "/source/inthemachinepath", "localmachinepath")
@@ -189,7 +221,27 @@ Currently only used by aws provider. Allows you to define multiple keystores for
     vm_config.vm.bootstrap_password = "blabla"
     vm_config.vm.user = "ubuntu"
 
+    vm_config.vm.name
+    vm_config.vm.user
+    vm_config.vm.port
+    vm_config.vm.private_key_path
+    vm_config.vm.public_key_path
+    vm_config.vm.agent_forwarding
+    vm_config.vm.autoselection
+    vm_config.vm.bootstrap
+    vm_config.vm.bootstrap_user
+    vm_config.vm.bootstrap_password
+
+    vm_config.vm.forward_port
+
 ### AWS vm
+
+    vm.ami
+    vm.key_name
+    vm.security_groups = Array
+    vm.user_data
+    vm.flavor
+    vm.user
 
     config.vm.define "demo" do |config|
      config.vm.provider="aws-eu-west"
@@ -203,6 +255,37 @@ Currently only used by aws provider. Allows you to define multiple keystores for
      config.vm.private_key_path="keys/mccloud_rsa"
      config.vm.public_key_path="keys/mccloud_rsa.pub"
     end
+
+
+this is the way we are currently mounting EBS Volumes with Mccloud.
+For attaching an EBS volume created from a Snaphot;
+
+      # see http://fog.io/1.1.2/rdoc/Fog/Compute/AWS/Servers.html
+      # and https://github.com/fog/fog/blob/v1.1.2/lib/fog/aws/requests/compute/run_instances.rb
+      config.vm.create_options = {
+        :block_device_mapping => [
+          { "DeviceName" => "/dev/sdf", "Ebs.SnapshotId" =>
+  "snap-d056d786", "Ebs.DeleteOnTermination" => true }
+        ]
+      }
+
+Or, for attaching a newly created EBS volume:
+
+    config.vm.create_options = {
+    :block_device_mapping => [
+    { "DeviceName" => "/dev/sdf", "Ebs.VolumeSize" => "100",
+    "Ebs.DeleteOnTermination" => false }
+    ]
+    }
+
+The mounting we then do our provision.sh script:
+
+      echo "/dev/sdf1 /mnt/ebs ext4 defaults 0 0" >> /etc/fstab
+      mkdir -p /mnt/ebs
+      mount -a
+
+
+### Fog vm
 
 ### Vagrant vm
 
@@ -248,6 +331,12 @@ You can use multiple provisioners per vm
 
 ### Puppet apply provisioner
 
+    manifest_file
+    manifest_path
+    module_paths = Array
+    pp_path
+    options
+
     vm_config.vm.provision :puppet do |puppet|
       puppet_flags = "--verbose --show_diff"
       puppet.manifest_file = "site.pp"
@@ -258,6 +347,20 @@ You can use multiple provisioners per vm
     end
 
 ### Chef-solo provisioner
+
+    cookbooks_path
+    roles_path
+    provisioning_path
+    data_bags_path
+    json
+    json_erb
+    clean_after_run
+    roles
+
+    mccloud server is added to json
+
+    add_role(name)
+    add_recipe(name)
 
      # Read chef solo nodes files
      require 'chef'
@@ -298,38 +401,77 @@ You can use multiple provisioners per vm
       end #end vm define
     end # nodes.each
 
+
+     # Using ips in erb json
+     chef.json.merge!({
+       :logger => {
+                :redis_host_ip => "<%= private_ips['frontend'] %>"
+            }
+     })
+
+     # Defining a default node
+      def default_node(chef)
+        chef.add_recipe("ntp")
+        chef.add_recipe("timezone")
+        chef.json.merge!({
+          :nagios_host_ip => "<%= private_ips['monitoring'] %>",
+          :ruby => {
+          :version => "1.9.2",
+          :patch_level => "p180"}}
+        })
+      end
+
 ### Shell provisioner
+
+option command.sudo = true|false
 
       config.vm.provision :shell do |command|
         command.inline="uptime"
       end
-    end
+
+      config.vm.provision :shell do |command|
+        command.path="script.sh"
+      end
 
 ## Usage
 
-### Check the status
-$ mccloud status
+Some functions are there in the CLI, but they are left overs from previous coding sessions.
 
-### Bootstrap the machine
-$ mccloud bootstrap web
+### Mostly working
+Tasks:
 
-### (interactive) Login into the machine
-$ mccloud ssh web
+ mccloud version                      # Prints the Mccloud version information
 
-### Halt the machine
-$ mccloud halt web
+ mccloud bootstrap [NAME] [FILENAME]  # Executes the bootstrap sequence
+ mccloud destroy [NAME]               # Destroys the machine
+ mccloud forward [NAME]               # Forwards ports from a machine to localhost
+ mccloud halt [NAME]                  # Shutdown the machine
+ mccloud help [TASK]                  # Describe available tasks or one specific task
+ mccloud image                        # Subcommand to manage images
+ mccloud up [NAME]                    # Starts the machine and provisions it
+ mccloud provision [NAME]             # Provisions the machine
+ mccloud reload [NAME]                # Reboots the machine
+ mccloud ssh [NAME] [COMMAND]         # Ssh-shes into the box
+ mccloud status [name]                # Shows the status of the current Mccloud environment
 
-### Start the machine again
-$ mccloud up web
+ mccloud lb                           # Subcommand to manage Loadbalancers
+ mccloud balance [LB-NAME]            # Balances loadbalancers
+ mccloud sorry [LB-NAME]              # Puts loadbalancers in a sorry state
 
-### Provision the machine
-$ mccloud provision web
+ mccloud ip                           # Subcommand to manage IP's
+ mccloud ips [NAME]                   # Associate IP addresses
 
-### Port forwarding server
-$ mccloud server
+### Experimental/Not checked
+ mccloud define NAME TEMPLATE-NAME    # Creates a new definition based on a tempate
+ mccloud init                         # Initializes a new Mccloud project
 
-### Destroy the machine again
-$ mccloud destroy web
+ mccloud keypair                      # Subcommand to manage keypairs
+ mccloud keystore                     # Subcommand to manage keystores
+
+ mccloud package [NAME]               # Packages the machine
+ mccloud template                     # Subcommand to manage templates
+ mccloud vm                           # Subcommand to manage vms
+
 
 # DISCLAIMER:
 this is eternal beta sofware . Don't trust it:) And don't complain if it removes all your EC instances at once....
