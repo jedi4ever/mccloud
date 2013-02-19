@@ -20,6 +20,21 @@ module Mccloud::Provider
         rsync(clean_src_path,dest,options)
       end
 
+      def windows_client?
+        ::Mccloud::Util::Platform.windows?
+      end
+
+      # cygwin rsync path must be adjusted to work
+      def adjust_rsync_path(path)
+        return path unless windows_client?
+        path.gsub(/^(\w):/) { "/cygdrive/#{$1}" }
+      end
+
+      # see http://stackoverflow.com/questions/5798807/rsync-permission-denied-created-directories-have-no-permissions
+      def rsync_permissions
+        '--chmod=ugo=rwX' if windows_client?
+      end
+
       # http://blade.nagaokaut.ac.jp/cgi-bin/scat.rb/ruby/ruby-talk/185404
       # This should work on windows too now
       # This will result in a ShellResult structure with stdout, stderr and status
@@ -40,7 +55,7 @@ module Mccloud::Provider
             exit -1
           end
 
-          command="rsync --exclude '.DS_Store' --exclude '.hg' --exclude '.git' #{mute} --delete-excluded --delete  -az -e 'ssh #{ssh_commandline_options(options)}' '#{src}' '#{@user}@#{self.ip_address}:#{dest_path}'"
+          command="rsync #{rsync_permissions} --exclude '.DS_Store' --exclude '.hg' --exclude '.git' #{mute} --delete-excluded --delete  -az -e 'ssh #{ssh_commandline_options(options)}' '#{adjust_rsync_path(src)}' '#{@user}@#{self.ip_address}:#{dest_path}'"
         else
           env.ui.info "[#{@name}] - rsync error: #{src} does no exist"
           exit

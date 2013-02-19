@@ -1,4 +1,3 @@
-require 'mccloud/util/rsync'
 require 'mccloud/util/ssh'
 require 'erb'
 require 'tempfile'

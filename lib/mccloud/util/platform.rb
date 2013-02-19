@@ -14,6 +14,10 @@ module Mccloud
           platform.include?("darwin9")
         end
 
+        def windows?
+          platform.include?("mswin") || platform.include?("mingw")
+        end
+
         [:darwin, :bsd, :linux].each do |type|
           define_method("#{type}?") do
             platform.include?(type.to_s)
