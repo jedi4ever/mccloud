@@ -21,7 +21,7 @@ module Mccloud::Provider
       end
 
       def windows_client?
-        RbConfig::CONFIG['host_os'] =~ /mswin|mingw/
+        ::Mccloud::Util::Platform.windows?
       end
 
       # cygwin rsync path must be adjusted to work
