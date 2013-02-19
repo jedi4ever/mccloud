@@ -1,11 +1,11 @@
 module Mccloud::Provider
-  module Virtualbox
+  module Vagrant
     module VmCommand
 
         def destroy(command,options={})
-            Vagrant::CLI.start(["destroy"],:env => @provider.raw)
+          self.provider.raw.cli(['destroy',name])
         end
- 
+
     end #module
   end #module
 end #module

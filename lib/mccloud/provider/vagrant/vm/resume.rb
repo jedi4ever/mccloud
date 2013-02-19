@@ -1,11 +1,11 @@
 module Mccloud::Provider
-  module Virtualbox
+  module Vagrant
     module VmCommand
 
         def resume(command,options={})
-            Vagrant::CLI.start(["resume"],:env => @provider.raw)
+          self.provider.raw.cli(['resume',name])
         end
- 
+
     end #module
   end #module
 end #module

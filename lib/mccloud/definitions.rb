@@ -30,7 +30,11 @@ module Mccloud
         Dir[File.join(self.path,"**")].each do |dir|
           definition_name=File.basename(dir)
           d=Definition.new(definition_name,env)
-          d.load!
+          if d.valid?
+            d.load!
+          else
+            env.logger.info "Skipping loading of definitions #{dir}"
+          end
         end
       else
         env.logger.info "Skipping loading of definitions as the definition_path does exist"

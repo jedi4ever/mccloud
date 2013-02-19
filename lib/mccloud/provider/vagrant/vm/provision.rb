@@ -1,11 +1,11 @@
 module Mccloud::Provider
-  module Virtualbox
+  module Vagrant
     module VmCommand
 
         def _provision(command,options={})
-            Vagrant::CLI.start(["provision"],:env => @provider.raw)
+          self.provider.raw.cli(['provision',name])
         end
- 
+
     end #module
   end #module
 end #module

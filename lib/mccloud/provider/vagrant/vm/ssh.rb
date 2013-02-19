@@ -1,11 +1,11 @@
 module Mccloud::Provider
-  module Virtualbox
+  module Vagrant
     module VmCommand
 
         def ssh(command,options={})
-             Vagrant::CLI.start(["ssh"],:env => @provider.raw)
+          self.provider.raw.cli(['ssh',self.name, command])
         end
- 
+
     end #module
   end #module
 end #module

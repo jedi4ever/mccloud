@@ -11,3 +11,4 @@ definitions/*
 pkg/*
 *.swp
 Gemfile.lock
+.DS_Store

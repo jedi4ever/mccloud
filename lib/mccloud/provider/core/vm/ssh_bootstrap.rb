@@ -10,6 +10,8 @@ module Mccloud
           begin
             options = bootstrap_options.dup
 
+            options[:port] = @port
+
             unless @bootstrap_user.nil?
               options[:user] = @bootstrap_user
             end
