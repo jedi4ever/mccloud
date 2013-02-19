@@ -1,5 +1,5 @@
 module Mccloud::Provider
-  module Virtualbox
+  module Vagrant
     module VmCommand
 
         def forward(command,options={})

@@ -17,14 +17,14 @@ Gem::Specification.new do |s|
   s.add_dependency "net-ssh", "~> 2.2.2"
   #s.add_dependency "sshkey"
   s.add_dependency "net-scp"
-   s.add_dependency "fog", "~> 1.1.0"
+   s.add_dependency "fog", ">= 1.1.0"
 
   s.add_dependency "json"
   s.add_dependency "ansi"
 
   #s.add_dependency "templater"
   s.add_dependency "popen4", "~> 0.1.2"
-  s.add_dependency "thor", "~> 0.14.6"
+  s.add_dependency "thor", ">= 0.14.6"
   s.add_dependency "highline", "~> 1.6.1"
   #s.add_dependency "progressbar"
   #s.add_development_dependency "cucumber", "0.8.5"
@@ -36,7 +36,7 @@ Gem::Specification.new do |s|
   s.add_development_dependency "bundler", ">= 1.0.0"
   s.add_development_dependency("ruby-libvirt","~>0.4.0")
   s.add_development_dependency("vagrant","~>0.8.1")
-  s.add_dependency("rake","~>0.9")
+  s.add_development_dependency("rake","~>0.9")
 
   s.add_dependency "i18n"
 

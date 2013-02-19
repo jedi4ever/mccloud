@@ -6,8 +6,19 @@ module Mccloud
     module Core
       module VmCommand
 
-        def ssh_bootstrap(command,options=nil)
+        def ssh_bootstrap(command,bootstrap_options=nil)
           begin
+            options = bootstrap_options.dup
+
+            options[:port] = @port
+
+            unless @bootstrap_user.nil?
+              options[:user] = @bootstrap_user
+            end
+
+            unless @bootstrap_password.nil?
+              options[:password] = @bootstrap_password
+            end
 
             if self.running?
               scriptname=command.nil? ? @bootstrap : command
@@ -19,17 +30,15 @@ module Mccloud
 
                 unless !File.exists?(full_scriptname)
                   begin
-                    self.scp(full_scriptname,"/tmp/bootstrap.sh")
+                    self.transfer(full_scriptname,"/tmp/bootstrap.sh",options)
+                  rescue Net::SSH::AuthenticationFailed
+                    raise ::Mccloud::Error, "[#{@name}] - Authentication problem \n"
                   rescue Exception => ex
-                    raise ::Mccloud::Error, "[#{@name}] - Error uploading file #{full_scriptname}\n"+ex
+                    raise ::Mccloud::Error, "[#{@name}] - Error uploading file #{full_scriptname} #{ex.to_s}\n"
                   end
                   env.ui.info "[#{@name}] - Enabling the bootstrap code to run"
-                  result=self.ssh("chmod +x /tmp/bootstrap.sh")
+                  result=self.execute("chmod +x /tmp/bootstrap.sh && #{self.sudo_string("/tmp/bootstrap.sh",options)}",options)
 
-                  #sudo_cmd="sudo"
-                  #sudo_cmd=options["sudo"] unless options["sudo"].nil?
-
-                  self.sudo("/tmp/bootstrap.sh",options)
 
                 else
                   raise ::Mccloud::Error, "[#{@name}] - Error: bootstrap file #{scriptname} does not exist"

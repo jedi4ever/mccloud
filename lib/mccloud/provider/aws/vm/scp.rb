@@ -2,8 +2,8 @@ module Mccloud::Provider
   module Aws
     module VmCommand
 
-      def transfer(src,dest)
-        scp(src,dest)
+      def transfer(src,dest,options = {})
+        scp(src,dest,options)
       end
 
        def scp(local_path, remote_path, scp_options = {})

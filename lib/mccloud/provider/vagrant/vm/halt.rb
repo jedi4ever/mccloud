@@ -1,11 +1,11 @@
 module Mccloud::Provider
-  module Virtualbox
+  module Vagrant
     module VmCommand
 
         def halt(command,options={})
-            Vagrant::CLI.start(["halt"],:env => @provider.raw)
+            self.provider.raw.cli(['halt',name])
         end
- 
+
     end #module
   end #module
 end #module

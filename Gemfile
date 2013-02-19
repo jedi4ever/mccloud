@@ -7,11 +7,6 @@ source "http://rubygems.org"
 group :development do
   gem 'rspec', '>= 2.0'
   gem "rake"
-  gem 'guard'
-  gem 'guard-rspec'
-  gem 'guard-cucumber'
-  gem 'growl'
-  gem 'rb-fsevent'
   gem 'parallel_tests'
 end
 
