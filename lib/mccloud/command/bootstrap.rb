@@ -10,7 +10,7 @@ module Mccloud
       def execute
         env.load!
         env.config.providers.each do |name,provider|
-          env.logger.debug("Asking provider #{name} to reload box #{box_name}")
+          env.logger.debug("Asking provider #{name} to boostrap box #{box_name}")
           provider.bootstrap(box_name,command,options)
         end
       end
