@@ -85,10 +85,12 @@ The syntax to use for an ec2
     Mccloud::Config.run do |config|
 
       # Define a :aws provider 'aws-us-east'
-      config.provider.define "host-provider" do |provider_config|
+      config.provider.define "aws-us-east" do |provider_config|
 
         #Note: this are option provided to fog for creation
         provider_config.provider.options = { }
+
+        provider_config.provider.flavor = :aws
 
         # Region in which to create the VM
         provider_config.provider.region = "us-east-1"
@@ -171,7 +173,7 @@ this works together with veewee that support creating kvm template machines.
 Like on vagrant, mccloud clones a veewee created vm 
 
     config.provider.define "kvm-libvirt" do |config|
-      config.provider.type=:libvirt
+      config.provider.flavor=:libvirt
       config.provider.options={ :libvirt_uri => "qemu+ssh://ubuntu@kvmbox/system" }
       config.provider.namespace="test"
     end
