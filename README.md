@@ -165,7 +165,7 @@ Usefull if your cloud doesn't have an ip, but you can create start,stop, etc... 
 
     end
 
-### Provider kvm
+### Provider kvm (might not work out of the box)
 
 this works together with veewee that support creating kvm template machines.
 Like on vagrant, mccloud clones a veewee created vm 
@@ -331,7 +331,8 @@ The mounting we then do our provision.sh script:
     end
 
 
-### Vmfusion
+### Vmfusion vm
+need to check this
 
 ## Provisioners
 
