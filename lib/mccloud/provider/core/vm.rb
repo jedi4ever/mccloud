@@ -51,6 +51,7 @@ module Mccloud
 
       attr_accessor :forwardings
       attr_accessor :shared_folders
+      attr_accessor :shared_files
       attr_accessor :stacked
       attr_accessor :declared
 
@@ -58,6 +59,7 @@ module Mccloud
         @env=env
         @forwardings=Array.new
         @shared_folders = Array.new
+        @shared_files = Array.new
         @stacked=false
         @auto_selection=true
         @declared=true

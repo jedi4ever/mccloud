@@ -20,6 +20,7 @@ module Mccloud
       attr_accessor :roles_path
       attr_accessor :provisioning_path
       attr_accessor :data_bags_path
+      attr_accessor :encrypted_data_bag_secret_key_path
       attr_accessor :json
       attr_accessor :json_erb
       attr_accessor :clean_after_run
@@ -96,6 +97,7 @@ module Mccloud
         configfile << "log_level #{log_level}"
         configfile << "role_path \"/tmp/#{File.basename(roles_path)}\"" unless roles_path.nil?
         configfile << "data_bag_path \"/tmp/#{File.basename(data_bags_path)}\"" unless data_bags_path.nil?
+        configfile << "encrypted_data_bag_secret \"/tmp/#{File.basename(encrypted_data_bag_secret_key_path)}\"" unless encrypted_data_bag_secret_key_path.nil?
 
         #convert string to Tempfile (instead of StringIO), as server.transfer expects a file with a filename
         temp_file_json = Tempfile.new("dna_json")
@@ -122,6 +124,10 @@ module Mccloud
 
         unless data_bags_path.nil?
           server.share_folder("databags_path","/tmp/" + File.basename(data_bags_path),data_bags_path,{:mute => true})
+        end
+
+        unless encrypted_data_bag_secret_key_path.nil?
+          server.share_file("encrypted_databag_secret","/tmp/" + File.basename(encrypted_data_bag_secret_key_path),encrypted_data_bag_secret_key_path,{:mute => true})
         end
 
         server.share
@@ -156,6 +162,11 @@ module Mccloud
             unless data_bags_path.nil?
                 env.ui.info "[#{server.name}] - [#{@name}] - Cleaning data_bags_path #{data_bags_path}"
                 server.execute("rm -rf /tmp/#{File.basename(data_bags_path)}",{:mute => true})
+            end
+
+            unless encrypted_data_bag_secret_key_path.nil?
+                env.ui.info "[#{server.name}] - [#{@name}] - Cleaning encrypted_databag_secret #{encrypted_data_bag_secret_key_path}"
+                server.execute("rm -rf /tmp/#{File.basename(encrypted_data_bag_secret_key_path)}",{:mute => true})
             end
           end
         end
@@ -240,6 +251,7 @@ module Mccloud
           :recipe_url => config.recipe_url,
           :roles_path => roles_path,
           :data_bags_path => data_bags_path,
+          :encrypted_data_bag_secret_key_path => encrypted_data_bag_secret_key_path
         })
       end
       def run_chef_solo
