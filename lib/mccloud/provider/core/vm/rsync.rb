@@ -7,11 +7,21 @@ module Mccloud::Provider
         @shared_folders << { :name => name, :dest => dest, :src => src, :options => new_options}
       end
 
+      def share_file(name , dest,src,options={})
+        new_options={:mute => false}.merge(options)
+        @shared_files << { :name => name, :dest => dest, :src => src, :options => new_options}
+      end
+
       def share
         @shared_folders.each do |folder|
           self.execute("test -d '#{folder[:dest]}' || mkdir -p '#{folder[:dest]}' ")
           clean_src_path=File.join(Pathname.new(folder[:src]).expand_path.cleanpath.to_s,'/')
           rsync(clean_src_path,folder[:dest],folder[:options])
+        end
+        @shared_files.each do |file|
+          self.execute("test -d '#{File.dirname(file[:dest])}' || mkdir -p '#{File.dirname(file[:dest])}' ")
+          clean_src_path=Pathname.new(file[:src]).expand_path.cleanpath.to_s
+          rsync(clean_src_path,file[:dest],file[:options])
         end
       end
 
