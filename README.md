@@ -364,6 +364,7 @@ You can use multiple provisioners per vm
     roles_path
     provisioning_path
     data_bags_path
+    encrypted_data_bag_secret_key_path
     json
     json_erb
     clean_after_run
@@ -395,6 +396,7 @@ You can use multiple provisioners per vm
           chef.cookbooks_path = [ "cookbooks", "site-cookbooks" ]
           chef.roles_path = "roles"
           chef.data_bags_path = "data_bags"
+          chef.encrypted_data_bag_secret_key_path = "my_databag_secret"
           chef.clean_after_run = false
 
           chef.json.merge!(n.default_attrs)
