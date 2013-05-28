@@ -38,7 +38,7 @@ module Mccloud::Provider
         80.times { |i| printf "=" } ; env.ui.info ""
         images_list=raw.images.all({"Owner" => "self"})
         images_list.each do |image|
-          printf "%-10s %-10s %-10s %-20s\n",image.id,image.name.gsub(/"#{filter}"/,''),image.state, image.description[0..20]
+          printf "%-10s %-10s %-10s %-20s\n",image.id,image.name.gsub(/"#{filter}"/,''),image.state, image.description.to_s[0..20]
         end
 
         # List volumes
