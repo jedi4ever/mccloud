@@ -3,6 +3,8 @@
 # About
 ## What the hell is mccloud?
 
+[![Build Status](https://travis-ci.org/jedi4ever/mccloud.png)](https://travis-ci.org/jedi4ever/mccloud)
+
 Over the years I fell in love with [Vagrant](http://vagrantup.com) and wanted to have the same workflow for ec2, kvm,  internal clouds etc..
 
 Therefore Mccloud aims to be the equivalent of ``vagrant`` but extending it to use providers:
