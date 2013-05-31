@@ -1,8 +1,8 @@
 require 'bundler/setup'
 Bundler::GemHelper.install_tasks
 
-#desc 'Default: run tests'
-#task :default => :test
+desc 'Default: run tests'
+task :default => :test
 
 require 'rake'
 require 'rspec/core/rake_task'
