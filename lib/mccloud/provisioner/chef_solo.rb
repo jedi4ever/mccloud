@@ -88,7 +88,6 @@ module Mccloud
 
         @json.merge!({:run_list => @run_list })
         json=@json.to_json
-        puts json
 
         cooks=Array.new
         @cookbooks_path.each do |cook|
