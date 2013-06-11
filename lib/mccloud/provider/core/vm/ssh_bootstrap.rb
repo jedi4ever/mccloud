@@ -6,9 +6,9 @@ module Mccloud
     module Core
       module VmCommand
 
-        def ssh_bootstrap(command,bootstrap_options=nil)
+        def ssh_bootstrap(command,bootstrap_options= {})
           begin
-            options = bootstrap_options.dup
+            options = Hash.new
 
             options[:port] = @port
 
@@ -34,7 +34,7 @@ module Mccloud
                   rescue Net::SSH::AuthenticationFailed
                     raise ::Mccloud::Error, "[#{@name}] - Authentication problem \n"
                   rescue Exception => ex
-                    raise ::Mccloud::Error, "[#{@name}] - Error uploading file #{full_scriptname} #{ex.to_s}\n"
+                    raise ::Mccloud::Error, "[#{@name}] - Error uploading file #{full_scriptname} #{ex.inspect}\n"
                   end
                   env.ui.info "[#{@name}] - Enabling the bootstrap code to run"
                   result=self.execute("chmod +x /tmp/bootstrap.sh && #{self.sudo_string("/tmp/bootstrap.sh",options)}",options)
