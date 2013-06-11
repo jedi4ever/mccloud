@@ -44,6 +44,7 @@ module Mccloud
         @name ="chef_solo"
         @log_level="info"
         @cookbooks_path =  []
+        @run_list = []
         @clean_after_run = true
       end
 
@@ -80,11 +81,14 @@ module Mccloud
           #JSON.parse result = Hash
           #.to_json = String containing JSON formatting of Hash
 
-          json=JSON.parse(result).to_json
+          @json.merge!(JSON.parse(result))
 
         else
-          json=@json.to_json
         end
+
+        @json.merge!({:run_list => @run_list })
+        json=@json.to_json
+        puts json
 
         cooks=Array.new
         @cookbooks_path.each do |cook|
@@ -178,17 +182,13 @@ module Mccloud
       def run_list
         json[:run_list] ||= []
       end
-      # Sets the run list to the specified value
-      def run_list=(value)
-        json[:run_list] = value
-      end
       def add_role(name)
         name = "role[#{name}]" unless name =~ /^role\[(.+?)\]$/
-        run_list << name
+        @run_list << name
       end
       def add_recipe(name)
         name = "recipe[#{name}]" unless name =~ /^recipe\[(.+?)\]$/
-        run_list << name
+        @run_list << name
       end
 
       def setup_config(template, filename, template_vars)
