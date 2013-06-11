@@ -14,7 +14,7 @@ Gem::Specification.new do |s|
   s.required_rubygems_version = ">= 1.3.6"
   s.rubyforge_project         = "mccloud"
 
-  s.add_dependency "net-ssh", "~> 2.2.2"
+  s.add_dependency "net-ssh", ">= 2.2.2"
   #s.add_dependency "sshkey"
   s.add_dependency "net-scp"
    s.add_dependency "fog", ">= 1.1.0"
