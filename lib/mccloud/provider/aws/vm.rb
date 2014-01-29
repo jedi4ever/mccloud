@@ -25,6 +25,7 @@ module Mccloud::Provider
       #         forwardings
       #         provider
       attr_accessor :ami
+      attr_accessor :tags
       attr_accessor :key_name
       attr_accessor :zone
       attr_accessor :security_groups
@@ -46,6 +47,9 @@ module Mccloud::Provider
         # Todo calculate the ubuntu one based
         # on provider region and flavor
         @ami="ami-e59ca991"
+
+        # Empty tags, but on up the name get's added
+        @tags = {}
 
         @user = "root"
         @user_data = nil

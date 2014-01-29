@@ -67,8 +67,11 @@ module Mccloud::Provider
             :key_name => @key_name,
             :user_data => @user_data,
             :groups => @security_groups,
-            :tags             => {"Name" => "#{@provider.filter}#{@name}"}
+            :tags  => @tags
           }.merge(@create_options)
+
+          # Always add the name tag
+          create_options.tags["Name"] = "#{@provider.filter}#{@name}"
 
           check_security_groups(create_options[:groups])
           check_key(create_options[:key_name])
