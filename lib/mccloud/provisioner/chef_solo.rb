@@ -69,7 +69,11 @@ module Mccloud
           vars = ErbBinding.new(data)
 
           # Added vmname in mccloud
-          @json.merge!({ :mccloud => {:name => server.name }})
+          @json.merge!({ :mccloud => {
+            :name => server.name,
+            :private_ips => private_ips,
+            :public_ips => public_ips
+          } })
 
           template = @json.to_json.to_s
           erb = ERB.new(template)
