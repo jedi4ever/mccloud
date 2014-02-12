@@ -141,11 +141,14 @@ module Mccloud
 
         env.ui.info "[#{server.name}] - [#{@name}] - running chef-solo"
         env.ui.info "[#{server.name}] - [#{@name}] - login as #{server.user}"
+
+        exec_results = ''
+
         begin
           if server.user=="root"
-            server.execute("chef-solo -c /tmp/solo.rb -j /tmp/dna.json -l #{@log_level}")
+            exec_results = server.execute("chef-solo -c /tmp/solo.rb -j /tmp/dna.json -l #{@log_level}")
           else
-            server.execute("sudo -i chef-solo -c /tmp/solo.rb -j /tmp/dna.json -l #{@log_level}")
+            exec_results = server.execute("sudo -i chef-solo -c /tmp/solo.rb -j /tmp/dna.json -l #{@log_level}")
 
             #server.execute("sudo chef-solo -c /tmp/solo.rb -j /tmp/dna.json -l #{@log_level}")
           end
@@ -175,6 +178,10 @@ module Mccloud
                 env.ui.info "[#{server.name}] - [#{@name}] - Cleaning encrypted_databag_secret #{encrypted_data_bag_secret_key_path}"
                 server.execute("rm -rf /tmp/#{File.basename(encrypted_data_bag_secret_key_path)}",{:mute => true})
             end
+          end
+
+          if (exec_results.status != 0)
+            raise ::Mccloud::Error,"Chef solo exit with a non-zero exitcode #{exec_results.status}"
           end
         end
 

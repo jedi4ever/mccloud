@@ -18,6 +18,7 @@ begin
     ::Mccloud::CLI.start(ARGV,:env => env)
   rescue Mccloud::Error => ex
     env.ui.error "#{ex}"
+    exit 1
   rescue Exception => ex
     puts "Something blew up Mccloud. Time for McGuyver:"
     puts ""
