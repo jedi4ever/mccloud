@@ -67,6 +67,16 @@ module Mccloud
           end
         end
 
+        def hosts
+          hostentries = Hash.new
+          self.vms.each do |name,vm|
+           hostentries[name] = Hash.new
+           hostentries[name]['public_ip_address'] = vm.public_ip_address
+           hostentries[name]['private_ip_address'] = vm.private_ip_address
+          end
+          return hostentries
+        end
+
         #TODO this loading of gem , needs to be moved else where
         #This provider should only check what it needs
 

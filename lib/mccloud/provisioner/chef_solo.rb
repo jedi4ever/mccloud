@@ -57,10 +57,35 @@ module Mccloud
 
           public_ips=Hash.new
           private_ips=Hash.new
+
+          providers = Hash.new
+          # Add all providers
           server.provider.vms.each do |name,vm|
-            public_ips[name]=vm.public_ip_address
-            private_ips[name]=vm.private_ip_address
+            providers[vm.provider.name] = vm.provider if providers[vm.provider.name].nil?
           end
+
+          providers.each do |providername,provider|
+            hosts = providers[providername].hosts
+            hosts.each do |name,host|
+              public_ips[name]=host['public_ip_address']
+              private_ips[name]=host['private_ip_address']
+            end
+          end
+
+=begin
+
+          # For each provider , get the ip-addresses
+          providers.each do |providername, provider|
+            #namespace = provider.namespace
+            filter = provider.filter
+
+            provider.raw.servers.each do |s|
+              name = s.tags["Name"].sub(/^#{filter}/,'')
+              public_ips[name]=s.public_ip_address
+              private_ips[name]=s.private_ip_address
+            end
+          end
+=end
 
           # http://www.techques.com/question/1-3242470/Problem-using-OpenStruct-with-ERB
           # We only want specific variables for ERB
