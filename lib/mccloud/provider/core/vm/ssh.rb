@@ -82,7 +82,7 @@ module Mccloud
             }
             result.status=Process.waitpid2(p.pid)[1].exitstatus
             if result.status!=0
-              env.ui.error "Exit status was not 0 but #{result.status}" unless options[:mute]
+              raise ::Mccloud::Error, "Exit status was not 0 but #{result.status}" unless options[:mute]
             end
           }
           return result
