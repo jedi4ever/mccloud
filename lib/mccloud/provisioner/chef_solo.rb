@@ -171,9 +171,9 @@ module Mccloud
 
         begin
           if server.user=="root"
-            exec_results = server.execute("chef-solo -c /tmp/solo.rb -j /tmp/dna.json -l #{@log_level}")
+            exec_results = server.execute("chef-solo --force-formatter -c /tmp/solo.rb -j /tmp/dna.json -l #{@log_level}")
           else
-            exec_results = server.execute("sudo -i chef-solo -c /tmp/solo.rb -j /tmp/dna.json -l #{@log_level}")
+            exec_results = server.execute("sudo -i chef-solo --force-formatter -c /tmp/solo.rb -j /tmp/dna.json -l #{@log_level}")
 
             #server.execute("sudo chef-solo -c /tmp/solo.rb -j /tmp/dna.json -l #{@log_level}")
           end
