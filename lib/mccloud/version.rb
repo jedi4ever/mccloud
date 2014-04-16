@@ -2,5 +2,5 @@ module Mccloud
 end
 
 unless defined?(Mccloud::VERSION)
-  ::Mccloud::VERSION = "0.0.26"
+  ::Mccloud::VERSION = "0.0.27"
 end
