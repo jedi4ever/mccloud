@@ -65,7 +65,13 @@ module Mccloud
           check_fog_credentials([:aws_access_key_id,:aws_secret_access_key])
           if @raw.nil?
             begin
-              @raw=::Fog::Compute.new({:provider => "Aws", :region => @region}.merge(@options))
+              @raw=::Fog::Compute.new({
+                :provider => "Aws", :region => @region,
+                :aws_access_key_id => ENV['AWS_ACCESS_KEY_ID'],
+                :aws_secret_access_key => ENV['AWS_SECRET_ACCESS_KEY'],
+                :aws_session_token => ENV['AWS_SESSION_TOKEN']
+              }.merge(@options))
+
             rescue ArgumentError => e
               @raw=nil
               raise Mccloud::Error, "Error loading Aws provider : #{e.to_s} #{$!}"

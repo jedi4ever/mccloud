@@ -1,4 +1,4 @@
-rvm use ruby-2.0
+rvm use ruby-2.1
 #rvm use ruby-1.9.2
 rvm gemset use mccloud
 alias mccloud="bundle exec mccloud"
